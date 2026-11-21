@@ -1,19 +1,48 @@
 /**
- * @fileoverview High-performance 8-Bit Arcade Motorsport Styling with Crystal-Clear Devanagari & Latin Typography.
- * Fully responsive, high-contrast, accessible, and optimized for mobile and desktop.
+ * @fileoverview CRED NeoPOP + 8-Bit Retro Grand Prix Styling Architecture.
+ * Combines NeoPOP neo-brutalist 3D plinths, hard-edge drop shadows, and high-contrast color blocking
+ * with 8-bit retro arcade motorsport aesthetics and crystal-clear Devanagari typography.
+ * Strictly 0 icons, 0 emojis.
  */
 
 :root {
-  --neon-cyan: #00f0ff;
-  --neon-green: #06d6a0;
-  --neon-yellow: #ffd166;
-  --neon-red: #e71d36;
-  --neon-pink: #ff007f;
-  --arcade-dark: #0a0520;
-  --arcade-card-bg: #140d2b;
-  --arcade-border: #3b2d66;
-  --text-white: #ffffff;
-  --text-dim: #c4c4e0;
+  /* --- CRED NeoPOP Palette --- */
+  --np-yellow: #ffe600;       /* CRED Signature Yellow */
+  --np-yellow-hover: #fff04d;
+  --np-cyan: #00f0ff;         /* Retro Cyber Cyan */
+  --np-lime: #00ff66;         /* Radioactive Turbo Mint */
+  --np-coral: #ff2a55;        /* Emergency / Stall Coral */
+  --np-pink: #ff007f;         /* Synthwave Magenta */
+  --np-violet: #8b5cf6;       /* Zen Pranayama Focus */
+  --np-amber: #ff9f1c;        /* AI Tutor Accent */
+  --np-black: #000000;        /* Pure Pitch Black */
+  
+  /* --- Surface Plinths --- */
+  --np-bg-root: #06040f;
+  --np-card-bg: #0f0a21;
+  --np-surface-sunken: #090616;
+  --np-surface-raised: #181236;
+  --np-surface-active: #231a4a;
+  --np-border-primary: #000000;
+  --np-border-highlight: #3b2d66;
+
+  /* --- Text & Contrast --- */
+  --np-text-white: #ffffff;
+  --np-text-dim: #cfcbe3;
+  --np-text-muted: #8b85ad;
+  --np-text-black: #000000;
+
+  /* --- NeoPOP Hard 3D Shadows --- */
+  --np-shadow-xs: 2px 2px 0px #000000;
+  --np-shadow-sm: 3px 3px 0px #000000;
+  --np-shadow-md: 4px 4px 0px #000000;
+  --np-shadow-lg: 6px 6px 0px #000000;
+  --np-shadow-xl: 8px 8px 0px #000000;
+  --np-shadow-cyan: 4px 4px 0px #00f0ff;
+  --np-shadow-yellow: 4px 4px 0px #ffe600;
+  --np-shadow-card: 8px 8px 0px #000000, 12px 12px 0px rgba(0, 240, 255, 0.25);
+
+  /* --- Typography --- */
   --font-retro: 'Press Start 2P', monospace;
   --font-body: 'Mukta', 'Noto Sans Devanagari', system-ui, sans-serif;
   --font-mono: 'Share Tech Mono', monospace;
@@ -32,9 +61,9 @@ body.arcade-body {
   height: 100vh;
   height: 100dvh;
   overflow: hidden;
-  background-color: #050210;
+  background-color: var(--np-bg-root);
   font-family: var(--font-body);
-  color: var(--text-white);
+  color: var(--np-text-white);
   user-select: none;
   -webkit-user-select: none;
   display: flex;
@@ -55,6 +84,7 @@ body.arcade-body {
   align-items: center;
 }
 
+/* CRT Screen Bezel with NeoPOP Frame */
 #crt-screen {
   position: relative;
   width: 100%;
@@ -63,8 +93,8 @@ body.arcade-body {
   justify-content: center;
   align-items: center;
   background: #000000;
-  border: 4px solid #221c38;
-  box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.9), 0 0 20px rgba(0, 240, 255, 0.2);
+  border: 4px solid #140f2b;
+  box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.95), 0 0 24px rgba(0, 240, 255, 0.22);
 }
 
 #game-canvas {
@@ -76,29 +106,30 @@ body.arcade-body {
   image-rendering: crisp-edges;
 }
 
-/* CRT Scanline Effect */
+/* CRT Scanlines */
 .crt-scanlines {
   position: absolute;
   inset: 0;
   pointer-events: none;
   background: linear-gradient(
     rgba(18, 16, 16, 0) 50%,
-    rgba(0, 0, 0, 0.22) 50%
+    rgba(0, 0, 0, 0.25) 50%
   );
   background-size: 100% 4px;
   z-index: 10;
-  opacity: 0.7;
+  opacity: 0.65;
 }
 
-/* Overlay & Menus */
+/* --- NeoPOP Modal / Garage Overlay --- */
 .overlay {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(10, 5, 32, 0.94);
-  backdrop-filter: blur(6px);
+  background: rgba(6, 4, 15, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   z-index: 100;
   overflow-y: auto;
   padding: 16px;
@@ -109,24 +140,34 @@ body.arcade-body {
   display: none !important;
 }
 
+/* NeoPOP Elevated Plinth Card */
 .arcade-card {
-  background: var(--arcade-card-bg);
-  border: 3px solid var(--neon-cyan);
-  box-shadow: 0 0 30px rgba(0, 240, 255, 0.35), inset 0 0 20px rgba(0, 0, 0, 0.8);
+  background: var(--np-card-bg);
+  border: 3px solid var(--np-border-primary);
+  outline: 2px solid var(--np-cyan);
+  box-shadow: var(--np-shadow-card);
   padding: 24px;
-  max-width: 620px;
+  max-width: 640px;
   width: 100%;
   display: flex;
   flex-direction: column;
   gap: 14px;
-  border-radius: 4px;
+  position: relative;
+  border-radius: 2px;
 }
 
+/* NeoPOP Header Tag Pill */
 .arcade-header-tag {
+  align-self: flex-start;
+  background: var(--np-lime);
+  color: var(--np-black);
   font-family: var(--font-retro);
-  font-size: 10px;
-  color: var(--neon-green);
+  font-size: 9px;
+  font-weight: 800;
+  padding: 4px 8px;
   letter-spacing: 1px;
+  border: 2px solid var(--np-black);
+  box-shadow: var(--np-shadow-xs);
 }
 
 .arcade-title {
@@ -134,26 +175,28 @@ body.arcade-body {
   font-family: var(--font-body);
   font-size: 32px;
   font-weight: 800;
-  color: var(--neon-yellow);
-  text-shadow: 2px 2px 0px #000000, 0 0 10px rgba(255, 209, 102, 0.5);
-  line-height: 1.2;
+  color: var(--np-yellow);
+  text-shadow: 2px 2px 0px #000000;
+  line-height: 1.15;
+  letter-spacing: 0.3px;
 }
 
 .arcade-sub {
   font-family: var(--font-retro);
   font-size: 10px;
-  color: var(--neon-cyan);
-  letter-spacing: 0.5px;
+  color: var(--np-cyan);
+  letter-spacing: 0.8px;
 }
 
-/* Custom Topic Study Angle Section */
+/* NeoPOP Sunken Study Section */
 .topic-study-section {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  background: #191033;
+  background: var(--np-surface-sunken);
   padding: 12px;
-  border: 1px solid var(--neon-cyan);
+  border: 2.5px solid var(--np-border-primary);
+  box-shadow: inset 2px 2px 0px rgba(0, 0, 0, 0.8), 2px 2px 0px rgba(255, 255, 255, 0.08);
 }
 
 .topic-input-row {
@@ -161,117 +204,145 @@ body.arcade-body {
   gap: 8px;
 }
 
+/* NeoPOP Text Input */
 .arcade-text-input {
   flex: 1;
-  background: #0a0520;
-  border: 2px solid #58448a;
+  background: #05030d;
+  border: 2.5px solid var(--np-border-primary);
   color: #ffffff;
   font-family: var(--font-body);
   font-size: 16px;
-  padding: 8px 12px;
-  border-radius: 2px;
+  font-weight: 600;
+  padding: 10px 14px;
   outline: none;
+  box-shadow: inset 2px 2px 0px rgba(0, 0, 0, 0.9);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .arcade-text-input:focus {
-  border-color: var(--neon-cyan);
-  box-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
+  border-color: var(--np-cyan);
+  box-shadow: inset 2px 2px 0px rgba(0, 0, 0, 0.9), 0 0 0 2px var(--np-cyan);
 }
 
+/* NeoPOP Tactile Microphone Button */
 .arcade-mic-btn {
-  background: #251b47;
-  border: 2px solid var(--neon-yellow);
-  color: var(--neon-yellow);
+  background: var(--np-surface-raised);
+  border: 2.5px solid var(--np-border-primary);
+  color: var(--np-yellow);
   font-family: var(--font-body);
-  font-weight: 700;
+  font-weight: 800;
   font-size: 14px;
-  padding: 8px 14px;
+  padding: 10px 14px;
   cursor: pointer;
   white-space: nowrap;
-  transition: all 0.15s ease;
+  box-shadow: var(--np-shadow-sm);
+  transition: transform 0.08s ease, box-shadow 0.08s ease, background-color 0.15s ease;
 }
 
 .arcade-mic-btn:hover {
-  background: var(--neon-yellow);
-  color: #000000;
+  background: var(--np-yellow);
+  color: var(--np-black);
+  transform: translate(-1.5px, -1.5px);
+  box-shadow: var(--np-shadow-md);
+}
+
+.arcade-mic-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px #000000;
 }
 
 .arcade-mic-btn.listening {
-  background: #e71d36 !important;
+  background: var(--np-coral) !important;
   color: #ffffff !important;
-  border-color: #ffffff !important;
-  animation: pulse-mic 1s infinite alternate;
+  animation: neopop-pulse-mic 0.8s infinite alternate;
 }
 
-@keyframes pulse-mic {
-  0% { box-shadow: 0 0 4px #e71d36; }
-  100% { box-shadow: 0 0 16px #ff3366; }
+@keyframes neopop-pulse-mic {
+  0% { box-shadow: 2px 2px 0px #000000, 0 0 6px var(--np-coral); }
+  100% { box-shadow: 2px 2px 0px #000000, 0 0 18px #ff4d6d; }
 }
 
 .transcription-live-bubble {
   font-size: 13px;
-  color: var(--neon-green);
-  font-style: italic;
+  font-weight: 700;
+  color: var(--np-lime);
+  font-style: normal;
   min-height: 18px;
+  letter-spacing: 0.3px;
 }
 
-/* Selectors */
+/* NeoPOP Selectors */
 .selector-section {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .selector-label {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text-dim);
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--np-text-dim);
+  letter-spacing: 0.5px;
 }
 
 .chip-group {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 8px;
 }
 
+/* NeoPOP 3D Plinth Chip Buttons */
 .chip-btn {
-  background: #1e163d;
-  border: 2px solid #4a3b7a;
-  color: var(--text-white);
+  background: var(--np-surface-raised);
+  border: 2px solid var(--np-border-primary);
+  color: var(--np-text-dim);
   font-family: var(--font-body);
   font-size: 14px;
-  font-weight: 600;
-  padding: 6px 12px;
+  font-weight: 700;
+  padding: 7px 14px;
   cursor: pointer;
-  transition: all 0.1s ease;
+  box-shadow: var(--np-shadow-sm);
+  transition: transform 0.08s ease, box-shadow 0.08s ease, background-color 0.15s ease, color 0.15s ease;
 }
 
 .chip-btn:hover {
-  border-color: var(--neon-cyan);
-  background: #2b1f54;
+  color: #ffffff;
+  background: var(--np-surface-active);
+  transform: translate(-1px, -1px);
+  box-shadow: var(--np-shadow-md);
 }
 
+.chip-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px #000000;
+}
+
+/* NeoPOP Active Chip State: CRED Hero Yellow with black text & hard offset */
 .chip-btn.active {
-  background: var(--neon-cyan);
-  color: #000000;
-  border-color: #ffffff;
-  font-weight: 700;
-  box-shadow: 0 0 8px rgba(0, 240, 255, 0.6);
+  background: var(--np-yellow);
+  color: var(--np-black);
+  border: 2px solid var(--np-black);
+  font-weight: 800;
+  box-shadow: 3px 3px 0px var(--np-cyan);
+  transform: translate(-1px, -1px);
 }
 
 .circuit-group .chip-btn {
   font-size: 13px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.5px;
   flex: 1 1 45%;
 }
 
-/* Controls Guide */
+/* NeoPOP Controls Guide Plinth */
 .controls-guide {
-  background: #0d081f;
-  border: 2px dashed #3a2e5c;
+  background: var(--np-surface-sunken);
+  border: 2.5px solid var(--np-border-primary);
   padding: 10px 14px;
   display: flex;
   flex-direction: column;
   gap: 6px;
+  box-shadow: inset 1px 1px 0px rgba(0, 0, 0, 0.9);
 }
 
 .guide-item {
@@ -284,95 +355,122 @@ body.arcade-body {
 
 .guide-key {
   font-family: var(--font-mono);
-  font-weight: bold;
-  color: var(--neon-yellow);
-  min-width: 90px;
+  font-weight: 800;
+  color: var(--np-yellow);
+  background: #191433;
+  padding: 2px 6px;
+  border: 1.5px solid var(--np-black);
+  box-shadow: var(--np-shadow-xs);
+  min-width: 95px;
+  text-align: center;
 }
 
 .guide-desc {
-  color: var(--text-dim);
+  color: var(--np-text-dim);
+  font-weight: 500;
 }
 
-/* Action Buttons */
+/* --- NeoPOP Action Bar & Buttons --- */
 .arcade-action-bar {
   display: flex;
-  gap: 10px;
-  margin-top: 6px;
+  gap: 12px;
+  margin-top: 8px;
   flex-wrap: wrap;
 }
 
+/* Secondary NeoPOP Buttons */
 .arcade-secondary-btn {
   flex: 1;
-  background: #251b47;
-  border: 2px solid #58448a;
-  color: var(--text-white);
+  background: var(--np-surface-raised);
+  border: 2.5px solid var(--np-border-primary);
+  color: var(--np-text-white);
   font-family: var(--font-body);
   font-size: 14px;
-  font-weight: 700;
-  padding: 10px 8px;
+  font-weight: 800;
+  padding: 12px 10px;
   cursor: pointer;
+  box-shadow: var(--np-shadow-md);
+  transition: transform 0.08s ease, box-shadow 0.08s ease, background-color 0.15s ease;
+  min-height: 46px;
 }
 
 .arcade-secondary-btn:hover {
-  background: #342761;
-  border-color: var(--neon-yellow);
+  background: var(--np-surface-active);
+  transform: translate(-1.5px, -1.5px);
+  box-shadow: var(--np-shadow-lg);
+  border-color: var(--np-yellow);
 }
 
+.arcade-secondary-btn:active {
+  transform: translate(3px, 3px);
+  box-shadow: 1px 1px 0px #000000;
+}
+
+/* Primary Hero Button: CRED Signature NeoPOP Yellow */
 .arcade-start-btn {
   flex: 2;
-  background: var(--neon-green);
-  border: 3px solid #ffffff;
-  color: #000000;
+  background: var(--np-yellow);
+  border: 3px solid var(--np-border-primary);
+  color: var(--np-black);
   font-family: var(--font-body);
   font-size: 18px;
   font-weight: 800;
-  padding: 10px;
+  padding: 12px;
   cursor: pointer;
-  box-shadow: 0 0 12px rgba(6, 214, 160, 0.6);
-  animation: pulse-glow 1.5s infinite alternate;
+  box-shadow: var(--np-shadow-lg);
+  letter-spacing: 0.5px;
+  transition: transform 0.08s ease, box-shadow 0.08s ease, background-color 0.15s ease;
+  min-height: 46px;
 }
 
 .arcade-start-btn:hover {
-  background: #10f0b4;
-  transform: translateY(-2px);
+  background: var(--np-yellow-hover);
+  transform: translate(-2px, -2px);
+  box-shadow: 8px 8px 0px #000000;
 }
 
-@keyframes pulse-glow {
-  0% { box-shadow: 0 0 8px rgba(6, 214, 160, 0.4); }
-  100% { box-shadow: 0 0 20px rgba(6, 214, 160, 0.9); }
+.arcade-start-btn:active {
+  transform: translate(3px, 3px);
+  box-shadow: 1px 1px 0px #000000;
 }
 
 /* --- High-Legibility In-Game STEM Quiz Modal --- */
 #stem-quiz-modal {
   position: absolute;
-  top: 40px;
+  top: 36px;
   left: 50%;
   transform: translateX(-50%);
   width: 92%;
-  max-width: 600px;
-  background: rgba(12, 8, 28, 0.96);
-  border: 3px solid var(--neon-cyan);
-  box-shadow: 0 0 25px rgba(0, 240, 255, 0.5);
-  padding: 18px;
+  max-width: 620px;
+  background: var(--np-card-bg);
+  border: 3px solid var(--np-border-primary);
+  outline: 2.5px solid var(--np-cyan);
+  box-shadow: var(--np-shadow-card);
+  padding: 20px;
   z-index: 60;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  border-radius: 4px;
+  gap: 14px;
+  border-radius: 2px;
 }
 
 .quiz-modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #33285c;
-  padding-bottom: 8px;
+  border-bottom: 2.5px solid var(--np-border-primary);
+  padding-bottom: 10px;
 }
 
 .quiz-badge {
+  background: var(--np-yellow);
+  color: var(--np-black);
   font-family: var(--font-retro);
   font-size: 9px;
-  color: var(--neon-yellow);
+  font-weight: 800;
+  padding: 4px 8px;
+  border: 2px solid var(--np-black);
+  box-shadow: var(--np-shadow-xs);
 }
 
 .quiz-audio-bar {
@@ -381,163 +479,210 @@ body.arcade-body {
 }
 
 .quiz-helper-btn {
-  background: #1e163d;
-  border: 1px solid var(--neon-cyan);
-  color: var(--neon-cyan);
+  background: var(--np-surface-raised);
+  border: 2px solid var(--np-border-primary);
+  color: var(--np-cyan);
+  font-family: var(--font-body);
   font-size: 13px;
-  font-weight: 700;
-  padding: 4px 10px;
+  font-weight: 800;
+  padding: 6px 12px;
   cursor: pointer;
-  border-radius: 2px;
+  box-shadow: var(--np-shadow-xs);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
 }
 
 .quiz-helper-btn:hover {
-  background: var(--neon-cyan);
-  color: #000000;
+  background: var(--np-cyan);
+  color: var(--np-black);
+  transform: translate(-1px, -1px);
+  box-shadow: var(--np-shadow-sm);
+}
+
+.quiz-helper-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px #000000;
 }
 
 .quiz-question-text {
-  font-size: 18px;
+  font-size: 19px;
   font-weight: 700;
   color: #ffffff;
   line-height: 1.5;
+  letter-spacing: 0.2px;
 }
 
 .quiz-options-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: 12px;
 }
 
+/* NeoPOP Quiz Option Plinths */
 .quiz-option-btn {
-  background: #181233;
-  border: 2px solid #493b77;
+  background: var(--np-surface-raised);
+  border: 2.5px solid var(--np-border-primary);
   color: #ffffff;
   font-family: var(--font-body);
   font-size: 15px;
-  font-weight: 600;
-  padding: 12px;
+  font-weight: 700;
+  padding: 12px 14px;
   text-align: left;
   cursor: pointer;
-  transition: all 0.1s ease;
+  box-shadow: var(--np-shadow-md);
+  transition: transform 0.08s ease, box-shadow 0.08s ease, background-color 0.15s ease, border-color 0.15s ease;
   display: flex;
-  gap: 8px;
+  gap: 10px;
   align-items: center;
+  min-height: 48px;
 }
 
 .quiz-option-btn:hover {
-  border-color: var(--neon-green);
-  background: #231a47;
+  background: var(--np-surface-active);
+  border-color: var(--np-lime);
+  transform: translate(-2px, -2px);
+  box-shadow: var(--np-shadow-lg);
+}
+
+.quiz-option-btn:active {
+  transform: translate(3px, 3px);
+  box-shadow: 1px 1px 0px #000000;
 }
 
 .quiz-option-key {
   font-family: var(--font-mono);
-  color: var(--neon-yellow);
-  font-weight: bold;
+  background: var(--np-yellow);
+  color: var(--np-black);
+  font-weight: 800;
+  font-size: 13px;
+  padding: 2px 6px;
+  border: 1.5px solid var(--np-black);
+  box-shadow: var(--np-shadow-xs);
 }
 
+/* NeoPOP Quiz Feedback Box */
 .quiz-feedback-box {
-  padding: 10px;
-  font-size: 14px;
-  line-height: 1.4;
+  padding: 12px 16px;
+  font-size: 15px;
+  line-height: 1.45;
+  border: 2.5px solid var(--np-border-primary);
+  box-shadow: var(--np-shadow-md);
   border-radius: 2px;
 }
 
 .quiz-feedback-box.correct {
-  background: rgba(6, 214, 160, 0.2);
-  border: 1px solid var(--neon-green);
-  color: var(--neon-green);
+  background: #022b1c;
+  border-color: var(--np-lime);
+  color: var(--np-lime);
+  outline: 2px solid var(--np-black);
 }
 
 .quiz-feedback-box.incorrect {
-  background: rgba(231, 29, 54, 0.2);
-  border: 1px solid var(--neon-red);
-  color: #ff6b7d;
+  background: #330810;
+  border-color: var(--np-coral);
+  color: #ff99a8;
+  outline: 2px solid var(--np-black);
 }
 
-/* --- In-Game AI Tutor Drawer --- */
+/* --- In-Game AI STEM Tutor Drawer --- */
 #ai-tutor-drawer {
   position: absolute;
   top: 10px;
   right: 10px;
   width: 90%;
-  max-width: 380px;
+  max-width: 400px;
   max-height: 85vh;
-  background: rgba(14, 10, 32, 0.98);
-  border: 2px solid var(--neon-yellow);
-  box-shadow: 0 0 20px rgba(255, 209, 102, 0.3);
-  padding: 16px;
+  background: var(--np-card-bg);
+  border: 3px solid var(--np-border-primary);
+  outline: 2px solid var(--np-amber);
+  box-shadow: -6px 6px 0px #000000, -10px 10px 0px rgba(255, 159, 28, 0.25);
+  padding: 18px;
   z-index: 70;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  border-radius: 4px;
+  gap: 12px;
+  border-radius: 2px;
 }
 
 .ai-tutor-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #44356e;
-  padding-bottom: 6px;
+  border-bottom: 2.5px solid var(--np-border-primary);
+  padding-bottom: 8px;
 }
 
 .ai-tutor-title {
   font-size: 16px;
   font-weight: 800;
-  color: var(--neon-yellow);
+  color: var(--np-amber);
+  letter-spacing: 0.3px;
 }
 
 .ai-tutor-close-btn {
-  background: transparent;
-  border: 1px solid #665294;
+  background: var(--np-surface-raised);
+  border: 2px solid var(--np-border-primary);
   color: #ffffff;
+  font-family: var(--font-mono);
+  font-weight: 800;
   cursor: pointer;
-  padding: 2px 8px;
+  padding: 4px 10px;
+  box-shadow: var(--np-shadow-xs);
+  transition: transform 0.08s ease;
+}
+
+.ai-tutor-close-btn:hover {
+  background: var(--np-coral);
+  color: #ffffff;
+}
+
+.ai-tutor-close-btn:active {
+  transform: translate(1px, 1px);
 }
 
 .ai-tutor-messages {
   flex: 1;
   overflow-y: auto;
-  max-height: 260px;
+  max-height: 270px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   padding-right: 4px;
 }
 
 .ai-msg {
-  padding: 10px;
+  padding: 12px;
   font-size: 14px;
-  line-height: 1.4;
-  border-radius: 4px;
+  line-height: 1.45;
+  border: 2px solid var(--np-border-primary);
+  box-shadow: var(--np-shadow-xs);
 }
 
 .ai-msg.bot {
-  background: #1c153b;
-  border-left: 3px solid var(--neon-cyan);
+  background: var(--np-surface-sunken);
+  border-left: 4px solid var(--np-cyan);
 }
 
 .ai-msg.user {
-  background: #2a1f52;
-  border-right: 3px solid var(--neon-yellow);
+  background: var(--np-surface-raised);
+  border-right: 4px solid var(--np-yellow);
   align-self: flex-end;
 }
 
 .ai-analogy-tag {
   font-size: 12px;
-  color: var(--neon-yellow);
-  margin-top: 4px;
+  font-weight: 700;
+  color: var(--np-yellow);
+  margin-top: 6px;
 }
 
 .ai-anxiety-tip-tag {
   font-size: 12px;
-  color: var(--neon-green);
-  margin-top: 4px;
-  font-style: italic;
+  font-weight: 700;
+  color: var(--np-lime);
+  margin-top: 6px;
 }
 
-/* Mobile Touch Controls Bar */
+/* --- Mobile Touch Controls Bar --- */
 #touch-controls {
   position: absolute;
   bottom: 8px;
@@ -547,28 +692,32 @@ body.arcade-body {
   justify-content: space-between;
   pointer-events: none;
   z-index: 50;
-  gap: 6px;
+  gap: 8px;
 }
 
 .touch-steer-group,
 .touch-action-group {
   display: flex;
-  gap: 6px;
+  gap: 8px;
   pointer-events: auto;
 }
 
+/* NeoPOP Tactile Touch Button */
 .touch-btn {
-  background: rgba(20, 13, 43, 0.9);
-  border: 2px solid var(--neon-cyan);
-  color: var(--text-white);
+  background: #140d2b;
+  border: 2.5px solid var(--np-border-primary);
+  color: var(--np-text-white);
   font-family: var(--font-body);
   font-size: 12px;
-  font-weight: 700;
-  padding: 10px 12px;
+  font-weight: 800;
+  padding: 12px 14px;
   cursor: pointer;
   box-shadow: 0 4px 0 #000000;
-  border-radius: 3px;
   touch-action: manipulation;
+  min-height: 46px;
+  min-width: 46px;
+  letter-spacing: 0.5px;
+  transition: transform 0.06s ease, box-shadow 0.06s ease;
 }
 
 .touch-btn:active {
@@ -577,28 +726,87 @@ body.arcade-body {
 }
 
 .gas-btn {
-  border-color: var(--neon-green);
-  color: var(--neon-green);
+  background: #064024;
+  border-color: #000000;
+  color: var(--np-lime);
+}
+
+.gas-btn:active {
+  background: var(--np-lime);
+  color: #000000;
 }
 
 .brake-btn {
-  border-color: var(--neon-red);
-  color: var(--neon-red);
+  background: #470814;
+  border-color: #000000;
+  color: #ff5c77;
+}
+
+.brake-btn:active {
+  background: var(--np-coral);
+  color: #000000;
 }
 
 .nitro-btn {
-  border-color: var(--neon-yellow);
-  color: var(--neon-yellow);
+  background: #053b47;
+  border-color: #000000;
+  color: var(--np-cyan);
+}
+
+.nitro-btn:active {
+  background: var(--np-cyan);
+  color: #000000;
+}
+
+.pulse-glow {
+  background: #473e05;
+  border-color: #000000;
+  color: var(--np-yellow);
+}
+
+.pulse-glow:active {
+  background: var(--np-yellow);
+  color: #000000;
 }
 
 .zen-btn {
-  border-color: var(--neon-pink);
-  color: #ff9ebb;
+  background: #2b114d;
+  border-color: #000000;
+  color: #c4a1ff;
+}
+
+.zen-btn:active {
+  background: var(--np-violet);
+  color: #000000;
 }
 
 .tutor-btn {
-  border-color: var(--neon-yellow);
-  color: var(--neon-yellow);
+  background: #472905;
+  border-color: #000000;
+  color: var(--np-amber);
+}
+
+.tutor-btn:active {
+  background: var(--np-amber);
+  color: #000000;
+}
+
+/* Accessibility Focus States */
+:focus-visible {
+  outline: 3px solid var(--np-yellow);
+  outline-offset: 2px;
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 @media (max-width: 640px) {
@@ -606,7 +814,15 @@ body.arcade-body {
     grid-template-columns: 1fr;
   }
   .touch-btn {
-    padding: 8px 10px;
+    padding: 10px 10px;
     font-size: 11px;
+    min-height: 44px;
+    min-width: 44px;
+  }
+  .arcade-card {
+    padding: 16px;
+  }
+  .arcade-title {
+    font-size: 26px;
   }
 }
