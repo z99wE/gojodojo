@@ -1,0 +1,52 @@
+// Hindi (default) UI strings.
+export default {
+  'app.title': 'संख्या स्ट्राइक',
+  'app.start': 'शुरू करें',
+  'app.clickToContinue': 'जारी रखने के लिए स्क्रीन पर क्लिक करें',
+  'app.lang': 'English',
+  'zone.hub': 'केंद्र',
+  'zone.maths': 'गणित द्वीप',
+  'zone.science': 'विज्ञान वाटिका',
+  'stone.interact': 'पत्थर के पास जाकर E दबाएँ',
+  'stone.prompt': 'सीखने के लिए E दबाएँ',
+  'touch.action': 'E',
+
+  // Quiz UI
+  'quiz.question': 'प्रश्न',
+  'quiz.score': 'अंक',
+  'quiz.hint': '💡 संकेत देखें',
+  'quiz.explain': '📖 समाधान और व्याख्या',
+  'quiz.listen': '🔊 सुनें',
+  'quiz.stopAudio': '⏹ रोकें',
+  'quiz.next': 'अगला प्रश्न ➔',
+  'quiz.finish': 'सत्र समाप्त करें',
+  'quiz.correct': 'शाबाश! बिल्कुल सही उत्तर!',
+  'quiz.incorrect': 'गलत उत्तर। कोई बात नहीं, नीचे व्याख्या समझें!',
+  'quiz.askTutor': '🤖 AI गुरु से पूछें',
+  'quiz.voiceDoubt': '🎤 बोलकर संशय पूछें',
+  'quiz.photoDoubt': '📷 फोटो से पूछें',
+  'quiz.listening': 'सुन रहे हैं... बोलिए...',
+  'quiz.completed': 'अद्भुत! अभ्यास पूर्ण हुआ!',
+  'quiz.returnWorld': 'वापस द्वीप पर जाएँ',
+  'quiz.retry': 'फिर से अभ्यास करें',
+
+  // Progress UI
+  'progress.title': 'प्रगति और रिपोर्ट',
+  'progress.learner': '🎒 शिक्षार्थी',
+  'progress.parent': '👨‍👩‍👧 अभिभावक',
+  'progress.teacher': '👩‍🏫 शिक्षक / स्वयंसेवक',
+  'progress.grade': 'कक्षा',
+  'progress.topicsDone': 'पूर्ण विषय',
+  'progress.totalStars': 'कुल सितारे',
+  'progress.accuracy': 'सटीकता',
+  'progress.practice': 'अभ्यास',
+  'progress.completed': 'पूर्ण',
+  'progress.focusAreas': 'पुनरावृत्ति की आवश्यकता',
+  'progress.parentVoiceSummary': '🔊 अभिभावक सारांश सुनें',
+  'progress.shareReport': '📋 रिपोर्ट कॉपी करें (WhatsApp/SMS)',
+  'progress.reportCopied': 'रिपोर्ट कॉपी हो गई!',
+
+  // HUD
+  'hud.progress': '📊 प्रगति [P]',
+  'hud.offline': '⚡ ऑफ़लाइन सुरक्षित',
+};

@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+
+# Production build
+dist/
+
+# Local environment & IDE
+.DS_Store
+Thumbs.db
+*.local
+.env
+.env.*
+!.env.example
+.vscode/
+.idea/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Workspace state
+.codebenders/

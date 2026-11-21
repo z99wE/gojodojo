@@ -1,0 +1,52 @@
+// English UI strings.
+export default {
+  'app.title': 'Sankhya Strike',
+  'app.start': 'Start',
+  'app.clickToContinue': 'Click the screen to continue',
+  'app.lang': 'हिंदी',
+  'zone.hub': 'Hub',
+  'zone.maths': 'Ganit Dweep (Maths Isle)',
+  'zone.science': 'Vigyan Vatika (Science Garden)',
+  'stone.interact': 'Walk up to a stone and press E',
+  'stone.prompt': 'Press E to learn',
+  'touch.action': 'E',
+
+  // Quiz UI
+  'quiz.question': 'Question',
+  'quiz.score': 'Score',
+  'quiz.hint': '💡 Need a Hint?',
+  'quiz.explain': '📖 Solution & Explanation',
+  'quiz.listen': '🔊 Listen',
+  'quiz.stopAudio': '⏹ Stop',
+  'quiz.next': 'Next Question ➔',
+  'quiz.finish': 'Finish Session',
+  'quiz.correct': 'Brilliant! That is correct!',
+  'quiz.incorrect': 'Incorrect. No worries, learn from explanation below!',
+  'quiz.askTutor': '🤖 Ask AI Guru',
+  'quiz.voiceDoubt': '🎤 Speak Your Doubt',
+  'quiz.photoDoubt': '📷 Photo Doubt',
+  'quiz.listening': 'Listening... speak now...',
+  'quiz.completed': 'Awesome! Topic Completed!',
+  'quiz.returnWorld': 'Return to Island',
+  'quiz.retry': 'Practice Again',
+
+  // Progress UI
+  'progress.title': 'Progress & Reports',
+  'progress.learner': '🎒 Learner',
+  'progress.parent': '👨‍👩‍👧 Parent',
+  'progress.teacher': '👩‍🏫 Teacher / Volunteer',
+  'progress.grade': 'Class',
+  'progress.topicsDone': 'Topics Done',
+  'progress.totalStars': 'Total Stars',
+  'progress.accuracy': 'Accuracy',
+  'progress.practice': 'Practice',
+  'progress.completed': 'Completed',
+  'progress.focusAreas': 'Areas for Revision',
+  'progress.parentVoiceSummary': '🔊 Listen to Parent Summary',
+  'progress.shareReport': '📋 Copy Report for WhatsApp/SMS',
+  'progress.reportCopied': 'Report copied to clipboard!',
+
+  // HUD
+  'hud.progress': '📊 Progress [P]',
+  'hud.offline': '⚡ Offline Ready',
+};

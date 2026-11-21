@@ -1,0 +1,10 @@
+{
+  "name": "Sankhya Strike",
+  "short_name": "Sankhya",
+  "lang": "hi",
+  "start_url": "/",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#0f1f1b",
+  "theme_color": "#1d3b33"
+}
