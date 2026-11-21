@@ -24,6 +24,8 @@ import {
   playChemicalFizzSound,
   playOverheatSound,
   playForcefieldDownSound,
+  playBioPulseSound,
+  playElectricSound,
 } from './ui/audio.js';
 
 const INTERACT_RANGE = 2.8;
@@ -484,26 +486,51 @@ function updateProjectiles(dt) {
             spawnSparks(node.mesh.position.x, node.mesh.position.y, node.mesh.position.z, 0x00f5d4, 28);
             if (node.labId === 'prism') {
               playRefractionSound();
-              if (world.labs && world.labs.prism) world.labs.prism.activate();
-              world.disengageGate('gate-west');
-              if (hud) hud.setMissionDirective("SNELL'S LAW CALIBRATED: WEST CONTAINMENT GATE DOWN");
+              if (world.labMap?.prism) world.labMap.prism.activate();
+              world.disengageGate('gate-maths');
+              if (hud) hud.setMissionDirective("SNELL'S LAW REFRACTION CALIBRATED: WEST GATE DOWN");
               showFloatingCombatText("SNELL'S LAW CALIBRATED! +50 XP", '#00f5d4');
+            } else if (node.labId === 'momentum') {
+              playTargetHitSound();
+              if (world.labMap?.momentum) world.labMap.momentum.activate();
+              showFloatingCombatText('ELASTIC IMPULSE SYNCHRONIZED! +50 XP', '#00f5d4');
+              if (hud) hud.setMissionDirective('CONSERVATION OF MOMENTUM VERIFIED: ELASTIC IMPULSE ACTIVE');
+            } else if (node.labId === 'lorentz') {
+              playElectricSound();
+              if (world.labMap?.lorentz) world.labMap.lorentz.activate();
+              showFloatingCombatText('FARADAY INDUCTION DYNAMO ENGAGED! +50 XP', '#00f5d4');
+              if (hud) hud.setMissionDirective('FARADAY-LENZ LAW VERIFIED: SOLENOID DYNAMO ONLINE');
             } else if (node.labId === 'bohr') {
               playRefractionSound();
-              if (world.labs && world.labs.bohr) world.labs.bohr.activate();
+              if (world.labMap?.bohr) world.labMap.bohr.activate();
               showFloatingCombatText('QUANTUM LEAP (10.2 eV) ACTIVATED! +50 XP', '#00f5d4');
               if (hud) hud.setMissionDirective('LYMAN EMISSION VERIFIED: ORBIT STABILIZED');
             } else if (node.labId === 'titration') {
               playChemicalFizzSound();
-              if (world.labs && world.labs.titration) world.labs.titration.activate();
-              world.disengageGate('gate-east');
-              showFloatingCombatText('TITRATION NEUTRALIZED (pH 7)! +50 XP', '#00f5d4');
-              if (hud) hud.setMissionDirective('TITRATION NEUTRALIZED: EAST CONTAINMENT GATE DOWN');
-            } else if (node.labId === 'momentum') {
-              playTargetHitSound();
-              if (world.labs && world.labs.momentum) world.labs.momentum.activate();
-              showFloatingCombatText('ELASTIC IMPULSE SYNCHRONIZED! +50 XP', '#00f5d4');
-              if (hud) hud.setMissionDirective('CONSERVATION OF MOMENTUM VERIFIED');
+              if (world.labMap?.titration) world.labMap.titration.activate();
+              world.disengageGate('gate-science');
+              showFloatingCombatText('TITRATION NEUTRALIZED (pH 7.0)! +50 XP', '#00f5d4');
+              if (hud) hud.setMissionDirective('TITRATION NEUTRALIZED: EAST GATE DOWN');
+            } else if (node.labId === 'molecule') {
+              playChemicalFizzSound();
+              if (world.labMap?.molecule) world.labMap.molecule.activate();
+              showFloatingCombatText('sp3 TETRAHEDRAL BONDS FORMED! +50 XP', '#00f5d4');
+              if (hud) hud.setMissionDirective('VSEPR sp3 TETRAHEDRAL HYBRIDIZATION BONDED (109.5 DEG)');
+            } else if (node.labId === 'galvanic') {
+              playElectricSound();
+              if (world.labMap?.galvanic) world.labMap.galvanic.activate();
+              showFloatingCombatText('VOLTAIC CELL ACTIVE (+1.10V)! +50 XP', '#00f5d4');
+              if (hud) hud.setMissionDirective('GALVANIC REDOX POTENTIAL STABILIZED: +1.10 V CELL RUNNING');
+            } else if (node.labId === 'dna') {
+              playBioPulseSound();
+              if (world.labMap?.dna) world.labMap.dna.activate();
+              showFloatingCombatText('DNA HELIX BASE PAIR REPLICATED! +50 XP', '#00f5d4');
+              if (hud) hud.setMissionDirective('WATSON-CRICK DNA BASE PAIR (A=T) VERIFIED: HELIX UNWOUND');
+            } else if (node.labId === 'cell') {
+              playBioPulseSound();
+              if (world.labMap?.cell) world.labMap.cell.activate();
+              showFloatingCombatText('AEROBIC ATP RESPIRATION ACTIVE! +50 XP', '#00f5d4');
+              if (hud) hud.setMissionDirective('MITOCHONDRIA AEROBIC RESPIRATION ONLINE: 38 ATP GENERATED');
             }
             if (hud) {
               hud.addGold(50);

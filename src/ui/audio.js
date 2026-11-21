@@ -354,6 +354,49 @@ export function playOverheatSound() {
   } catch (e) { void e; }
 }
 
+// Bio-pulse DNA replication / cellular respiration synthesis sound
+export function playBioPulseSound() {
+  try {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+    [329.63, 440.0, 554.37, 659.25].forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, now + i * 0.06);
+      osc.frequency.exponentialRampToValueAtTime(freq * 1.25, now + i * 0.06 + 0.3);
+      gain.gain.setValueAtTime(0.16, now + i * 0.06);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.06 + 0.35);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now + i * 0.06);
+      osc.stop(now + i * 0.06 + 0.38);
+    });
+  } catch (e) { void e; }
+}
+
+// Electric galvanic ion exchange / electromagnetic induction hum
+export function playElectricSound() {
+  try {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(110, now);
+    osc.frequency.linearRampToValueAtTime(220, now + 0.15);
+    osc.frequency.linearRampToValueAtTime(880, now + 0.35);
+    gain.gain.setValueAtTime(0.12, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.42);
+  } catch (e) { void e; }
+}
+
 // Forcefield gate powerdown hum
 export function playForcefieldDownSound() {
   try {

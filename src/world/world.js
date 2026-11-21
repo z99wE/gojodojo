@@ -30,6 +30,11 @@ import {
   makeBohrAtomLab,
   makeTitrationLab,
   makeMomentumLab,
+  makeLorentzElectromagnetLab,
+  makeMolecularLatticeLab,
+  makeGalvanicCellLab,
+  makeDnaHelixLab,
+  makePlantCellLab,
   makeSectorForcefield,
 } from './physics-labs.js';
 import { emit } from '../engine/events.js';
@@ -433,31 +438,61 @@ export function createWorld(scene) {
   });
 
   // -------------------------------------------------------------
-  // REAL 3D INTERACTIVE STEM LABORATORIES
+  // REAL 3D INTERACTIVE STEM LABORATORIES: PHYSICS, CHEMISTRY & BIOLOGY
   // -------------------------------------------------------------
-  // 1. Prism Refraction Lab (Maths Isle)
+  // 1. Prism Refraction Lab (Physics - Snell's Law Optics)
   const prismLab = makePrismLab(MATHS_CENTRE.x, 0, MATHS_CENTRE.z - 7.0);
   scene.add(prismLab.group);
   labs.push(prismLab);
   labNodes.push(...prismLab.targetNodes);
 
-  // 2. Momentum Collider Lab (Maths Isle)
+  // 2. Momentum Collider Lab (Physics - Elastic Impulse Rail)
   const momentumLab = makeMomentumLab(MATHS_CENTRE.x, 0, MATHS_CENTRE.z + 7.0);
   scene.add(momentumLab.group);
   labs.push(momentumLab);
   labNodes.push(...momentumLab.targetNodes);
 
-  // 3. Bohr Quantum Atom Lab (Science Garden)
+  // 3. Lorentz Electromagnetism Lab (Physics - Solenoid & Flux Induction)
+  const lorentzLab = makeLorentzElectromagnetLab(0, 0, 7.5);
+  scene.add(lorentzLab.group);
+  labs.push(lorentzLab);
+  labNodes.push(...lorentzLab.targetNodes);
+
+  // 4. Bohr Quantum Atom Lab (Chemistry - Atomic Shells & Lyman Emission)
   const atomLab = makeBohrAtomLab(SCIENCE_CENTRE.x, 0, SCIENCE_CENTRE.z - 7.0);
   scene.add(atomLab.group);
   labs.push(atomLab);
   labNodes.push(...atomLab.targetNodes);
 
-  // 4. Chemical Titration Neutralization Lab (Science Garden)
+  // 5. Chemical Titration Neutralization Lab (Chemistry - Volumetric Burette pH)
   const titrationLab = makeTitrationLab(SCIENCE_CENTRE.x, 0, SCIENCE_CENTRE.z + 7.0);
   scene.add(titrationLab.group);
   labs.push(titrationLab);
   labNodes.push(...titrationLab.targetNodes);
+
+  // 6. Molecular Lattice Lab (Chemistry - VSEPR Tetrahedral & Crystal Unit Cell)
+  const moleculeLab = makeMolecularLatticeLab(MATHS_CENTRE.x - 7.5, 0, MATHS_CENTRE.z);
+  scene.add(moleculeLab.group);
+  labs.push(moleculeLab);
+  labNodes.push(...moleculeLab.targetNodes);
+
+  // 7. Galvanic Voltaic Battery Lab (Chemistry - Redox Beakers & Salt Bridge)
+  const galvanicLab = makeGalvanicCellLab(SCIENCE_CENTRE.x + 7.5, 0, SCIENCE_CENTRE.z);
+  scene.add(galvanicLab.group);
+  labs.push(galvanicLab);
+  labNodes.push(...galvanicLab.targetNodes);
+
+  // 8. Watson-Crick DNA Double Helix Lab (Biology - Genetics & Nucleotide Base Pairs)
+  const dnaLab = makeDnaHelixLab(SCIENCE_CENTRE.x, 0, SCIENCE_CENTRE.z + 12.0);
+  scene.add(dnaLab.group);
+  labs.push(dnaLab);
+  labNodes.push(...dnaLab.targetNodes);
+
+  // 9. Plant Cell & Mitochondria Organelle Lab (Biology - Cellular Respiration & ATP)
+  const cellLab = makePlantCellLab(0, 0, -8.0);
+  scene.add(cellLab.group);
+  labs.push(cellLab);
+  labNodes.push(...cellLab.targetNodes);
 
   // -------------------------------------------------------------
   // SECTOR FORCEFIELD SECURITY GATES
@@ -498,6 +533,18 @@ export function createWorld(scene) {
 
   let elapsed = 0;
 
+  const labMap = {
+    prism: prismLab,
+    momentum: momentumLab,
+    lorentz: lorentzLab,
+    bohr: atomLab,
+    titration: titrationLab,
+    molecule: moleculeLab,
+    galvanic: galvanicLab,
+    dna: dnaLab,
+    cell: cellLab,
+  };
+
   return {
     stones,
     colliders,
@@ -505,6 +552,7 @@ export function createWorld(scene) {
     targets,
     cars,
     labs,
+    labMap,
     forcefields,
     labNodes,
     disengageGate(gateId) {
