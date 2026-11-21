@@ -1,7 +1,6 @@
 /**
- * @fileoverview Zero-dependency Web Audio API 8-Bit Chiptune Synthesizer.
- * Generates retro arcade engine revs, gear shifts, nitro blasts, metal collision crunches,
- * physiological anxiety heartbeat pulses, and Zen focus chimes.
+ * @fileoverview Web Audio API Arcade Synthesizer with energetic chiptune rhythm,
+ * smooth filtered engine harmonics (no droning buzz), and punchy race sound effects.
  */
 
 export class ChiptuneAudio {
@@ -9,8 +8,12 @@ export class ChiptuneAudio {
     this.ctx = null;
     this.muted = false;
     this.engineOsc = null;
+    this.engineFilter = null;
     this.engineGain = null;
+    this.bgmTimer = null;
+    this.isBgmPlaying = false;
     this.lastHeartbeatTime = 0;
+    this.bgmStep = 0;
   }
 
   init() {
@@ -34,28 +37,43 @@ export class ChiptuneAudio {
 
   toggleMute() {
     this.muted = !this.muted;
-    if (this.muted && this.engineGain) {
-      this.engineGain.gain.setValueAtTime(0, this.ctx ? this.ctx.currentTime : 0);
+    if (this.muted) {
+      if (this.engineGain) {
+        this.engineGain.gain.setValueAtTime(0, this.ctx ? this.ctx.currentTime : 0);
+      }
+      this.stopBgm();
+    } else {
+      this.startBgm();
     }
     return this.muted;
   }
 
-  // --- Engine Rev Synthesizer ---
+  // --- Smooth, Warm Filtered Engine Sound (No Droning Buzz) ---
 
   startEngine() {
     if (!this.ctx || this.engineOsc || this.muted) return;
     try {
       this.engineOsc = this.ctx.createOscillator();
+      this.engineFilter = this.ctx.createBiquadFilter();
       this.engineGain = this.ctx.createGain();
 
-      this.engineOsc.type = 'sawtooth';
-      this.engineOsc.frequency.setValueAtTime(80, this.ctx.currentTime);
+      // Triangle wave for smooth, warm engine hum instead of grating sawtooth drone
+      this.engineOsc.type = 'triangle';
+      this.engineOsc.frequency.setValueAtTime(75, this.ctx.currentTime);
 
-      this.engineGain.gain.setValueAtTime(this.muted ? 0 : 0.08, this.ctx.currentTime);
+      // Lowpass filter cutoff to remove harsh high frequencies
+      this.engineFilter.type = 'lowpass';
+      this.engineFilter.frequency.setValueAtTime(280, this.ctx.currentTime);
 
-      this.engineOsc.connect(this.engineGain);
+      // Gentle, pleasant baseline volume
+      this.engineGain.gain.setValueAtTime(this.muted ? 0 : 0.05, this.ctx.currentTime);
+
+      this.engineOsc.connect(this.engineFilter);
+      this.engineFilter.connect(this.engineGain);
       this.engineGain.connect(this.ctx.destination);
       this.engineOsc.start();
+
+      this.startBgm();
     } catch (e) {
       void e;
     }
@@ -65,11 +83,15 @@ export class ChiptuneAudio {
     if (!this.ctx || !this.engineOsc || this.muted) return;
     try {
       const ratio = Math.max(0, Math.min(1.0, rpm / maxRpm));
-      const freq = 65 + ratio * 320;
-      this.engineOsc.frequency.setTargetAtTime(freq, this.ctx.currentTime, 0.05);
+      const freq = 60 + ratio * 240;
+      this.engineOsc.frequency.setTargetAtTime(freq, this.ctx.currentTime, 0.06);
+
+      if (this.engineFilter) {
+        this.engineFilter.frequency.setTargetAtTime(240 + ratio * 320, this.ctx.currentTime, 0.06);
+      }
 
       if (this.engineGain) {
-        this.engineGain.gain.setTargetAtTime(0.06 + ratio * 0.04, this.ctx.currentTime, 0.05);
+        this.engineGain.gain.setTargetAtTime(0.04 + ratio * 0.04, this.ctx.currentTime, 0.06);
       }
     } catch (e) {
       void e;
@@ -86,6 +108,65 @@ export class ChiptuneAudio {
       }
       this.engineOsc = null;
     }
+    this.stopBgm();
+  }
+
+  // --- Energetic Retro Arcade Bassline (Creates Speed & Urgency) ---
+
+  startBgm() {
+    if (this.isBgmPlaying || this.muted || !this.ctx) return;
+    this.isBgmPlaying = true;
+    this.bgmStep = 0;
+
+    // 130 BPM driving synthwave arpeggio
+    const bassline = [
+      110.0, 110.0, 130.81, 146.83, // A2, A2, C3, D3
+      110.0, 110.0, 164.81, 146.83, // A2, A2, E3, D3
+      98.0, 98.0, 123.47, 130.81,   // G2, G2, B2, C3
+      82.41, 82.41, 110.0, 123.47   // E2, E2, A2, B2
+    ];
+
+    const stepIntervalMs = 120; // Fast energetic tempo
+
+    this.bgmTimer = setInterval(() => {
+      if (this.muted || !this.ctx || this.ctx.state !== 'running') return;
+      try {
+        const t = this.ctx.currentTime;
+        const freq = bassline[this.bgmStep % bassline.length];
+        this.bgmStep++;
+
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const filter = this.ctx.createBiquadFilter();
+
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(freq, t);
+
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(420, t);
+        filter.frequency.exponentialRampToValueAtTime(140, t + 0.1);
+
+        gain.gain.setValueAtTime(0.04, t);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.1);
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(t);
+        osc.stop(t + 0.1);
+      } catch (e) {
+        void e;
+      }
+    }, stepIntervalMs);
+  }
+
+  stopBgm() {
+    this.isBgmPlaying = false;
+    if (this.bgmTimer) {
+      clearInterval(this.bgmTimer);
+      this.bgmTimer = null;
+    }
   }
 
   // --- Sound Effects ---
@@ -97,39 +178,26 @@ export class ChiptuneAudio {
       const t = this.ctx.currentTime;
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
-
       osc.type = 'square';
 
       if (type === 'perfect') {
-        osc.frequency.setValueAtTime(523.25, t); // C5
-        osc.frequency.setValueAtTime(659.25, t + 0.06); // E5
-        osc.frequency.setValueAtTime(783.99, t + 0.12); // G5
-        osc.frequency.setValueAtTime(1046.5, t + 0.18); // C6
-        gain.gain.setValueAtTime(0.18, t);
-        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start(t);
-        osc.stop(t + 0.35);
-      } else if (type === 'early') {
-        osc.frequency.setValueAtTime(140, t);
-        osc.frequency.exponentialRampToValueAtTime(90, t + 0.15);
-        gain.gain.setValueAtTime(0.15, t);
-        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start(t);
-        osc.stop(t + 0.18);
+        osc.frequency.setValueAtTime(523.25, t);
+        osc.frequency.setValueAtTime(659.25, t + 0.05);
+        osc.frequency.setValueAtTime(783.99, t + 0.10);
+        osc.frequency.setValueAtTime(1046.5, t + 0.15);
+        gain.gain.setValueAtTime(0.16, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
       } else {
-        osc.frequency.setValueAtTime(260, t);
-        osc.frequency.exponentialRampToValueAtTime(180, t + 0.08);
-        gain.gain.setValueAtTime(0.12, t);
+        osc.frequency.setValueAtTime(240, t);
+        osc.frequency.exponentialRampToValueAtTime(160, t + 0.08);
+        gain.gain.setValueAtTime(0.10, t);
         gain.gain.exponentialRampToValueAtTime(0.001, t + 0.10);
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start(t);
-        osc.stop(t + 0.10);
       }
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.3);
     } catch (e) {
       void e;
     }
@@ -140,7 +208,7 @@ export class ChiptuneAudio {
     this.resume();
     try {
       const t = this.ctx.currentTime;
-      const dur = 0.3 * intensity;
+      const dur = 0.28 * intensity;
       const bufferSize = this.ctx.sampleRate * dur;
       const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
       const output = buffer.getChannelData(0);
@@ -153,11 +221,11 @@ export class ChiptuneAudio {
 
       const filter = this.ctx.createBiquadFilter();
       filter.type = 'lowpass';
-      filter.frequency.setValueAtTime(650, t);
-      filter.frequency.exponentialRampToValueAtTime(80, t + dur);
+      filter.frequency.setValueAtTime(550, t);
+      filter.frequency.exponentialRampToValueAtTime(70, t + dur);
 
       const gain = this.ctx.createGain();
-      gain.gain.setValueAtTime(0.35 * intensity, t);
+      gain.gain.setValueAtTime(0.3 * intensity, t);
       gain.gain.exponentialRampToValueAtTime(0.001, t + dur);
 
       whiteNoise.connect(filter);
@@ -165,29 +233,6 @@ export class ChiptuneAudio {
       gain.connect(this.ctx.destination);
 
       whiteNoise.start(t);
-    } catch (e) {
-      void e;
-    }
-  }
-
-  playScreech() {
-    if (!this.ctx || this.muted) return;
-    this.resume();
-    try {
-      const t = this.ctx.currentTime;
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-      osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(880, t);
-      osc.frequency.linearRampToValueAtTime(440, t + 0.25);
-
-      gain.gain.setValueAtTime(0.15, t);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
-
-      osc.connect(gain);
-      gain.connect(this.ctx.destination);
-      osc.start(t);
-      osc.stop(t + 0.25);
     } catch (e) {
       void e;
     }
@@ -206,7 +251,6 @@ export class ChiptuneAudio {
       const gain = this.ctx.createGain();
 
       osc.type = 'sine';
-      // Low thud
       osc.frequency.setValueAtTime(55, t);
       osc.frequency.exponentialRampToValueAtTime(28, t + 0.08);
 
@@ -227,7 +271,7 @@ export class ChiptuneAudio {
     this.resume();
     try {
       const t = this.ctx.currentTime;
-      const chords = [392.00, 493.88, 587.33, 783.99]; // G major serene chime
+      const chords = [392.0, 493.88, 587.33, 783.99];
       chords.forEach((freq, idx) => {
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
@@ -259,7 +303,7 @@ export class ChiptuneAudio {
       osc.frequency.setValueAtTime(220, t);
       osc.frequency.exponentialRampToValueAtTime(1320, t + 0.4);
 
-      gain.gain.setValueAtTime(0.22, t);
+      gain.gain.setValueAtTime(0.20, t);
       gain.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
 
       osc.connect(gain);
@@ -283,13 +327,13 @@ export class ChiptuneAudio {
       const freq = count === 0 ? 880 : 440;
       osc.frequency.setValueAtTime(freq, t);
 
-      gain.gain.setValueAtTime(0.2, t);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + (count === 0 ? 0.45 : 0.2));
+      gain.gain.setValueAtTime(0.18, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + (count === 0 ? 0.4 : 0.18));
 
       osc.connect(gain);
       gain.connect(this.ctx.destination);
       osc.start(t);
-      osc.stop(t + (count === 0 ? 0.45 : 0.2));
+      osc.stop(t + (count === 0 ? 0.4 : 0.18));
     } catch (e) {
       void e;
     }
@@ -307,7 +351,7 @@ export class ChiptuneAudio {
       osc.frequency.setValueAtTime(950, t);
       osc.frequency.setValueAtTime(1400, t + 0.08);
 
-      gain.gain.setValueAtTime(0.18, t);
+      gain.gain.setValueAtTime(0.16, t);
       gain.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
 
       osc.connect(gain);
@@ -326,21 +370,20 @@ export class ChiptuneAudio {
       const t = this.ctx.currentTime;
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
-
       osc.type = 'square';
+
       if (isCorrect) {
         osc.frequency.setValueAtTime(440, t);
-        osc.frequency.setValueAtTime(554.37, t + 0.08);
-        osc.frequency.setValueAtTime(659.25, t + 0.16);
-        osc.frequency.setValueAtTime(880, t + 0.24);
+        osc.frequency.setValueAtTime(554.37, t + 0.07);
+        osc.frequency.setValueAtTime(659.25, t + 0.14);
+        osc.frequency.setValueAtTime(880, t + 0.21);
         gain.gain.setValueAtTime(0.2, t);
         gain.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
       } else {
         osc.frequency.setValueAtTime(220, t);
-        osc.frequency.setValueAtTime(185, t + 0.12);
-        osc.frequency.setValueAtTime(130, t + 0.24);
-        gain.gain.setValueAtTime(0.2, t);
-        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+        osc.frequency.setValueAtTime(175, t + 0.12);
+        gain.gain.setValueAtTime(0.18, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
       }
 
       osc.connect(gain);

@@ -43,6 +43,20 @@
           <h1 class="arcade-title">संख्या टर्बो: 8-बिट ग्रैंड प्रिक्स</h1>
           <div class="arcade-sub">SANKHYA TURBO: RETRO STEM RACER</div>
 
+          <!-- Character & Pilot Selection -->
+          <div class="topic-study-section">
+            <label class="selector-label" for="player-name-input">खिलाड़ी का नाम / PILOT NAME:</label>
+            <div class="topic-input-row">
+              <input type="text" id="player-name-input" class="arcade-text-input" placeholder="अपना नाम लिखें (उदा: Aryabhata, Kalpana, Raman...)" value="ARYABHATA" />
+            </div>
+            <div id="character-selector" class="chip-group" style="margin-top: 6px;">
+              <button class="chip-btn active" data-char="Velocity Ace">Velocity Ace (गति नायक)</button>
+              <button class="chip-btn" data-char="Quantum Racer">Quantum Racer (क्वांटम चालक)</button>
+              <button class="chip-btn" data-char="Cosmo Pilot">Cosmo Pilot (ब्रह्मांडीय)</button>
+              <button class="chip-btn" data-char="Aero Striker">Aero Striker (वायु योद्धा)</button>
+            </div>
+          </div>
+
           <!-- Study Angle: What do you want to learn today? -->
           <div class="topic-study-section">
             <label class="selector-label" for="custom-topic-input">आज आप क्या सीखना चाहते हैं? / WHAT DO YOU WANT TO STUDY?</label>
@@ -59,7 +73,7 @@
             <div id="grade-selector" class="chip-group">
               <button class="chip-btn" data-grade="1">G1</button>
               <button class="chip-btn" data-grade="2">G2</button>
-              <button class="chip-btn" data-grade="3">G3</button>
+              <button class="chip-btn" data-grade="2">G3</button>
               <button class="chip-btn" data-grade="4">G4</button>
               <button class="chip-btn active" data-grade="5">G5</button>
               <button class="chip-btn" data-grade="6">G6</button>
@@ -82,8 +96,12 @@
           <!-- Controls Quick Reference -->
           <div class="controls-guide">
             <div class="guide-item">
-              <span class="guide-key">W / S</span>
-              <span class="guide-desc">Accelerate (Gas) / Active Brake (Slow Down)</span>
+              <span class="guide-key">W / UP</span>
+              <span class="guide-desc">Accelerate (Gas) - Hold to surge forward</span>
+            </div>
+            <div class="guide-item">
+              <span class="guide-key">S / DOWN</span>
+              <span class="guide-desc">Active Brake - Slow down, illuminate brake lights</span>
             </div>
             <div class="guide-item">
               <span class="guide-key">A / D</span>
@@ -91,7 +109,7 @@
             </div>
             <div class="guide-item">
               <span class="guide-key">SPACEBAR</span>
-              <span class="guide-desc">Shift Up (Hit GREEN sweet spot on Tachometer!)</span>
+              <span class="guide-desc">Shift Up (Green sweet spot on Tachometer for Boost!)</span>
             </div>
             <div class="guide-item">
               <span class="guide-key">B KEY</span>

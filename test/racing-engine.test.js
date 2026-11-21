@@ -208,3 +208,31 @@ test('Anxiety BPM model increases under stress and calms with Zen breath', () =>
   assert.strictEqual(engine.player.bpm, 72, 'Zen breath resets vagus nerve back to resting 72 BPM');
   assert.ok(engine.timeScale < 1.0, 'Focus breath slows down simulation time');
 });
+
+test('Player profile and dynamic day-to-night scene transitions', () => {
+  const engine = new RacingEngine();
+  engine.setPlayerProfile('Kalpana', 'Quantum Racer');
+  assert.strictEqual(engine.playerName, 'KALPANA');
+  assert.strictEqual(engine.character, 'Quantum Racer');
+
+  // Initial stage is dawn
+  engine.player.distance = 50;
+  engine.elapsedTime = 5;
+  assert.strictEqual(engine.getScene().id, 'dawn');
+
+  // Noon stage
+  engine.player.distance = 450;
+  engine.elapsedTime = 20;
+  assert.strictEqual(engine.getScene().id, 'noon');
+
+  // Sunset stage
+  engine.player.distance = 750;
+  engine.elapsedTime = 35;
+  assert.strictEqual(engine.getScene().id, 'sunset');
+
+  // Midnight neon stage
+  engine.player.distance = 1100;
+  engine.elapsedTime = 55;
+  assert.strictEqual(engine.getScene().id, 'midnight');
+});
+

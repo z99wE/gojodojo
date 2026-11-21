@@ -28,6 +28,11 @@ class GameApp {
     this.touchControls = document.getElementById('touch-controls');
     this.uiContainer = document.getElementById('ui');
 
+    // Pilot Profile & Character Selection
+    this.playerNameInput = document.getElementById('player-name-input');
+    this.selectedCharacter = 'Velocity Ace';
+    this.playerName = 'ARYABHATA';
+
     // Topic Study Input
     this.customTopicInput = document.getElementById('custom-topic-input');
     this.btnVoiceTopic = document.getElementById('btn-voice-topic');
@@ -118,6 +123,25 @@ class GameApp {
       });
     });
 
+    // Player Pilot Name Input
+    if (this.playerNameInput) {
+      this.playerNameInput.addEventListener('input', (e) => {
+        this.playerName = e.target.value.trim() || 'ARYABHATA';
+        this.engine.setPlayerProfile(this.playerName, this.selectedCharacter);
+      });
+    }
+
+    // Character Archetype Chips
+    const charBtns = document.querySelectorAll('#character-selector .chip-btn');
+    charBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        charBtns.forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        this.selectedCharacter = btn.dataset.char || 'Velocity Ace';
+        this.engine.setPlayerProfile(this.playerName, this.selectedCharacter);
+      });
+    });
+
     // Custom Topic Input
     if (this.customTopicInput) {
       this.customTopicInput.addEventListener('input', (e) => {
@@ -185,6 +209,11 @@ class GameApp {
     if (this.touchControls) {
       this.touchControls.classList.remove('hidden');
     }
+
+    if (this.playerNameInput && this.playerNameInput.value.trim()) {
+      this.playerName = this.playerNameInput.value.trim();
+    }
+    this.engine.setPlayerProfile(this.playerName, this.selectedCharacter);
 
     this.engine.reset();
     this.engine.trackLength = TRACK_CIRCUITS[this.currentCircuit]?.trackLength || 1200;
@@ -543,23 +572,28 @@ class GameApp {
   }
 
   handleQuizSubmit(optionIndex) {
+    const currentQ = this.quiz.currentQuestion;
     const result = this.quiz.submitAnswer(optionIndex);
     if (!result) return;
 
+    const correctText = (currentQ && currentQ.options && currentQ.options[result.correctIndex])
+      ? currentQ.options[result.correctIndex]
+      : '';
+
     this.audio.playQuizResult(result.isCorrect);
-    this.engine.onQuizAnswer(result.isCorrect);
+    this.engine.onQuizAnswer(result.isCorrect, { correctText, explain: result.explain });
 
     // Stop active listening and speaking
     this.voiceInput.stop();
     this.screenReader.stop();
 
-    // Show feedback in modal
+    // Show feedback in modal with explicit mistake identification and correct answer
     const fbContainer = document.getElementById('quiz-feedback-container');
     if (fbContainer) {
       const isHi = this.activeLang === 'hi';
       const statusTitle = result.isCorrect
-        ? (isHi ? 'सही उत्तर! सुपर नाइट्रो चार्ज!' : 'CORRECT! SUPER NITRO CHARGED!')
-        : (isHi ? 'गलत उत्तर! -25% शील्ड' : 'INCORRECT! -25% SHIELD');
+        ? (isHi ? '[ सही उत्तर! / CORRECT! ] +1000 अंक & सुपर टर्बो ओवरड्राइव!' : '[ CORRECT! ] +1000 PTS & SUPER TURBO OVERDRIVE!')
+        : (isHi ? `[ गलत उत्तर! / INCORRECT! ] सही उत्तर: ${correctText}` : `[ INCORRECT! ] CORRECT ANSWER: ${correctText}`);
 
       fbContainer.innerHTML = `
         <div class="quiz-feedback-box ${result.isCorrect ? 'correct' : 'incorrect'}">
@@ -580,13 +614,13 @@ class GameApp {
     };
     saveProgress(this.progress);
 
-    // Auto dismiss after 2.4s so student can absorb the explanation
+    // Auto dismiss after 2.6s so student can absorb the explanation and mistake analysis
     setTimeout(() => {
       this.quiz.dismiss();
       if (this.uiContainer) {
         this.uiContainer.innerHTML = '';
       }
-    }, 2400);
+    }, 2600);
   }
 
   // --- Interactive In-Game AI STEM Tutor Drawer ---
