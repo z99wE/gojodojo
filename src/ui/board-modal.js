@@ -105,20 +105,29 @@ export function createBoardModal({ container, onClose, onOpenProgress }) {
       </div>
     `);
 
-    // Wire events
-    modalEl.querySelector('#ss-board-close').addEventListener('click', close);
-    modalEl.querySelector('#ss-board-done-btn').addEventListener('click', close);
+    // Wire events safely
+    const closeBtn = modalEl.querySelector('#ss-board-close');
+    if (closeBtn) closeBtn.addEventListener('click', close);
 
-    modalEl.querySelector('#ss-board-audio').addEventListener('click', () => {
-      playClickSound();
-      speakText(body, lang);
-    });
+    const doneBtn = modalEl.querySelector('#ss-board-done-btn');
+    if (doneBtn) doneBtn.addEventListener('click', close);
 
-    modalEl.querySelector('#ss-board-progress-btn').addEventListener('click', () => {
-      playClickSound();
-      close();
-      if (onOpenProgress) onOpenProgress();
-    });
+    const audioBtn = modalEl.querySelector('#ss-board-audio');
+    if (audioBtn) {
+      audioBtn.addEventListener('click', () => {
+        playClickSound();
+        speakText(body, lang);
+      });
+    }
+
+    const progBtn = modalEl.querySelector('#ss-board-progress-btn');
+    if (progBtn) {
+      progBtn.addEventListener('click', () => {
+        playClickSound();
+        close();
+        if (onOpenProgress) onOpenProgress();
+      });
+    }
 
     modalEl.querySelectorAll('.ss-grade-btn').forEach((chip) => {
       chip.addEventListener('click', () => {

@@ -416,7 +416,7 @@ export function createWorld(scene) {
           r.ringMesh.rotation.z += dt * r.speed;
           const a = elapsed * r.speed * 2.0;
           r.electron.position.set(Math.cos(a) * 3.6, Math.sin(a) * 3.6, 0);
-          r.electron.applyEuler(r.ringMesh.rotation);
+          r.electron.position.applyEuler(r.ringMesh.rotation);
         });
       }
 

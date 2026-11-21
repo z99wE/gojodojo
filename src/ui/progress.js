@@ -129,9 +129,11 @@ export function createProgressModal({ container, onClose, onOpenTopic }) {
       </div>
     `);
 
-    // Wire events
-    modalEl.querySelector('#ss-progress-close').addEventListener('click', close);
-    modalEl.querySelector('#ss-progress-done-btn').addEventListener('click', close);
+    // Wire events safely
+    const closeBtn = modalEl.querySelector('#ss-progress-close');
+    if (closeBtn) closeBtn.addEventListener('click', close);
+    const doneBtn = modalEl.querySelector('#ss-progress-done-btn');
+    if (doneBtn) doneBtn.addEventListener('click', close);
 
     // Tab buttons
     modalEl.querySelectorAll('.ss-clay-tab').forEach((tabBtn) => {

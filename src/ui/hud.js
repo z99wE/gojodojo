@@ -141,24 +141,33 @@ export function createHUD({
       <div id="ss-floating-rewards-layer"></div>
     `);
 
-    // Wire events
-    hudContainer.querySelector('#ss-hud-progress-btn').addEventListener('click', () => {
-      playButtonPopSound();
-      if (onOpenProgress) onOpenProgress();
-    });
+    // Wire events safely
+    const progBtn = hudContainer.querySelector('#ss-hud-progress-btn');
+    if (progBtn) {
+      progBtn.addEventListener('click', () => {
+        playButtonPopSound();
+        if (onOpenProgress) onOpenProgress();
+      });
+    }
 
-    hudContainer.querySelector('#ss-hud-grade-btn').addEventListener('click', () => {
-      playButtonPopSound();
-      if (onOpenProgress) onOpenProgress('learner');
-    });
+    const gradeBtn = hudContainer.querySelector('#ss-hud-grade-btn');
+    if (gradeBtn) {
+      gradeBtn.addEventListener('click', () => {
+        playButtonPopSound();
+        if (onOpenProgress) onOpenProgress('learner');
+      });
+    }
 
-    hudContainer.querySelector('#ss-hud-lang-btn').addEventListener('click', () => {
-      playButtonPopSound();
-      const nextLang = lang === 'hi' ? 'en' : 'hi';
-      setLang(nextLang);
-      render();
-      if (onLanguageChange) onLanguageChange(nextLang);
-    });
+    const langBtn = hudContainer.querySelector('#ss-hud-lang-btn');
+    if (langBtn) {
+      langBtn.addEventListener('click', () => {
+        playButtonPopSound();
+        const nextLang = lang === 'hi' ? 'en' : 'hi';
+        setLang(nextLang);
+        render();
+        if (onLanguageChange) onLanguageChange(nextLang);
+      });
+    }
 
     updatePromptDisplay();
   }

@@ -12,15 +12,49 @@ const SLOW_FRAME_MS = 40;
 const SLOW_TIME_LIMIT = 3;
 
 export function createRenderer(container) {
-  const renderer = new THREE.WebGLRenderer({
-    antialias: true,
-    powerPreference: 'high-performance',
-  });
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.0;
-  renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  let renderer = null;
+  let isFallback = false;
+
+  try {
+    renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      powerPreference: 'high-performance',
+    });
+  } catch (e) {
+    void e;
+    try {
+      renderer = new THREE.WebGLRenderer({
+        antialias: false,
+        powerPreference: 'default',
+        failIfMajorPerformanceCaveat: false,
+      });
+    } catch (err) {
+      void err;
+      isFallback = true;
+      const fallbackCanvas = document.createElement('canvas');
+      fallbackCanvas.width = window.innerWidth || 800;
+      fallbackCanvas.height = window.innerHeight || 600;
+      renderer = {
+        domElement: fallbackCanvas,
+        toneMapping: null,
+        toneMappingExposure: 1.0,
+        outputColorSpace: null,
+        shadowMap: { enabled: false, type: null },
+        setPixelRatio: () => {},
+        setSize: (w, h) => { fallbackCanvas.width = w; fallbackCanvas.height = h; },
+        render: () => {},
+        dispose: () => {},
+      };
+    }
+  }
+
+  if (!isFallback) {
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.0;
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  }
   container.appendChild(renderer.domElement);
 
   let tierName = 'high';

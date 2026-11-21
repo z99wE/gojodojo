@@ -123,7 +123,7 @@ function requestLock() {
 
 function pauseGame(show) {
   controller.setPaused(true);
-  if (show && !isAnyModalOpen()) showHint(true);
+  if (show && !isAnyModalOpen() && started) showHint(true);
 }
 
 function resumeGame() {
@@ -245,7 +245,7 @@ on('stone:interact', ({ id, zone, topic }) => {
 
 // Keyboard shortcut: P for Adventure Log / Progress
 window.addEventListener('keydown', (e) => {
-  if ((e.key === 'p' || e.key === 'P') && !e.ctrlKey && !e.metaKey && !e.altKey) {
+  if ((e.key === 'p' || e.key === 'P' || e.code === 'KeyP') && !e.ctrlKey && !e.metaKey && !e.altKey) {
     if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
     if (progressModal.isOpen()) {
       progressModal.close();
@@ -260,43 +260,49 @@ window.addEventListener('keydown', (e) => {
 document.addEventListener('visibilitychange', () => {
   if (!started) return;
   if (document.hidden) {
-    pauseGame(false);
-  } else if (isTouch || document.pointerLockElement === canvas) {
+    controller.setPaused(true);
+  } else if (!isAnyModalOpen()) {
     resumeGame();
-  } else {
-    pauseGame(true);
   }
 });
 
 // Pointer lock change listener
 document.addEventListener('pointerlockchange', () => {
-  if (!started || isTouch) return;
+  if (!started) return;
   if (document.pointerLockElement === canvas) {
-    resumeGame();
-  } else {
-    if (!isAnyModalOpen()) {
-      pauseGame(true);
-    }
+    showHint(false);
   }
 });
 
 canvas.addEventListener('click', () => {
-  if (!started || isTouch) return;
+  if (!started) return;
   if (isAnyModalOpen()) return;
-  if (controller.isPaused()) requestLock();
+  if (!isTouch && document.pointerLockElement !== canvas) {
+    requestLock();
+  }
+  resumeGame();
   // Trigger punch animation on click
   punchTime = 1.0;
 });
 
-// Start button click
-startBtn.addEventListener('click', () => {
+// Start button click & touch handling
+function handleStartGame() {
   if (startEl) startEl.style.display = 'none';
   started = true;
+  resumeGame();
   requestLock();
   if (!stopLoop) {
     stopLoop = startLoop(frame);
   }
-});
+}
+
+if (startBtn) {
+  startBtn.addEventListener('click', handleStartGame);
+  startBtn.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    handleStartGame();
+  });
+}
 
 function findNearestStone() {
   const p = controller.position;

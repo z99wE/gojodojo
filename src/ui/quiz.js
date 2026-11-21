@@ -165,95 +165,114 @@ export function createQuizModal({
         </div>
       `);
 
-      // Wire close button
-      modalEl.querySelector('#ss-quiz-close').addEventListener('click', close);
+      // Wire close button safely
+      const closeBtn = modalEl.querySelector('#ss-quiz-close');
+      if (closeBtn) closeBtn.addEventListener('click', close);
 
       // Audio read aloud
       const audioBtn = modalEl.querySelector('#ss-audio-toggle');
       let isReading = false;
-      audioBtn.addEventListener('click', () => {
-        playClickSound();
-        if (isReading) {
-          stopSpeaking();
-          isReading = false;
-          audioBtn.querySelector('.ss-audio-icon').textContent = '🔊';
-          audioBtn.querySelector('.ss-audio-label').textContent = t('quiz.listen');
-        } else {
-          isReading = true;
-          audioBtn.querySelector('.ss-audio-icon').textContent = '⏹';
-          audioBtn.querySelector('.ss-audio-label').textContent = t('quiz.stopAudio');
-          const optionsText = q.options
-            .map((opt, i) => `${['A', 'B', 'C', 'D'][i]}: ${opt[lang] || opt.hi}`)
-            .join('. ');
-          speakText(`${questionText}. ${optionsText}`, lang);
-        }
-      });
+      if (audioBtn) {
+        audioBtn.addEventListener('click', () => {
+          playClickSound();
+          if (isReading) {
+            stopSpeaking();
+            isReading = false;
+            const icon = audioBtn.querySelector('.ss-audio-icon');
+            const label = audioBtn.querySelector('.ss-audio-label');
+            if (icon) icon.textContent = '🔊';
+            if (label) label.textContent = t('quiz.listen');
+          } else {
+            isReading = true;
+            const icon = audioBtn.querySelector('.ss-audio-icon');
+            const label = audioBtn.querySelector('.ss-audio-label');
+            if (icon) icon.textContent = '⏹';
+            if (label) label.textContent = t('quiz.stopAudio');
+            const optionsText = q.options
+              .map((opt, i) => `${['A', 'B', 'C', 'D'][i]}: ${opt[lang] || opt.hi}`)
+              .join('. ');
+            speakText(`${questionText}. ${optionsText}`, lang);
+          }
+        });
+      }
 
       // Hint toggle
-      modalEl.querySelector('#ss-hint-btn').addEventListener('click', () => {
-        playHintSound();
-        showHint = !showHint;
-        botMood = showHint ? '🧐' : '😸';
-        renderQuestion();
-      });
+      const hintBtn = modalEl.querySelector('#ss-hint-btn');
+      if (hintBtn) {
+        hintBtn.addEventListener('click', () => {
+          playHintSound();
+          showHint = !showHint;
+          botMood = showHint ? '🧐' : '😸';
+          renderQuestion();
+        });
+      }
 
       // Voice Doubt Assistant
       const voiceBtn = modalEl.querySelector('#ss-ask-voice-btn');
-      voiceBtn.addEventListener('click', () => {
-        playClickSound();
-        const chatArea = modalEl.querySelector('#ss-guru-chat-area');
-        chatArea.style.display = 'block';
-        botMood = '🧐';
-        updateMascot();
+      if (voiceBtn) {
+        voiceBtn.addEventListener('click', () => {
+          playClickSound();
+          const chatArea = modalEl.querySelector('#ss-guru-chat-area');
+          if (chatArea) chatArea.style.display = 'block';
+          botMood = '🧐';
+          updateMascot();
 
-        chatArea.innerHTML = sanitizeHtml(`
-          <div class="ss-guru-bubble">
-            <div class="ss-bubble-tag">🎙️ गुरु बॉट (Guru Bot Voice Lens)</div>
-            <div class="ss-listening-pulse">${t('quiz.listening')}</div>
-          </div>
-        `);
+          if (chatArea) {
+            chatArea.innerHTML = sanitizeHtml(`
+              <div class="ss-guru-bubble">
+                <div class="ss-bubble-tag">🎙️ गुरु बॉट (Guru Bot Voice Lens)</div>
+                <div class="ss-listening-pulse">${t('quiz.listening')}</div>
+              </div>
+            `);
+          }
 
-        activeRecognition = startVoiceRecognition({
-          lang,
-          onResult: (spokenText) => {
-            activeRecognition = null;
-            handleDoubtResponse(spokenText, q, lang);
-          },
-          onError: () => {
-            activeRecognition = null;
-            handleDoubtResponse(
-              lang === 'hi'
-                ? 'मुझे इस सवाल को हल करने की सरल विधि समझाएँ'
-                : 'Explain simple step to solve this',
-              q,
-              lang
-            );
-          },
+          activeRecognition = startVoiceRecognition({
+            lang,
+            onResult: (spokenText) => {
+              activeRecognition = null;
+              handleDoubtResponse(spokenText, q, lang);
+            },
+            onError: () => {
+              activeRecognition = null;
+              handleDoubtResponse(
+                lang === 'hi'
+                  ? 'मुझे इस सवाल को हल करने की सरल विधि समझाएँ'
+                  : 'Explain simple step to solve this',
+                q,
+                lang
+              );
+            },
+          });
         });
-      });
+      }
 
       // Photo Doubt Assistant (Textbook snapshot scanner)
-      modalEl.querySelector('#ss-ask-photo-btn').addEventListener('click', () => {
-        playClickSound();
-        const chatArea = modalEl.querySelector('#ss-guru-chat-area');
-        chatArea.style.display = 'block';
-        botMood = '✨';
-        updateMascot();
+      const photoBtn = modalEl.querySelector('#ss-ask-photo-btn');
+      if (photoBtn) {
+        photoBtn.addEventListener('click', () => {
+          playClickSound();
+          const chatArea = modalEl.querySelector('#ss-guru-chat-area');
+          if (chatArea) chatArea.style.display = 'block';
+          botMood = '✨';
+          updateMascot();
 
-        chatArea.innerHTML = sanitizeHtml(`
-          <div class="ss-guru-bubble ss-photo-bubble">
-            <div class="ss-bubble-tag">📷 पाठ्यपुस्तक फोटो स्कैनर (Textbook Cyber Scanner)</div>
-            <div class="ss-scanned-preview">
-              <span class="ss-scan-tag">📖 SCAN COMPLETE</span>
-              <p class="ss-scanned-text">"${questionText}"</p>
-            </div>
-            <div class="ss-bubble-msg" style="margin-top:10px;">
-              💡 <strong>गुरु बॉट का संकेत:</strong> ${q.hint[lang] || q.hint.hi}
-            </div>
-          </div>
-        `);
-        speakText(q.hint[lang] || q.hint.hi, lang);
-      });
+          if (chatArea) {
+            chatArea.innerHTML = sanitizeHtml(`
+              <div class="ss-guru-bubble ss-photo-bubble">
+                <div class="ss-bubble-tag">📷 पाठ्यपुस्तक फोटो स्कैनर (Textbook Cyber Scanner)</div>
+                <div class="ss-scanned-preview">
+                  <span class="ss-scan-tag">📖 SCAN COMPLETE</span>
+                  <p class="ss-scanned-text">"${questionText}"</p>
+                </div>
+                <div class="ss-bubble-msg" style="margin-top:10px;">
+                  💡 <strong>गुरु बॉट का संकेत:</strong> ${q.hint[lang] || q.hint.hi}
+                </div>
+              </div>
+            `);
+          }
+          speakText(q.hint[lang] || q.hint.hi, lang);
+        });
+      }
 
       // Candy Option Buttons click handling
       const optionButtons = modalEl.querySelectorAll('.ss-candy-btn');
@@ -437,19 +456,29 @@ export function createQuizModal({
         </div>
       `);
 
-      modalEl.querySelector('#ss-summary-close').addEventListener('click', close);
-      modalEl.querySelector('#ss-finish-btn').addEventListener('click', close);
+      // Wire summary buttons safely
+      const summaryClose = modalEl.querySelector('#ss-summary-close');
+      if (summaryClose) summaryClose.addEventListener('click', close);
 
-      modalEl.querySelector('#ss-retry-btn').addEventListener('click', () => {
-        playClickSound();
-        open(stoneId, grade);
-      });
+      const finishBtn = modalEl.querySelector('#ss-finish-btn');
+      if (finishBtn) finishBtn.addEventListener('click', close);
 
-      modalEl.querySelector('#ss-progress-btn').addEventListener('click', () => {
-        playClickSound();
-        close();
-        if (onOpenProgress) onOpenProgress();
-      });
+      const retryBtn = modalEl.querySelector('#ss-retry-btn');
+      if (retryBtn) {
+        retryBtn.addEventListener('click', () => {
+          playClickSound();
+          open(stoneId, grade);
+        });
+      }
+
+      const progressBtn = modalEl.querySelector('#ss-progress-btn');
+      if (progressBtn) {
+        progressBtn.addEventListener('click', () => {
+          playClickSound();
+          close();
+          if (onOpenProgress) onOpenProgress();
+        });
+      }
     }
 
     renderQuestion();

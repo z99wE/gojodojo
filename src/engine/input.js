@@ -23,7 +23,7 @@ export function createInput(domElement) {
   let actionButton = null;
 
   function onKeyDown(e) {
-    if (e.code === 'KeyE') {
+    if (e.code === 'KeyE' || e.key === 'e' || e.key === 'E') {
       if (!e.repeat) interactQueued = true;
     }
     if (

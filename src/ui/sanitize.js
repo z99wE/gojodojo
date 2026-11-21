@@ -7,7 +7,7 @@
  * Dangerous tag names that must never be evaluated in dynamic DOM rendering.
  * @type {RegExp}
  */
-const FORBIDDEN_TAGS = /<\s*\/?\s*(script|style|iframe|object|embed|applet|meta|link|base|form|input|textarea|button[^\w]|select)\b[^>]*>/gi;
+const FORBIDDEN_TAGS = /<\s*\/?\s*(script|style|iframe|object|embed|applet|meta|link|base|form)\b[^>]*>/gi;
 
 /**
  * Event handler attributes that could trigger script execution.
