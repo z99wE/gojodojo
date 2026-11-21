@@ -1,13 +1,24 @@
-// Progress save/load using localStorage. All storage access is guarded.
+/**
+ * @fileoverview Progress save/load system using localStorage.
+ * Ensures offline resilience on basic, shared mobile devices.
+ */
+
 export const SAVE_KEY = 'ss-progress-v1';
 const SAVE_DELAY_MS = 400;
 
-// Fresh default progress object.
+/**
+ * Creates a fresh default progress object with zero personally identifiable info.
+ * @returns {object} Default player progress state
+ */
 function makeDefault() {
   return { version: 1, lang: 'hi', stones: {}, zones: {}, updatedAt: 0 };
 }
 
-// Load saved progress. Falls back to the default if missing, invalid or wrong version.
+/**
+ * Loads saved progress from local storage.
+ * Falls back to the default state if missing, invalid, or corrupted.
+ * @returns {object} Validated progress object
+ */
 export function loadProgress() {
   try {
     const raw = localStorage.getItem(SAVE_KEY);
@@ -16,28 +27,42 @@ export function loadProgress() {
       if (p && p.version === 1 && p.stones && typeof p.stones === 'object') return p;
     }
   } catch (e) {
-    // Bad JSON or blocked storage: use the default.
+    void e;
   }
   return makeDefault();
 }
 
-// Pending save: only the latest one is written.
+/**
+ * Pending state copy awaiting write to storage.
+ * @type {object|null}
+ */
 let pending = null;
+
+/**
+ * Active timer identifier for debounced storage flush.
+ * @type {number|null}
+ */
 let timer = null;
 
-// Queue a save. Stores a copy stamped with the current time; writes after 400 ms.
+/**
+ * Queues a progress save operation. Debounces writes by 400ms to preserve flash storage.
+ * @param {object} p Current progress state to persist
+ */
 export function saveProgress(p) {
   try {
     pending = JSON.parse(JSON.stringify(p));
     pending.updatedAt = Date.now();
   } catch (e) {
-    return; // Could not copy the object (e.g. circular); skip this save.
+    void e;
+    return;
   }
   if (timer) clearTimeout(timer);
   timer = setTimeout(flushProgress, SAVE_DELAY_MS);
 }
 
-// Write any pending save right away.
+/**
+ * Immediately flushes any queued progress payload to localStorage.
+ */
 export function flushProgress() {
   if (timer) {
     clearTimeout(timer);
@@ -49,11 +74,14 @@ export function flushProgress() {
   try {
     localStorage.setItem(SAVE_KEY, JSON.stringify(data));
   } catch (e) {
-    // Storage full or blocked; progress stays in memory only.
+    void e;
   }
 }
 
-// Remove saved progress, cancel any pending save, and return the default.
+/**
+ * Resets local student progress to default clean state and clears storage.
+ * @returns {object} Fresh default progress state
+ */
 export function resetProgress() {
   if (timer) {
     clearTimeout(timer);
@@ -63,7 +91,7 @@ export function resetProgress() {
   try {
     localStorage.removeItem(SAVE_KEY);
   } catch (e) {
-    // Storage blocked; nothing to remove.
+    void e;
   }
   return makeDefault();
 }

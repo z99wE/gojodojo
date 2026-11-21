@@ -2,6 +2,7 @@
 import { getGrade, getTopic } from '../content/index.js';
 import { t, getLang, setLang } from '../i18n/index.js';
 import { playButtonPopSound } from './audio.js';
+import { sanitizeHtml } from './sanitize.js';
 
 export function createHUD({
   container,
@@ -29,7 +30,9 @@ export function createHUD({
       playerLevel = Math.floor(playerXP / 100) + 1;
       playerStreak = parsed.streak ?? 1;
     }
-  } catch (e) {}
+  } catch (e) {
+    void e;
+  }
 
   function saveStats() {
     try {
@@ -37,7 +40,9 @@ export function createHUD({
         'ss-rpg-stats',
         JSON.stringify({ gold: playerGold, xp: playerXP, streak: playerStreak })
       );
-    } catch (e) {}
+    } catch (e) {
+      void e;
+    }
   }
 
   function addGold(amount) {
@@ -68,7 +73,7 @@ export function createHUD({
     const xpNext = playerLevel * 100;
     const xpCurrent = playerXP % 100;
 
-    hudContainer.innerHTML = `
+    hudContainer.innerHTML = sanitizeHtml(`
       <!-- Top RPG Navigation Bar -->
       <div class="ss-hud-top-bar">
         <!-- Player Level & Treasury Card (Left) -->
@@ -134,7 +139,7 @@ export function createHUD({
 
       <!-- Floating Reward Container -->
       <div id="ss-floating-rewards-layer"></div>
-    `;
+    `);
 
     // Wire events
     hudContainer.querySelector('#ss-hud-progress-btn').addEventListener('click', () => {

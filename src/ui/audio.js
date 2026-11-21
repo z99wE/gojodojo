@@ -11,7 +11,7 @@ function getAudioContext() {
     }
   }
   if (audioCtx && audioCtx.state === 'suspended') {
-    audioCtx.resume().catch(() => {});
+    audioCtx.resume().catch((err) => { void err; });
   }
   return audioCtx;
 }
@@ -38,7 +38,7 @@ export function playCoinSound() {
       osc.start(now + i * 0.07);
       osc.stop(now + i * 0.07 + 0.25);
     });
-  } catch (e) {}
+  } catch (e) { void e; }
 }
 
 // Bubbly jelly pop sound for clicks & buttons
@@ -62,7 +62,7 @@ export function playButtonPopSound() {
 
     osc.start(now);
     osc.stop(now + 0.09);
-  } catch (e) {}
+  } catch (e) { void e; }
 }
 
 export function playClickSound() {
@@ -92,7 +92,7 @@ export function playCorrectSound() {
       osc.start(now + i * 0.07);
       osc.stop(now + i * 0.07 + 0.35);
     });
-  } catch (e) {}
+  } catch (e) { void e; }
 }
 
 // Incorrect answer: Gentle cartoon boing / try again
@@ -116,7 +116,7 @@ export function playIncorrectSound() {
 
     osc.start(now);
     osc.stop(now + 0.28);
-  } catch (e) {}
+  } catch (e) { void e; }
 }
 
 // Hint reveal sound: Soft magical twinkle
@@ -141,7 +141,7 @@ export function playHintSound() {
       osc.start(now + idx * 0.05);
       osc.stop(now + idx * 0.05 + 0.22);
     });
-  } catch (e) {}
+  } catch (e) { void e; }
 }
 
 // Grand fanfare on completing quiz / leveling up
@@ -171,7 +171,7 @@ export function playFanfareSound() {
       osc.start(now + note.t);
       osc.stop(now + note.t + note.d + 0.05);
     });
-  } catch (e) {}
+  } catch (e) { void e; }
 }
 
 // Sprint turbo woosh
@@ -195,7 +195,7 @@ export function playSprintSound() {
 
     osc.start(now);
     osc.stop(now + 0.25);
-  } catch (e) {}
+  } catch (e) { void e; }
 }
 
 // Web Speech API - Text to Speech

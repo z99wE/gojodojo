@@ -1,16 +1,20 @@
 {
   "name": "sankhya-strike",
+  "version": "1.0.0",
+  "description": "Vice City Style 3D Hindi & English Last-Mile STEM RPG for Grades 1-8",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint": "node --check src/main.js src/save.js src/flags.js src/ui/sanitize.js src/ui/quiz.js src/ui/board-modal.js src/ui/hud.js src/ui/progress.js src/world/world.js src/world/props.js",
+    "test": "node --test test/*.test.js"
   },
   "dependencies": {
     "three": "0.169.0"
   },
   "devDependencies": {
-    "vite": "^5.4.0"
+    "vite": "5.4.0"
   }
 }

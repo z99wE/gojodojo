@@ -2,6 +2,7 @@
 import { BOARD, getGrade, setGrade, GRADES } from '../content/index.js';
 import { t, getLang } from '../i18n/index.js';
 import { playClickSound, speakText, stopSpeaking } from './audio.js';
+import { sanitizeHtml } from './sanitize.js';
 
 export function createBoardModal({ container, onClose, onOpenProgress }) {
   let modalEl = null;
@@ -26,7 +27,7 @@ export function createBoardModal({ container, onClose, onOpenProgress }) {
     modalEl = document.createElement('div');
     modalEl.className = 'ss-clay-backdrop';
 
-    modalEl.innerHTML = `
+    modalEl.innerHTML = sanitizeHtml(`
       <div class="ss-clay-modal" role="dialog" aria-modal="true">
         <!-- Header -->
         <div class="ss-clay-header ss-header-hub">
@@ -102,7 +103,7 @@ export function createBoardModal({ container, onClose, onOpenProgress }) {
           </button>
         </div>
       </div>
-    `;
+    `);
 
     // Wire events
     modalEl.querySelector('#ss-board-close').addEventListener('click', close);

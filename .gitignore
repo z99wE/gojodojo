@@ -20,5 +20,6 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# Workspace state
+# Tooling and audit cache
 .codebenders/
+.soloknuckle/

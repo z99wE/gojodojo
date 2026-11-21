@@ -1,0 +1,24 @@
+{
+  "flags": {
+    "viceCityMode": {
+      "description": "3D retro sports cars, neon palm blips, and first-person POV immersion",
+      "enabled": true,
+      "rolloutPercentage": 100
+    },
+    "koreanPastelTheme": {
+      "description": "South Korean pastel aesthetic with claymorphic cards and candy buttons",
+      "enabled": true,
+      "rolloutPercentage": 100
+    },
+    "offlineVoiceTts": {
+      "description": "Web Speech synthesis & speech recognition offline tutor mode",
+      "enabled": true,
+      "rolloutPercentage": 100
+    },
+    "radarMinimap": {
+      "description": "Vice City circular radar HUD with player heading compass and shrine blips",
+      "enabled": true,
+      "rolloutPercentage": 100
+    }
+  }
+}

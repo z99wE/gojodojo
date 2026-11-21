@@ -11,6 +11,7 @@ import {
   stopSpeaking,
   startVoiceRecognition,
 } from './audio.js';
+import { sanitizeHtml } from './sanitize.js';
 
 export function createQuizModal({
   container,
@@ -25,7 +26,7 @@ export function createQuizModal({
   function close() {
     stopSpeaking();
     if (activeRecognition) {
-      try { activeRecognition.abort(); } catch (e) {}
+      try { activeRecognition.abort(); } catch (e) { void e; }
       activeRecognition = null;
     }
     if (modalEl && modalEl.parentNode) {
@@ -70,7 +71,7 @@ export function createQuizModal({
       const hintText = q.hint[lang] || q.hint.hi;
       const explainText = q.explain[lang] || q.explain.hi;
 
-      modalEl.innerHTML = `
+      modalEl.innerHTML = sanitizeHtml(`
         <div class="ss-clay-modal" role="dialog" aria-modal="true">
           <!-- Modal Top Header with Mascot & Title -->
           <div class="ss-clay-header ss-header-${topic.subject}">
@@ -162,7 +163,7 @@ export function createQuizModal({
             <div id="ss-footer-action"></div>
           </div>
         </div>
-      `;
+      `);
 
       // Wire close button
       modalEl.querySelector('#ss-quiz-close').addEventListener('click', close);
@@ -205,12 +206,12 @@ export function createQuizModal({
         botMood = '🧐';
         updateMascot();
 
-        chatArea.innerHTML = `
+        chatArea.innerHTML = sanitizeHtml(`
           <div class="ss-guru-bubble">
             <div class="ss-bubble-tag">🎙️ गुरु बॉट (Guru Bot Voice Lens)</div>
             <div class="ss-listening-pulse">${t('quiz.listening')}</div>
           </div>
-        `;
+        `);
 
         activeRecognition = startVoiceRecognition({
           lang,
@@ -239,7 +240,7 @@ export function createQuizModal({
         botMood = '✨';
         updateMascot();
 
-        chatArea.innerHTML = `
+        chatArea.innerHTML = sanitizeHtml(`
           <div class="ss-guru-bubble ss-photo-bubble">
             <div class="ss-bubble-tag">📷 पाठ्यपुस्तक फोटो स्कैनर (Textbook Cyber Scanner)</div>
             <div class="ss-scanned-preview">
@@ -250,7 +251,7 @@ export function createQuizModal({
               💡 <strong>गुरु बॉट का संकेत:</strong> ${q.hint[lang] || q.hint.hi}
             </div>
           </div>
-        `;
+        `);
         speakText(q.hint[lang] || q.hint.hi, lang);
       });
 
@@ -291,7 +292,7 @@ export function createQuizModal({
 
           // Show explanation card
           const feedbackContainer = modalEl.querySelector('#ss-feedback-container');
-          feedbackContainer.innerHTML = `
+          feedbackContainer.innerHTML = sanitizeHtml(`
             <div class="ss-guru-bubble ${isCorrect ? 'ss-success-bubble' : 'ss-review-bubble'}">
               <div class="ss-bubble-tag">
                 <span>${isCorrect ? '✨ ' + t('quiz.correct') : '💡 ' + t('quiz.incorrect')}</span>
@@ -301,7 +302,7 @@ export function createQuizModal({
               </div>
               <div class="ss-bubble-msg">${explainText}</div>
             </div>
-          `;
+          `);
 
           modalEl.querySelector('#ss-explain-audio-btn').addEventListener('click', () => {
             playClickSound();
@@ -311,11 +312,11 @@ export function createQuizModal({
           // Show Next / Finish button
           const isLast = currentIdx >= totalQ - 1;
           const footerAction = modalEl.querySelector('#ss-footer-action');
-          footerAction.innerHTML = `
+          footerAction.innerHTML = sanitizeHtml(`
             <button class="ss-clay-primary-btn" id="ss-next-btn" type="button">
               ${isLast ? t('quiz.finish') + ' 🏆' : t('quiz.next')}
             </button>
-          `;
+          `);
 
           modalEl.querySelector('#ss-next-btn').addEventListener('click', () => {
             playClickSound();
@@ -349,12 +350,12 @@ export function createQuizModal({
         ? `गुरु बॉट: "${studentDoubt}" को समझना बहुत आसान है! याद रखें कि ${question.hint.hi}। अब विकल्पों को देखें, आपको सही उत्तर तुरंत मिल जाएगा!`
         : `Guru Bot: Solving "${studentDoubt}" is simple! Remember that ${question.hint.en}. Now look at the choices and pick the match!`;
 
-      chatArea.innerHTML = `
+      chatArea.innerHTML = sanitizeHtml(`
         <div class="ss-guru-bubble ss-hint-bubble">
           <div class="ss-bubble-tag">🤖 गुरु बॉट का सीधा समाधान (Guru Advice)</div>
           <div class="ss-bubble-msg">${responseText}</div>
         </div>
-      `;
+      `);
       speakText(responseText, currentLang);
     }
 
@@ -389,7 +390,7 @@ export function createQuizModal({
             ? (lang === 'hi' ? 'शानदार खेल! थोड़ी सी पुनरावृत्ति से आप पूरी तरह कुशल हो जाएँगे।' : 'Awesome playing! A quick review will make you invincible.')
             : (lang === 'hi' ? 'अच्छी शुरुआत! गुरु बॉट की सलाह पढ़कर एक बार फिर मुकाबला करें।' : 'Good try! Read Guru Bot\'s tips and challenge this shrine again.'));
 
-      modalEl.innerHTML = `
+      modalEl.innerHTML = sanitizeHtml(`
         <div class="ss-clay-modal ss-victory-modal" role="dialog">
           <div class="ss-clay-header ss-header-${topic.subject}">
             <div class="ss-mascot-avatar">👑</div>
@@ -434,7 +435,7 @@ export function createQuizModal({
             </button>
           </div>
         </div>
-      `;
+      `);
 
       modalEl.querySelector('#ss-summary-close').addEventListener('click', close);
       modalEl.querySelector('#ss-finish-btn').addEventListener('click', close);

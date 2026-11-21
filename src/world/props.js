@@ -519,7 +519,7 @@ export function makeBridgeSegment(length) {
 // 15. Rock
 export function makeRock(seed) {
   const rnd = (k) => {
-    const v = Math.sin(seed * 91.7 + k * 17.3) * 43758.5453;
+    const v = Math.sin(seed * 91.7 + k * 17.3) * 43758.5;
     return v - Math.floor(v);
   };
   const mesh = new THREE.Mesh(

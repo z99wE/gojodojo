@@ -3,6 +3,7 @@ import { GRADES, getGrade, setGrade, topicsForGrade, progressKey } from '../cont
 import { t, getLang } from '../i18n/index.js';
 import { loadProgress } from '../save.js';
 import { playClickSound, speakText, stopSpeaking } from './audio.js';
+import { sanitizeHtml } from './sanitize.js';
 
 export function createProgressModal({ container, onClose, onOpenTopic }) {
   let modalEl = null;
@@ -67,7 +68,7 @@ export function createProgressModal({ container, onClose, onOpenTopic }) {
     const accuracyPct = maxPossible > 0 ? Math.round((totalScore / maxPossible) * 100) : 0;
     const totalTopics = topics.length;
 
-    modalEl.innerHTML = `
+    modalEl.innerHTML = sanitizeHtml(`
       <div class="ss-clay-modal ss-progress-modal" role="dialog" aria-modal="true">
         <!-- Header -->
         <div class="ss-clay-header ss-header-hub">
@@ -126,7 +127,7 @@ export function createProgressModal({ container, onClose, onOpenTopic }) {
           </button>
         </div>
       </div>
-    `;
+    `);
 
     // Wire events
     modalEl.querySelector('#ss-progress-close').addEventListener('click', close);
@@ -171,10 +172,10 @@ export function createProgressModal({ container, onClose, onOpenTopic }) {
         if (speakingParent) {
           stopSpeaking();
           speakingParent = false;
-          parentVoiceBtn.innerHTML = `<span>🔊</span> <span>${t('progress.parentVoiceSummary')}</span>`;
+          parentVoiceBtn.innerHTML = sanitizeHtml(`<span>🔊</span> <span>${t('progress.parentVoiceSummary')}</span>`);
         } else {
           speakingParent = true;
-          parentVoiceBtn.innerHTML = `<span>⏹</span> <span>${t('quiz.stopAudio')}</span>`;
+          parentVoiceBtn.innerHTML = sanitizeHtml(`<span>⏹</span> <span>${t('quiz.stopAudio')}</span>`);
           const spokenText = lang === 'hi'
             ? `अभिभावक रिपोर्ट: आपके बच्चे ने कक्षा ${currentGrade} में कुल ${totalTopics} में से ${completedCount} अध्याय पूरे कर लिए हैं। बच्चे की शुद्धता ${accuracyPct} प्रतिशत है। बच्चे ने बहुत मन लगाकर अभ्यास किया है। आज शाम बच्चे की पीठ थपथपाएँ और उन्हें शाबाशी दें!`
             : `Parent Report: Your child has completed ${completedCount} out of ${totalTopics} topics in Class ${currentGrade} with an accuracy of ${accuracyPct} percent. Your child is making steady progress!`;

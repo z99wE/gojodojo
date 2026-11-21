@@ -144,7 +144,7 @@ function onModalOpen() {
   controller.setPaused(true);
   showHint(false);
   if (document.exitPointerLock) {
-    try { document.exitPointerLock(); } catch (e) {}
+    try { document.exitPointerLock(); } catch (e) { void e; }
   }
 }
 
