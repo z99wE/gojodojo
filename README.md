@@ -3,6 +3,8 @@
 
 > **A high-definition, first-person open-world RPG game inspired by GTA / Vice City with a delicious South Korean pastel aesthetic — built to make Math & Science education wildly fun, visual, and accessible for Grades 1 to 8 across India.**
 
+🌐 **Live on Cloudflare:** [https://sankhya-strike.pages.dev](https://sankhya-strike.pages.dev)
+
 ---
 
 ## 🌸 Visual Identity & Aesthetic (South Korean Pastel Claymorphism)
