@@ -99,6 +99,31 @@ class GameApp {
   }
 
   initUi() {
+    // Language Selector Chips at top of Garage
+    const topLangBtns = document.querySelectorAll('#lang-selector-top .chip-btn');
+    topLangBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        topLangBtns.forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        this.activeLang = btn.dataset.lang || 'hi';
+        this.quiz.setLang(this.activeLang);
+        this.voiceInput.updateLanguage(this.activeLang);
+        this.screenReader.setLang(this.activeLang);
+        this.updateI18nLabels();
+      });
+    });
+
+    // Car Color Selector Chips
+    const colorBtns = document.querySelectorAll('#car-color-selector .chip-btn');
+    colorBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        colorBtns.forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        const color = btn.dataset.color || '#00f0ff';
+        this.engine.setCarColor(color);
+      });
+    });
+
     // Grade Selection Chips
     const gradeBtns = document.querySelectorAll('#grade-selector .chip-btn');
     gradeBtns.forEach((btn) => {
@@ -189,6 +214,17 @@ class GameApp {
     const t = i18n[this.activeLang] || i18n.en;
     if (this.langBtn) {
       this.langBtn.textContent = this.activeLang === 'hi' ? 'LANG: हिंदी' : 'LANG: ENGLISH';
+    }
+    const hiBtn = document.getElementById('top-lang-hi');
+    const enBtn = document.getElementById('top-lang-en');
+    if (hiBtn && enBtn) {
+      if (this.activeLang === 'hi') {
+        hiBtn.classList.add('active');
+        enBtn.classList.remove('active');
+      } else {
+        enBtn.classList.add('active');
+        hiBtn.classList.remove('active');
+      }
     }
     if (this.startBtn) {
       this.startBtn.textContent = t['app.start'];
@@ -298,7 +334,7 @@ class GameApp {
       // In Start overlay, Space or Enter starts
       if (!this.startOverlay.classList.contains('hidden')) {
         if (e.code === 'Space' || e.code === 'Enter') {
-          if (document.activeElement === this.customTopicInput) return; // Allow typing spaces
+          if (document.activeElement === this.customTopicInput || document.activeElement === this.playerNameInput) return; // Allow typing
           e.preventDefault();
           this.startGame();
           return;
@@ -345,28 +381,28 @@ class GameApp {
         return;
       }
 
-      // Throttle (Accelerate / Gas)
-      if (e.code === 'ArrowUp' || e.code === 'KeyW') {
+      // 1. Lane UP: W, ArrowUp, L
+      if (e.code === 'ArrowUp' || e.code === 'KeyW' || e.code === 'KeyL') {
+        e.preventDefault();
+        this.engine.steerLaneUp();
+      }
+
+      // 2. Lane DOWN: S, ArrowDown, R
+      if (e.code === 'ArrowDown' || e.code === 'KeyS' || e.code === 'KeyR') {
+        e.preventDefault();
+        this.engine.steerLaneDown();
+      }
+
+      // 3. Accelerate / Gas: D, ArrowRight
+      if (e.code === 'ArrowRight' || e.code === 'KeyD') {
         e.preventDefault();
         this.engine.setThrottle(true);
       }
 
-      // Active Brake
-      if (e.code === 'ArrowDown' || e.code === 'KeyS') {
-        e.preventDefault();
-        this.engine.setBrake(true);
-      }
-
-      // Steer Left
+      // 4. Active Brake: A, ArrowLeft
       if (e.code === 'ArrowLeft' || e.code === 'KeyA') {
         e.preventDefault();
-        this.engine.setSteerLeft(true);
-      }
-
-      // Steer Right
-      if (e.code === 'ArrowRight' || e.code === 'KeyD') {
-        e.preventDefault();
-        this.engine.setSteerRight(true);
+        this.engine.setBrake(true);
       }
 
       // Shift Up (SPACEBAR)
@@ -396,17 +432,11 @@ class GameApp {
     });
 
     window.addEventListener('keyup', (e) => {
-      if (e.code === 'ArrowUp' || e.code === 'KeyW') {
+      if (e.code === 'ArrowRight' || e.code === 'KeyD') {
         this.engine.setThrottle(false);
       }
-      if (e.code === 'ArrowDown' || e.code === 'KeyS') {
-        this.engine.setBrake(false);
-      }
       if (e.code === 'ArrowLeft' || e.code === 'KeyA') {
-        this.engine.setSteerLeft(false);
-      }
-      if (e.code === 'ArrowRight' || e.code === 'KeyD') {
-        this.engine.setSteerRight(false);
+        this.engine.setBrake(false);
       }
     });
 
@@ -426,10 +456,17 @@ class GameApp {
       el.addEventListener('mouseup', () => onEnd());
     };
 
+    const btnLaneUp = document.getElementById('btn-steer-left');
+    if (btnLaneUp) {
+      btnLaneUp.addEventListener('click', () => this.engine.steerLaneUp());
+    }
+    const btnLaneDown = document.getElementById('btn-steer-right');
+    if (btnLaneDown) {
+      btnLaneDown.addEventListener('click', () => this.engine.steerLaneDown());
+    }
+
     bindTouchAction('btn-gas', () => this.engine.setThrottle(true), () => this.engine.setThrottle(false));
     bindTouchAction('btn-brake', () => this.engine.setBrake(true), () => this.engine.setBrake(false));
-    bindTouchAction('btn-steer-left', () => this.engine.setSteerLeft(true), () => this.engine.setSteerLeft(false));
-    bindTouchAction('btn-steer-right', () => this.engine.setSteerRight(true), () => this.engine.setSteerRight(false));
 
     const btnShiftUp = document.getElementById('btn-shift-up');
     if (btnShiftUp) {
@@ -499,6 +536,7 @@ class GameApp {
   showQuizModal(q) {
     if (!this.uiContainer) return;
 
+    this.engine.pauseForPitstop();
     this.screenReader.stop();
 
     const isHi = this.activeLang === 'hi';
@@ -617,6 +655,7 @@ class GameApp {
     // Auto dismiss after 2.6s so student can absorb the explanation and mistake analysis
     setTimeout(() => {
       this.quiz.dismiss();
+      this.engine.resumeFromPitstop();
       if (this.uiContainer) {
         this.uiContainer.innerHTML = '';
       }
@@ -628,8 +667,10 @@ class GameApp {
   toggleAiTutor() {
     this.isTutorOpen = !this.isTutorOpen;
     if (this.isTutorOpen) {
+      this.engine.pauseForPitstop();
       this.showAiTutor();
     } else {
+      this.engine.resumeFromPitstop();
       this.hideAiTutor();
     }
   }
@@ -737,6 +778,9 @@ class GameApp {
       if (prevCount !== newCount && newCount >= 0) {
         this.audio.playCountdown(newCount);
       }
+    } else if (this.engine.status === 'pitstop' || this.engine.isPaused) {
+      // FROZEN DURING QUIZ: Game is paused behind the modal!
+      // Engine physics are frozen so car does not advance or crash while studying.
     } else {
       this.engine.update(dt);
 
@@ -750,6 +794,7 @@ class GameApp {
         this.audio.playRadioBeep();
         const q = this.quiz.nextQuestion();
         if (q) {
+          this.engine.pauseForPitstop();
           this.showQuizModal(q);
         }
         this.engine.activeQuizCheckpoint = null;

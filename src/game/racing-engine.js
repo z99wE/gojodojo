@@ -58,11 +58,13 @@ export const TRACK_CIRCUITS = {
 
 export class RacingEngine {
   constructor(options = {}) {
-    this.trackLength = options.trackLength || 1200;
+    this.trackLength = options.trackLength || 100000; // Continuous 30+ min endurance GP
     this.circuitId = options.circuitId || 'physics';
     this.grade = options.grade || 5;
     this.playerName = options.playerName || 'ARYABHATA';
     this.character = options.character || 'Velocity Ace';
+    this.chosenCarColor = options.carColor || '#00f0ff';
+    this.chosenCarSecondaryColor = '#00485c';
 
     // Driving Inputs
     this.inputs = {
@@ -74,6 +76,12 @@ export class RacingEngine {
 
     this.screenShake = 0;
     this.crashEvent = null;
+    this.isPaused = false;
+    this.stage = 1;
+    this.traffic = [];
+    this.jaywalkers = [];
+    this.spawnTrafficTimer = 0;
+    this.spawnJaywalkerTimer = 0;
 
     this.reset();
   }
@@ -87,11 +95,43 @@ export class RacingEngine {
     }
   }
 
+  setCarColor(color) {
+    this.chosenCarColor = color;
+    const colorMap = {
+      '#00f0ff': '#00485c',
+      '#00ff66': '#004d1f',
+      '#ffe600': '#5c5200',
+      '#ff2a55': '#5c0a1b',
+      '#ff007f': '#5c002e'
+    };
+    this.chosenCarSecondaryColor = colorMap[color] || '#00485c';
+    if (this.player) {
+      this.player.carColor = this.chosenCarColor;
+      this.player.carSecondaryColor = this.chosenCarSecondaryColor;
+    }
+  }
+
+  pauseForPitstop() {
+    this.isPaused = true;
+    this.status = 'pitstop';
+  }
+
+  resumeFromPitstop() {
+    this.isPaused = false;
+    this.status = 'racing';
+  }
+
   reset() {
-    this.status = 'ready'; // ready, countdown, racing, finished
+    this.status = 'ready'; // ready, countdown, racing, pitstop, finished
     this.countdownTime = 1.8; // Snappy countdown so racing begins fast
     this.elapsedTime = 0;
     this.timeScale = 1.0;
+    this.isPaused = false;
+    this.stage = 1;
+    this.traffic = [];
+    this.jaywalkers = [];
+    this.spawnTrafficTimer = 0;
+    this.spawnJaywalkerTimer = 0;
 
     // Player State
     this.player = {
@@ -100,12 +140,15 @@ export class RacingEngine {
       speed: 0, // km/h
       distance: 0, // meters
       x: 0.0, // Continuous lateral: -1.0 (left) to +1.0 (right). >1.0 is off-road
+      targetX: 0.0,
       screenX: 130, // Dynamic forward surge with speed
-      lane: 1, // Discrete fallback
+      lane: 1, // Discrete lane: 0 (top), 1 (center), 2 (bottom)
+      carColor: this.chosenCarColor || '#00f0ff',
+      carSecondaryColor: this.chosenCarSecondaryColor || '#00485c',
       spinVelocity: 0,
       isOffRoad: false,
       isBraking: false,
-      nitro: 60, // 0-100%
+      nitro: 100, // Starts with 100% full nitro!
       isNitroActive: false,
       nitroTimeRemaining: 0,
       shield: 100, // 0-100%
@@ -132,7 +175,7 @@ export class RacingEngine {
       speed: 0,
       distance: 0,
       x: -0.5,
-      nitro: 40,
+      nitro: 60,
       isNitroActive: false,
       aiSkill: 0.88 + Math.min(0.12, (this.grade - 1) * 0.015),
       hasFinished: false,
@@ -141,7 +184,7 @@ export class RacingEngine {
 
     this.pickups = this.generateTrackItems();
 
-    // Early & Frequent Checkpoints so students get engaged right away
+    // Early & Continuous Checkpoints so students get engaged right away
     this.checkpoints = [
       { distance: 60, triggered: false },
       { distance: 220, triggered: false },
@@ -213,11 +256,20 @@ export class RacingEngine {
   }
 
   steerLane(direction) {
-    if (this.status !== 'racing') return;
+    if (this.status !== 'racing' && this.status !== 'countdown') return;
     const target = Math.max(0, Math.min(2, this.player.lane + direction));
     this.player.lane = target;
     const xMap = [-0.6, 0.0, 0.6];
+    this.player.targetX = xMap[target];
     this.player.x = xMap[target];
+  }
+
+  steerLaneUp() {
+    this.steerLane(-1);
+  }
+
+  steerLaneDown() {
+    this.steerLane(1);
   }
 
   shiftUp() {
@@ -262,20 +314,140 @@ export class RacingEngine {
   activateNitro() {
     if (this.status !== 'racing') return false;
     if (this.player.isNitroActive) return false;
-    if (this.player.nitro < 25) return false;
+    if (this.player.nitro < 15) return false;
     if (this.player.stallTimer > 0) return false;
 
     this.player.isNitroActive = true;
-    this.player.nitroTimeRemaining = 4.0;
+    this.player.nitroTimeRemaining = 4.5;
     this.player.nitro = Math.max(0, this.player.nitro - 25);
     this.player.score += 150;
-    this.player.speed = Math.min(430, this.player.speed + 40);
+    this.player.speed = Math.min(430, this.player.speed + 45);
     this.player.bpm = Math.min(160, this.player.bpm + 15);
+    this.player.shiftFeedback = {
+      text: 'SUPER NITRO OVERDRIVE ENGAGED!',
+      type: 'perfect',
+      timer: 2.0
+    };
     return true;
   }
 
+  // --- Oncoming Traffic & Jaywalker Simulation ---
+
+  spawnTrafficVehicle() {
+    const lane = Math.floor(Math.random() * 3);
+    const xMap = [-0.6, 0.0, 0.6];
+    const colors = ['#ff2a55', '#ffe600', '#8b5cf6', '#ff007f', '#ffffff'];
+    const types = ['sedan', 'truck', 'van'];
+    const type = types[Math.floor(Math.random() * types.length)];
+    const color = colors[Math.floor(Math.random() * colors.length)];
+
+    this.traffic.push({
+      id: `traffic-${Date.now()}-${Math.random()}`,
+      distance: this.player.distance + 85 + Math.random() * 50,
+      lane,
+      x: xMap[lane],
+      speed: 55 + Math.random() * 35,
+      type,
+      color,
+      passed: false
+    });
+  }
+
+  spawnJaywalker() {
+    const crossingDir = Math.random() > 0.5 ? 1 : -1;
+    this.jaywalkers.push({
+      id: `walker-${Date.now()}-${Math.random()}`,
+      distance: this.player.distance + 90 + Math.random() * 45,
+      x: crossingDir === 1 ? -0.85 : 0.85,
+      targetX: crossingDir === 1 ? 0.85 : -0.85,
+      crossingDir,
+      walkSpeed: 0.35 + Math.random() * 0.25,
+      passed: false,
+      color: Math.random() > 0.5 ? '#ffe600' : '#00f0ff'
+    });
+  }
+
+  updateTrafficAndJaywalkers(dt) {
+    if (this.status !== 'racing') return;
+
+    // Spawn oncoming traffic every 2.8s
+    this.spawnTrafficTimer += dt;
+    if (this.spawnTrafficTimer >= 2.8 && this.traffic.length < 5) {
+      this.spawnTrafficTimer = 0;
+      this.spawnTrafficVehicle();
+    }
+
+    // Spawn jaywalkers every 4.2s
+    this.spawnJaywalkerTimer += dt;
+    if (this.spawnJaywalkerTimer >= 4.2 && this.jaywalkers.length < 3) {
+      this.spawnJaywalkerTimer = 0;
+      this.spawnJaywalker();
+    }
+
+    // Update traffic
+    for (let i = this.traffic.length - 1; i >= 0; i--) {
+      const v = this.traffic[i];
+      const approachMps = (v.speed * 1000) / 3600;
+      v.distance -= approachMps * dt * 0.45;
+
+      const relDist = v.distance - this.player.distance;
+
+      // Check collision
+      if (Math.abs(relDist) < 4.8 && Math.abs(v.x - this.player.x) < 0.38) {
+        this.player.shield = Math.max(0, this.player.shield - 15);
+        this.player.speed = Math.max(25, this.player.speed - 30);
+        this.player.bpm = Math.min(170, this.player.bpm + 20);
+        this.triggerCrash('traffic', 0.9);
+        this.player.shiftFeedback = { text: 'TRAFFIC IMPACT! -15% SHIELD', type: 'stall', timer: 1.5 };
+        this.traffic.splice(i, 1);
+        continue;
+      }
+
+      // Successful clean dodge
+      if (relDist < -6 && !v.passed) {
+        v.passed = true;
+        this.player.score += 100;
+      }
+
+      // Despawn
+      if (relDist < -40) {
+        this.traffic.splice(i, 1);
+      }
+    }
+
+    // Update jaywalkers
+    for (let i = this.jaywalkers.length - 1; i >= 0; i--) {
+      const w = this.jaywalkers[i];
+      w.x += w.crossingDir * w.walkSpeed * dt;
+
+      const relDist = w.distance - this.player.distance;
+
+      // Check collision
+      if (Math.abs(relDist) < 4.0 && Math.abs(w.x - this.player.x) < 0.34) {
+        this.player.shield = Math.max(0, this.player.shield - 15);
+        this.player.speed = Math.max(25, this.player.speed - 30);
+        this.player.bpm = Math.min(170, this.player.bpm + 22);
+        this.triggerCrash('jaywalker', 0.85);
+        this.player.shiftFeedback = { text: 'PEDESTRIAN ACCIDENT! -15% SHIELD', type: 'stall', timer: 1.5 };
+        this.jaywalkers.splice(i, 1);
+        continue;
+      }
+
+      // Successful clean dodge
+      if (relDist < -5 && !w.passed) {
+        w.passed = true;
+        this.player.score += 150;
+      }
+
+      // Despawn
+      if (relDist < -30 || Math.abs(w.x) > 1.2) {
+        this.jaywalkers.splice(i, 1);
+      }
+    }
+  }
+
   activateFocus() {
-    if (this.status !== 'racing') return false;
+    if (this.status !== 'racing' && this.status !== 'pitstop') return false;
     if (this.player.focusCooldown > 0) return false;
 
     this.player.focusActive = true;
@@ -339,7 +511,61 @@ export class RacingEngine {
     const dist = this.player.distance;
     const time = this.elapsedTime;
 
-    if (dist < 300 || time < 15) {
+    if (time <= 60) {
+      if (dist < 300 || time < 15) {
+        return {
+          id: 'dawn',
+          name: { hi: 'सुनहरा प्रभात (Golden Dawn)', en: 'Golden Dawn' },
+          skyTop: '#14082e',
+          skyMid: '#3a124a',
+          skyBot: '#7a2245',
+          sunColor: '#ffbb44',
+          curbLight: '#ffdd77',
+          curbDark: '#c9184a',
+          ambientLight: 0.9
+        };
+      } else if (dist < 650 || time < 35) {
+        return {
+          id: 'noon',
+          name: { hi: 'दोपहर साइबरवे (High Noon Cyberway)', en: 'High Noon Cyberway' },
+          skyTop: '#081845',
+          skyMid: '#0a3b68',
+          skyBot: '#116688',
+          sunColor: '#fff5b0',
+          curbLight: '#ffffff',
+          curbDark: '#00b4d8',
+          ambientLight: 1.0
+        };
+      } else if (dist < 950 || time < 55) {
+        return {
+          id: 'sunset',
+          name: { hi: 'संध्या गोधूलि (Synthwave Sunset)', en: 'Synthwave Sunset' },
+          skyTop: '#2b0938',
+          skyMid: '#70104e',
+          skyBot: '#c43835',
+          sunColor: '#ff7744',
+          curbLight: '#ffd166',
+          curbDark: '#d90429',
+          ambientLight: 0.85
+        };
+      } else {
+        return {
+          id: 'midnight',
+          name: { hi: 'मध्यरात्रि एक्सप्रेसवे (Midnight Neon Expressway)', en: 'Midnight Neon Expressway' },
+          skyTop: '#03010c',
+          skyMid: '#08041c',
+          skyBot: '#150838',
+          sunColor: '#a8dadc',
+          curbLight: '#00f0ff',
+          curbDark: '#ff0077',
+          ambientLight: 0.75
+        };
+      }
+    }
+
+    // Extended 30+ minute endurance championship cycle (cycles every 4 minutes)
+    const cycle = Math.floor(time / 240) % 4;
+    if (cycle === 0) {
       return {
         id: 'dawn',
         name: { hi: 'सुनहरा प्रभात (Golden Dawn)', en: 'Golden Dawn' },
@@ -351,7 +577,7 @@ export class RacingEngine {
         curbDark: '#c9184a',
         ambientLight: 0.9
       };
-    } else if (dist < 650 || time < 35) {
+    } else if (cycle === 1) {
       return {
         id: 'noon',
         name: { hi: 'दोपहर साइबरवे (High Noon Cyberway)', en: 'High Noon Cyberway' },
@@ -363,7 +589,7 @@ export class RacingEngine {
         curbDark: '#00b4d8',
         ambientLight: 1.0
       };
-    } else if (dist < 950 || time < 55) {
+    } else if (cycle === 2) {
       return {
         id: 'sunset',
         name: { hi: 'संध्या गोधूलि (Synthwave Sunset)', en: 'Synthwave Sunset' },
@@ -382,7 +608,7 @@ export class RacingEngine {
         skyTop: '#03010c',
         skyMid: '#08041c',
         skyBot: '#150838',
-        sunColor: '#a8dadc', // Moon
+        sunColor: '#a8dadc',
         curbLight: '#00f0ff',
         curbDark: '#ff0077',
         ambientLight: 0.75
@@ -401,7 +627,7 @@ export class RacingEngine {
       return;
     }
 
-    if (this.status !== 'racing') return;
+    if (this.status !== 'racing' || this.isPaused) return;
 
     const dt = rawDt * this.timeScale;
     this.elapsedTime += rawDt;
@@ -436,6 +662,9 @@ export class RacingEngine {
       }
     }
 
+    // Passive Nitro Recharge
+    this.player.nitro = Math.min(100, this.player.nitro + 2.5 * dt);
+
     // 4. Nitro & Engine Stalls
     if (this.player.stallTimer > 0) {
       this.player.stallTimer -= dt;
@@ -451,7 +680,7 @@ export class RacingEngine {
 
       const gearCfg = GEAR_CONFIG[this.player.gear - 1];
       let maxSpeedForGear = gearCfg.maxSpeed;
-      let accelFactor = gearCfg.ratio * 22.0; // Responsive, punchy acceleration
+      let accelFactor = gearCfg.ratio * 22.0;
 
       if (this.player.isNitroActive) {
         maxSpeedForGear += 70;
@@ -465,7 +694,7 @@ export class RacingEngine {
         this.player.bpm = Math.min(160, this.player.bpm + 12 * dt);
       }
 
-      // Auto-Shift Transmission Assist: If holding throttle and at redline for 0.4s, auto upshift!
+      // Auto-Shift Transmission Assist
       if (this.inputs.throttle && this.player.rpm >= REV_ZONES.GREEN_MAX && this.player.gear < GEAR_CONFIG.length) {
         this.player.overrevTimer += dt;
         if (this.player.overrevTimer > 0.4) {
@@ -498,18 +727,21 @@ export class RacingEngine {
       }
     }
 
-    // 5. Lateral Steering
-    let steerVelocity = 0;
-    if (this.inputs.steerLeft) steerVelocity -= 2.2;
-    if (this.inputs.steerRight) steerVelocity += 2.2;
+    // 5. Responsive Lateral Steering & Lane Following
+    if (this.inputs.steerLeft) {
+      this.player.targetX = Math.max(-1.0, this.player.targetX - 2.6 * dt);
+    }
+    if (this.inputs.steerRight) {
+      this.player.targetX = Math.min(1.0, this.player.targetX + 2.6 * dt);
+    }
 
     if (Math.abs(this.player.spinVelocity) > 0.05) {
       this.player.x += this.player.spinVelocity * dt;
       this.player.spinVelocity *= Math.pow(0.1, dt);
     }
 
-    const steerScale = Math.min(1.0, Math.max(0.3, this.player.speed / 40));
-    this.player.x += steerVelocity * steerScale * dt;
+    const laneDiff = this.player.targetX - this.player.x;
+    this.player.x += laneDiff * Math.min(1.0, 16.0 * dt);
     this.player.x = Math.max(-1.85, Math.min(1.85, this.player.x));
 
     // Roadside Guardrail Hit
@@ -521,7 +753,7 @@ export class RacingEngine {
       this.player.x = Math.sign(this.player.x) * 1.40;
     }
 
-    // 6. Dynamic Screen Position (Car surges forward on screen with speed)
+    // 6. Dynamic Screen Position
     const targetScreenX = 110 + (this.player.speed / 380) * 140 + (this.player.isNitroActive ? 40 : 0);
     this.player.screenX += (targetScreenX - this.player.screenX) * dt * 4.0;
 
@@ -544,22 +776,61 @@ export class RacingEngine {
       this.player.bpm += (targetBpm - this.player.bpm) * dt * 0.5;
     }
 
-    // 9. Checkpoint Triggers
+    // 9. Checkpoint Triggers & Pitstop Pause
     for (const cp of this.checkpoints) {
       if (!cp.triggered && this.player.distance >= cp.distance) {
         cp.triggered = true;
         this.activeQuizCheckpoint = cp;
+        this.pauseForPitstop(); // FREEZES CAR BEHIND QUIZ MODAL
         this.player.bpm = Math.min(165, this.player.bpm + 18);
         break;
       }
     }
 
-    // 10. Pickups & Rival AI
+    // Continuous Checkpoint Generation for 30+ min gameplay
+    const lastCp = this.checkpoints[this.checkpoints.length - 1];
+    if (lastCp && this.player.distance > lastCp.distance - 200) {
+      this.checkpoints.push({
+        distance: lastCp.distance + 220 + Math.floor(Math.random() * 80),
+        triggered: false
+      });
+    }
+
+    // 10. Update Oncoming Traffic & Jaywalkers
+    this.updateTrafficAndJaywalkers(dt);
+
+    // 11. Pickups & Rival AI
     this.checkCollisions();
     this.updateRivalAi(dt);
     this.checkRivalCollision(dt);
 
-    // 11. Finish Line
+    // 12. Emergency Shield Pitstop Repair (Prevents premature crash, sustains 30+ min run)
+    if (this.player.shield <= 0) {
+      this.player.shield = 60;
+      this.player.speed = Math.max(30, this.player.speed * 0.5);
+      this.player.stallTimer = 1.2;
+      this.player.bpm = 85;
+      this.triggerCrash('hazard', 0.85);
+      this.player.shiftFeedback = {
+        text: 'EMERGENCY PIT REPAIR: +60% SHIELD RESTORED',
+        type: 'stall',
+        timer: 2.2
+      };
+    }
+
+    // 13. Multi-Stage Championship Progression (No abrupt finish)
+    if (this.player.distance >= this.stage * 1200) {
+      this.stage++;
+      this.player.score += 2000;
+      this.player.shield = Math.min(100, this.player.shield + 25);
+      this.player.shiftFeedback = {
+        text: `STAGE ${this.stage} REACHED! (+2000 PTS)`,
+        type: 'perfect',
+        timer: 2.5
+      };
+    }
+
+    // 14. Finish Line
     if (!this.player.hasFinished && this.player.distance >= this.trackLength) {
       this.player.hasFinished = true;
       this.player.finishTime = this.elapsedTime;
@@ -614,7 +885,7 @@ export class RacingEngine {
 
     const rivalSpeedMps = (this.rival.speed * 1000) / 3600;
     this.rival.distance += rivalSpeedMps * dt;
-    this.rival.x = Math.sin(this.elapsedTime * 0.8) * 0.65;
+    this.rival.x = -0.55 + Math.sin(this.elapsedTime * 0.5) * 0.2;
   }
 
   checkRivalCollision(dt) {
@@ -656,6 +927,11 @@ export class RacingEngine {
         this.player.nitro = Math.min(100, this.player.nitro + 35);
         this.player.score += 200;
         this.player.shiftFeedback = { text: '+35% NITRO CELL', type: 'pickup', timer: 1.0 };
+        break;
+      case 'repair':
+        this.player.shield = Math.min(100, this.player.shield + 30);
+        this.player.score += 250;
+        this.player.shiftFeedback = { text: 'REPAIR KIT! +30% SHIELD', type: 'pickup', timer: 1.0 };
         break;
       case 'chip':
         this.player.score += 600;

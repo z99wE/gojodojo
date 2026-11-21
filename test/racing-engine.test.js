@@ -236,3 +236,59 @@ test('Player profile and dynamic day-to-night scene transitions', () => {
   assert.strictEqual(engine.getScene().id, 'midnight');
 });
 
+test('Pitstop pause freezes racing engine and resumes cleanly', () => {
+  const engine = new RacingEngine();
+  engine.startRace();
+  assert.strictEqual(engine.status, 'racing');
+  assert.strictEqual(engine.isPaused, false);
+
+  engine.pauseForPitstop();
+  assert.strictEqual(engine.status, 'pitstop');
+  assert.strictEqual(engine.isPaused, true);
+
+  // During pitstop, distance does not advance
+  const initialDist = engine.player.distance;
+  engine.update(1.0);
+  assert.strictEqual(engine.player.distance, initialDist);
+
+  engine.resumeFromPitstop();
+  assert.strictEqual(engine.status, 'racing');
+  assert.strictEqual(engine.isPaused, false);
+});
+
+test('Steering lane up and down responds immediately and smoothly', () => {
+  const engine = new RacingEngine();
+  engine.startRace();
+  assert.strictEqual(engine.player.lane, 1);
+
+  engine.steerLaneUp(); // Lane 1 -> 0 (top lane)
+  assert.strictEqual(engine.player.lane, 0);
+  assert.strictEqual(engine.player.x, -0.6);
+
+  engine.steerLaneDown(); // Lane 0 -> 1 (center lane)
+  assert.strictEqual(engine.player.lane, 1);
+  assert.strictEqual(engine.player.x, 0.0);
+
+  engine.steerLaneDown(); // Lane 1 -> 2 (bottom lane)
+  assert.strictEqual(engine.player.lane, 2);
+  assert.strictEqual(engine.player.x, 0.6);
+});
+
+test('Car color customization updates primary and secondary hues', () => {
+  const engine = new RacingEngine();
+  engine.setCarColor('#ffe600');
+  assert.strictEqual(engine.player.carColor, '#ffe600');
+  assert.strictEqual(engine.player.carSecondaryColor, '#5c5200');
+});
+
+test('Emergency pit repair prevents premature crash during 30+ min endurance GP', () => {
+  const engine = new RacingEngine();
+  engine.startRace();
+  engine.player.shield = 0;
+  engine.update(0.1);
+
+  assert.ok(engine.player.shield >= 50, 'Emergency pit repair restores shield so session continues');
+  assert.strictEqual(engine.player.stallTimer > 0, true);
+});
+
+

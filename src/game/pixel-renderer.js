@@ -90,9 +90,17 @@ export class PixelRenderer {
     // 10. Draw Anxiety Red Vignette or Zen Focus Aura
     this.drawAnxietyAndFocusEffects(engine);
 
-    // 11. Draw Countdown or Finish Banner
+    // 11. Draw Countdown or Finish Banner or Pitstop Pause Indicator
     if (engine.status === 'countdown') {
       this.drawCountdown(engine.countdownTime);
+    } else if (engine.status === 'pitstop' || engine.isPaused) {
+      ctx.fillStyle = 'rgba(6, 4, 15, 0.45)';
+      ctx.fillRect(0, 0, this.width, this.height);
+      ctx.fillStyle = '#ffe600';
+      ctx.font = 'bold 10px "Press Start 2P", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('[ PITSTOP CHECKPOINT - RACE PAUSED ]', this.width / 2, 40);
+      ctx.textAlign = 'left';
     } else if (engine.status === 'finished') {
       this.drawFinishBanner(engine, activeLanguage);
     }
@@ -307,6 +315,14 @@ export class PixelRenderer {
           ctx.fillRect(screenX - 2, itemY + 8, 2, 2);
           ctx.fillRect(screenX + 12, itemY + 2, 2, 2);
           ctx.fillRect(screenX + 12, itemY + 8, 2, 2);
+        } else if (item.type === 'repair') {
+          ctx.fillStyle = '#00ff66';
+          ctx.fillRect(screenX, itemY, 14, 10);
+          ctx.fillStyle = '#000000';
+          ctx.fillRect(screenX + 2, itemY + 2, 10, 6);
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(screenX + 6, itemY + 3, 2, 4);
+          ctx.fillRect(screenX + 5, itemY + 4, 4, 2);
         } else if (item.type === 'booster') {
           ctx.fillStyle = '#00f0ff';
           ctx.fillRect(screenX, itemY + 1, 14, 8);
@@ -345,15 +361,41 @@ export class PixelRenderer {
         false
       );
 
-      // Rival floating tag
-      ctx.fillStyle = '#e63946';
-      ctx.font = 'bold 11px "Share Tech Mono", sans-serif';
+      // Rival floating tag (discrete)
+      ctx.fillStyle = 'rgba(230, 57, 70, 0.7)';
+      ctx.font = '9px "Share Tech Mono", monospace';
       ctx.textAlign = 'center';
       ctx.fillText(`RIVAL: ${engine.rival.name}`, rivalScreenX + 24, rivalY - 18);
       ctx.textAlign = 'left';
     }
 
-    // 2. Draw Player Car (Screen X dynamically surges with speed)
+    // 2. Draw Oncoming Traffic Vehicles (Retro 8-bit Traffic)
+    if (engine.traffic && engine.traffic.length > 0) {
+      for (const v of engine.traffic) {
+        const relDist = v.distance - engine.player.distance;
+        const vScreenX = engine.player.screenX + relDist * 4.0;
+        const vY = this.trackCenterY + v.x * this.trackHalfWidth;
+
+        if (vScreenX > -90 && vScreenX < this.width + 120) {
+          this.drawOncomingCar(ctx, vScreenX, vY, v);
+        }
+      }
+    }
+
+    // 3. Draw Jaywalkers / Pedestrians Crossing Road
+    if (engine.jaywalkers && engine.jaywalkers.length > 0) {
+      for (const w of engine.jaywalkers) {
+        const relDist = w.distance - engine.player.distance;
+        const wScreenX = engine.player.screenX + relDist * 4.0;
+        const wY = this.trackCenterY + w.x * this.trackHalfWidth;
+
+        if (wScreenX > -40 && wScreenX < this.width + 40) {
+          this.drawJaywalker(ctx, wScreenX, wY, w);
+        }
+      }
+    }
+
+    // 4. Draw Player Car (Screen X dynamically surges with speed)
     const playerScreenX = Math.round(engine.player.screenX);
     const playerY = this.trackCenterY + engine.player.x * this.trackHalfWidth;
 
@@ -387,12 +429,12 @@ export class PixelRenderer {
 
     this.updateAndDrawParticles(ctx);
 
-    // Draw Player Car Sprite
+    // Draw Player Car Sprite with Chosen Custom Color!
     this.drawCarSprite(
       playerScreenX,
       playerY,
-      '#06d6a0',
-      '#118ab2',
+      engine.player.carColor || '#00f0ff',
+      engine.player.carSecondaryColor || '#00485c',
       true,
       engine.player.isNitroActive,
       engine.playerName,
@@ -400,24 +442,90 @@ export class PixelRenderer {
       engine.player.isBraking
     );
 
-    // 3. Floating Player Character Nametag & Live Score over Car!
+    // 5. Inconspicuous Floating Player Nametag & Score (Low Opacity, Small 9px, Non-Distracting)
     ctx.save();
-    const tagText = `${engine.playerName} | ${engine.player.score} PTS`;
-    ctx.font = 'bold 12px "Mukta", "Share Tech Mono", sans-serif';
-    const tagWidth = ctx.measureText(tagText).width + 16;
+    const tagText = `${engine.playerName} | ${engine.player.score}`;
+    ctx.font = '9px "Share Tech Mono", monospace';
+    const tagWidth = ctx.measureText(tagText).width + 8;
     const tagX = playerScreenX + 24 - tagWidth / 2;
-    const tagY = playerY - 24;
+    const tagY = playerY - 18;
 
-    ctx.fillStyle = 'rgba(10, 5, 26, 0.92)';
-    ctx.fillRect(tagX, tagY, tagWidth, 18);
-    ctx.strokeStyle = '#00f0ff';
-    ctx.lineWidth = 1.5;
-    ctx.strokeRect(tagX, tagY, tagWidth, 18);
+    ctx.fillStyle = 'rgba(6, 4, 15, 0.35)';
+    ctx.fillRect(tagX, tagY, tagWidth, 11);
+    ctx.strokeStyle = 'rgba(0, 240, 255, 0.25)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(tagX, tagY, tagWidth, 11);
 
-    ctx.fillStyle = '#00f0ff';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.65)';
     ctx.textAlign = 'center';
-    ctx.fillText(tagText, playerScreenX + 24, tagY + 13);
+    ctx.fillText(tagText, playerScreenX + 24, tagY + 9);
     ctx.restore();
+  }
+
+  // Draw Oncoming Retro Traffic Car Facing Towards Player
+  drawOncomingCar(ctx, x, y, vehicle) {
+    const cy = y - 12;
+
+    // Shadow
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+    ctx.fillRect(x - 2, y + 6, 44, 6);
+
+    // Headlight Beams illuminating towards player (Leftwards)
+    ctx.fillStyle = 'rgba(255, 240, 180, 0.18)';
+    ctx.beginPath();
+    ctx.moveTo(x - 2, cy + 7);
+    ctx.lineTo(x - 30, cy + 2);
+    ctx.lineTo(x - 30, cy + 14);
+    ctx.closePath();
+    ctx.fill();
+
+    // Chassis
+    ctx.fillStyle = vehicle.color || '#ff2a55';
+    ctx.fillRect(x + 2, cy + 4, 38, 8);
+
+    // Cabin / Cockpit
+    ctx.fillStyle = '#11111e';
+    ctx.fillRect(x + 10, cy, 20, 5);
+
+    // Front Windshield (Facing Left)
+    ctx.fillStyle = '#a8dadc';
+    ctx.fillRect(x + 12, cy + 1, 8, 3);
+
+    // Headlights (Facing Left towards player)
+    ctx.fillStyle = '#ffff99';
+    ctx.fillRect(x + 2, cy + 7, 3, 3);
+
+    // Taillights (Facing Right)
+    ctx.fillStyle = '#ff0033';
+    ctx.fillRect(x + 38, cy + 6, 2, 3);
+
+    // Wheels
+    ctx.fillStyle = '#0a0a0f';
+    ctx.fillRect(x + 6, cy + 10, 8, 5);
+    ctx.fillRect(x + 28, cy + 10, 8, 5);
+  }
+
+  // Draw 8-Bit Jaywalker / Pedestrian Crossing Highway
+  drawJaywalker(ctx, x, y, walker) {
+    const legPhase = Math.sin(this.wheelRotation * 1.6);
+    const cy = y - 8;
+
+    // Shadow
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+    ctx.fillRect(x - 3, y + 6, 8, 3);
+
+    // Head
+    ctx.fillStyle = '#ffd166';
+    ctx.fillRect(x - 2, cy - 8, 5, 5);
+
+    // Shirt / Torso
+    ctx.fillStyle = walker.color || '#00f0ff';
+    ctx.fillRect(x - 3, cy - 3, 7, 6);
+
+    // Animated Walking Legs
+    ctx.fillStyle = '#0a0a14';
+    ctx.fillRect(x - 2 + legPhase * 2, cy + 3, 2, 5);
+    ctx.fillRect(x + 1 - legPhase * 2, cy + 3, 2, 5);
   }
 
   drawSpeedLines(engine) {

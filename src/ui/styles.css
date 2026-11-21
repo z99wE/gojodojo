@@ -327,6 +327,22 @@ body.arcade-body {
   transform: translate(-1px, -1px);
 }
 
+.color-chip[data-color="#00f0ff"] {
+  border-left: 6px solid #00f0ff;
+}
+.color-chip[data-color="#00ff66"] {
+  border-left: 6px solid #00ff66;
+}
+.color-chip[data-color="#ffe600"] {
+  border-left: 6px solid #ffe600;
+}
+.color-chip[data-color="#ff2a55"] {
+  border-left: 6px solid #ff2a55;
+}
+.color-chip[data-color="#ff007f"] {
+  border-left: 6px solid #ff007f;
+}
+
 .circuit-group .chip-btn {
   font-size: 13px;
   font-family: var(--font-mono);

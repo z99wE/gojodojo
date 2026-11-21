@@ -22,10 +22,10 @@
       <!-- Mobile Touch Controls Bar -->
       <div id="touch-controls" class="hidden">
         <div class="touch-steer-group">
-          <button id="btn-steer-left" class="touch-btn" type="button">STEER L</button>
-          <button id="btn-steer-right" class="touch-btn" type="button">STEER R</button>
-          <button id="btn-brake" class="touch-btn brake-btn" type="button">BRAKE [S]</button>
-          <button id="btn-gas" class="touch-btn gas-btn" type="button">GAS [W]</button>
+          <button id="btn-steer-left" class="touch-btn" type="button">LANE UP [W]</button>
+          <button id="btn-steer-right" class="touch-btn" type="button">LANE DOWN [S]</button>
+          <button id="btn-brake" class="touch-btn brake-btn" type="button">BRAKE [A]</button>
+          <button id="btn-gas" class="touch-btn gas-btn" type="button">GAS [D]</button>
         </div>
         <div class="touch-action-group">
           <button id="btn-shift-down" class="touch-btn" type="button">GEAR -</button>
@@ -43,6 +43,15 @@
           <h1 class="arcade-title">संख्या टर्बो: 8-बिट ग्रैंड प्रिक्स</h1>
           <div class="arcade-sub">SANKHYA TURBO: RETRO STEM RACER</div>
 
+          <!-- Language Selector at the beginning -->
+          <div class="topic-study-section">
+            <label class="selector-label">भाषा का चयन करें / CHOOSE LANGUAGE:</label>
+            <div id="lang-selector-top" class="chip-group" style="margin-top: 4px;">
+              <button id="top-lang-hi" class="chip-btn active" type="button" data-lang="hi">हिंदी (HINDI)</button>
+              <button id="top-lang-en" class="chip-btn" type="button" data-lang="en">ENGLISH</button>
+            </div>
+          </div>
+
           <!-- Character & Pilot Selection -->
           <div class="topic-study-section">
             <label class="selector-label" for="player-name-input">खिलाड़ी का नाम / PILOT NAME:</label>
@@ -54,6 +63,18 @@
               <button class="chip-btn" data-char="Quantum Racer">Quantum Racer (क्वांटम चालक)</button>
               <button class="chip-btn" data-char="Cosmo Pilot">Cosmo Pilot (ब्रह्मांडीय)</button>
               <button class="chip-btn" data-char="Aero Striker">Aero Striker (वायु योद्धा)</button>
+            </div>
+          </div>
+
+          <!-- Car Color Selection -->
+          <div class="topic-study-section">
+            <label class="selector-label">कार का रंग / CAR COLOR:</label>
+            <div id="car-color-selector" class="chip-group" style="margin-top: 6px;">
+              <button class="chip-btn active" data-color="#00f0ff">CYBER CYAN</button>
+              <button class="chip-btn" data-color="#00ff66">NEO LIME</button>
+              <button class="chip-btn" data-color="#ffe600">TURBO GOLD</button>
+              <button class="chip-btn" data-color="#ff2a55">CRIMSON RED</button>
+              <button class="chip-btn" data-color="#ff007f">SYNTH MAGENTA</button>
             </div>
           </div>
 
@@ -96,20 +117,28 @@
           <!-- Controls Quick Reference -->
           <div class="controls-guide">
             <div class="guide-item">
-              <span class="guide-key">W / UP</span>
+              <span class="guide-key">UP / W / L</span>
+              <span class="guide-desc">Switch Lane UP (Dodge Oncoming Traffic & Jaywalkers!)</span>
+            </div>
+            <div class="guide-item">
+              <span class="guide-key">DOWN / S / R</span>
+              <span class="guide-desc">Switch Lane DOWN (Dodge Hazards & Pedestrians!)</span>
+            </div>
+            <div class="guide-item">
+              <span class="guide-key">RIGHT / D</span>
               <span class="guide-desc">Accelerate (Gas) - Hold to surge forward</span>
             </div>
             <div class="guide-item">
-              <span class="guide-key">S / DOWN</span>
+              <span class="guide-key">LEFT / A</span>
               <span class="guide-desc">Active Brake - Slow down, illuminate brake lights</span>
-            </div>
-            <div class="guide-item">
-              <span class="guide-key">A / D</span>
-              <span class="guide-desc">Steer Left / Right (Dodge Hazards, Stay On-Track!)</span>
             </div>
             <div class="guide-item">
               <span class="guide-key">SPACEBAR</span>
               <span class="guide-desc">Shift Up (Green sweet spot on Tachometer for Boost!)</span>
+            </div>
+            <div class="guide-item">
+              <span class="guide-key">N KEY</span>
+              <span class="guide-desc">Super Nitro Overdrive (350+ KM/H Speed Surge)</span>
             </div>
             <div class="guide-item">
               <span class="guide-key">B KEY</span>
@@ -117,7 +146,7 @@
             </div>
             <div class="guide-item">
               <span class="guide-key">T KEY</span>
-              <span class="guide-desc">AI STEM Tutor (Ask Doubts & Concept Explanations)</span>
+              <span class="guide-desc">AI Pit Crew Tutor (Ask Doubts & Concept Explanations)</span>
             </div>
           </div>
 
