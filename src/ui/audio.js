@@ -261,6 +261,121 @@ export function playCarHornSound() {
   } catch (e) { void e; }
 }
 
+// Tactical containment alarm / shield damage siren
+export function playAlarmSound() {
+  try {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(740, now);
+    osc.frequency.linearRampToValueAtTime(320, now + 0.15);
+    osc.frequency.linearRampToValueAtTime(740, now + 0.3);
+    osc.frequency.linearRampToValueAtTime(320, now + 0.45);
+
+    gain.gain.setValueAtTime(0.3, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.52);
+  } catch (e) { void e; }
+}
+
+// Optical prism refraction harmonic chord
+export function playRefractionSound() {
+  try {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+    // Harmonic triad of light: 523Hz (C5), 659Hz (E5), 783Hz (G5), 1046Hz (C6)
+    [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, now + i * 0.05);
+      gain.gain.setValueAtTime(0.15, now + i * 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.05 + 0.6);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now + i * 0.05);
+      osc.stop(now + i * 0.05 + 0.65);
+    });
+  } catch (e) { void e; }
+}
+
+// Chemical effervescence bubbling sound
+export function playChemicalFizzSound() {
+  try {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+    for (let i = 0; i < 8; i++) {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      const f = 900 + Math.random() * 800;
+      osc.frequency.setValueAtTime(f, now + i * 0.04);
+      osc.frequency.exponentialRampToValueAtTime(f * 1.5, now + i * 0.04 + 0.05);
+
+      gain.gain.setValueAtTime(0.08, now + i * 0.04);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.04 + 0.06);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now + i * 0.04);
+      osc.stop(now + i * 0.04 + 0.07);
+    }
+  } catch (e) { void e; }
+}
+
+// Laser capacitor overheat thermal hiss
+export function playOverheatSound() {
+  try {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(120, now);
+    osc.frequency.exponentialRampToValueAtTime(60, now + 0.3);
+
+    gain.gain.setValueAtTime(0.18, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.38);
+  } catch (e) { void e; }
+}
+
+// Forcefield gate powerdown hum
+export function playForcefieldDownSound() {
+  try {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(440, now);
+    osc.frequency.exponentialRampToValueAtTime(55, now + 0.6);
+
+    gain.gain.setValueAtTime(0.25, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.65);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.7);
+  } catch (e) { void e; }
+}
+
 // Web Speech API - Text to Speech
 export function speakText(text, lang = 'hi') {
   if (typeof window === 'undefined' || !window.speechSynthesis) return;

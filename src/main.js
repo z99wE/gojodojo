@@ -19,6 +19,11 @@ import {
   playLaserShotSound,
   playTargetHitSound,
   playCarHornSound,
+  playAlarmSound,
+  playRefractionSound,
+  playChemicalFizzSound,
+  playOverheatSound,
+  playForcefieldDownSound,
 } from './ui/audio.js';
 
 const INTERACT_RANGE = 2.8;
@@ -138,6 +143,47 @@ ui.appendChild(hint);
 
 let started = false;
 let stopLoop = null;
+
+// Game Rules, Stakes & Player Telemetry
+let playerShield = 100;
+let playerEnergy = 100;
+let lockdownTimer = 0;
+let gameTime = 0;
+
+function applyPlayerDamage(amount, reason = 'CONTAINMENT FAILURE') {
+  playerShield = Math.max(0, playerShield - amount);
+  if (hud) {
+    hud.setShield(playerShield);
+    hud.triggerDamageFlash();
+    hud.showContainmentWarning(`[CONTAINMENT BREACH: -${amount}% SHIELD] ${reason}`);
+  }
+  playAlarmSound();
+  showFloatingCombatText(`[-${amount}% SHIELD] ${reason}`, '#ff3b77');
+
+  // Lockdown penalty: halt player movement temporarily
+  lockdownTimer = 3.5;
+  if (controller) controller.setPaused(true);
+
+  if (playerShield <= 0) {
+    // Critical failure: teleport player back to central hub cradle and reboot
+    if (hud) hud.showContainmentWarning('[SYSTEM FAILURE] SHIELD DEPLETED - TELEPORTING TO HUB');
+    setTimeout(() => {
+      controller.position.set(0, 1.6, 0);
+      playerShield = 100;
+      playerEnergy = 100;
+      if (hud) {
+        hud.setShield(100);
+        hud.setEnergy(100);
+        hud.showContainmentWarning('[SYSTEM REBOOT COMPLETE] SHIELDS RESTORED');
+      }
+    }, 1200);
+  }
+}
+
+// Damage event from incorrect quiz answers
+on('player:damage', ({ amount = 25, reason = 'INCORRECT ANSWER' }) => {
+  applyPlayerDamage(amount, reason);
+});
 
 function showHint(show) {
   if (isAnyModalOpen()) {
@@ -370,7 +416,23 @@ function showFloatingCombatText(text, color = '#ff3b77') {
 }
 
 function fireBlaster() {
-  if (!started || controller.isPaused() || isAnyModalOpen()) return;
+  if (!started || isAnyModalOpen()) return;
+  if (lockdownTimer > 0) {
+    if (hud) hud.showContainmentWarning('[SYSTEM LOCKED] WAIT FOR CONTAINMENT CYCLE');
+    playAlarmSound();
+    return;
+  }
+  if (controller.isPaused()) return;
+
+  if (playerEnergy < 12) {
+    playOverheatSound();
+    showFloatingCombatText('[CAPACITOR OVERHEATED - COOLING]', '#ff3b77');
+    if (hud) hud.showContainmentWarning('[ENERGY DEPLETED] CAPACITOR VENTING');
+    return;
+  }
+
+  playerEnergy = Math.max(0, playerEnergy - 12);
+  if (hud) hud.setEnergy(playerEnergy);
 
   playLaserShotSound();
   punchTime = 1.0;
@@ -409,8 +471,59 @@ function updateProjectiles(dt) {
 
     let hit = false;
 
+    // 0. Physics & Chemistry STEM Apparatus Targets
+    if (world.labNodes) {
+      for (const node of world.labNodes) {
+        if (!node.active) continue;
+        const d = p.pos.distanceTo(node.mesh.position);
+        if (d <= (node.hitRadius || 1.8)) {
+          hit = true;
+          if (node.isCorrect) {
+            node.active = false;
+            node.mesh.visible = false;
+            spawnSparks(node.mesh.position.x, node.mesh.position.y, node.mesh.position.z, 0x00f5d4, 28);
+            if (node.labId === 'prism') {
+              playRefractionSound();
+              if (world.labs && world.labs.prism) world.labs.prism.activate();
+              world.disengageGate('gate-west');
+              if (hud) hud.setMissionDirective("SNELL'S LAW CALIBRATED: WEST CONTAINMENT GATE DOWN");
+              showFloatingCombatText("SNELL'S LAW CALIBRATED! +50 XP", '#00f5d4');
+            } else if (node.labId === 'bohr') {
+              playRefractionSound();
+              if (world.labs && world.labs.bohr) world.labs.bohr.activate();
+              showFloatingCombatText('QUANTUM LEAP (10.2 eV) ACTIVATED! +50 XP', '#00f5d4');
+              if (hud) hud.setMissionDirective('LYMAN EMISSION VERIFIED: ORBIT STABILIZED');
+            } else if (node.labId === 'titration') {
+              playChemicalFizzSound();
+              if (world.labs && world.labs.titration) world.labs.titration.activate();
+              world.disengageGate('gate-east');
+              showFloatingCombatText('TITRATION NEUTRALIZED (pH 7)! +50 XP', '#00f5d4');
+              if (hud) hud.setMissionDirective('TITRATION NEUTRALIZED: EAST CONTAINMENT GATE DOWN');
+            } else if (node.labId === 'momentum') {
+              playTargetHitSound();
+              if (world.labs && world.labs.momentum) world.labs.momentum.activate();
+              showFloatingCombatText('ELASTIC IMPULSE SYNCHRONIZED! +50 XP', '#00f5d4');
+              if (hud) hud.setMissionDirective('CONSERVATION OF MOMENTUM VERIFIED');
+            }
+            if (hud) {
+              hud.addGold(50);
+              hud.addQuizReward(2, 2);
+              playerEnergy = Math.min(100, playerEnergy + 25);
+              playerShield = Math.min(100, playerShield + 15);
+              hud.setEnergy(playerEnergy);
+              hud.setShield(playerShield);
+            }
+          } else {
+            spawnSparks(node.mesh.position.x, node.mesh.position.y, node.mesh.position.z, 0xff0044, 24);
+            applyPlayerDamage(25, node.desc || 'UNSTABLE STEM CALIBRATION');
+          }
+          break;
+        }
+      }
+    }
+
     // 1. Target Drones
-    if (world.targets) {
+    if (!hit && world.targets) {
       for (const tgt of world.targets) {
         if (!tgt.active) continue;
         const d = p.pos.distanceTo(tgt.group.position);
@@ -425,7 +538,7 @@ function updateProjectiles(dt) {
             hud.addGold(15);
             hud.addQuizReward(1, 1);
           }
-          showFloatingCombatText('+25 XP 🎯 TARGET DOWN!', '#00f5d4');
+          showFloatingCombatText('+25 XP [TARGET ELIMINATED]', '#00f5d4');
           break;
         }
       }
@@ -443,7 +556,7 @@ function updateProjectiles(dt) {
           playCoinSound();
           spawnSparks(c.mesh.position.x, c.mesh.position.y, c.mesh.position.z, 0xffd166, 18);
           emit('coin:collect', { id: c.id, amount: 10 });
-          showFloatingCombatText('+10 🪙 SHOT COIN!', '#ffd166');
+          showFloatingCombatText('+10 CREDITS [DATA COIN]', '#ffd166');
           break;
         }
       }
@@ -456,7 +569,7 @@ function updateProjectiles(dt) {
         if (d <= 1.7) {
           hit = true;
           spawnSparks(s.position.x, s.position.y, s.position.z, 0xbb86fc, 20);
-          showFloatingCombatText('💎 SHRINE ACTIVATED!', '#ff758c');
+          showFloatingCombatText('[KNOWLEDGE SHRINE ONLINE]', '#ff758c');
           emit('stone:interact', { id: s.id, zone: s.zone, topic: s.topic });
           break;
         }
@@ -472,7 +585,7 @@ function updateProjectiles(dt) {
           playCarHornSound();
           car.flareTimer = 1.4;
           spawnSparks(p.pos.x, p.pos.y, p.pos.z, 0x70e3db, 16);
-          showFloatingCombatText('🏎️ SUPERCAR HONK!', '#70e3db');
+          showFloatingCombatText('[VEHICLE ENGINE HORN]', '#70e3db');
           break;
         }
       }
@@ -561,6 +674,27 @@ let animTime = 0;
 let punchTime = 0;
 
 function frame(dt) {
+  gameTime += dt;
+
+  // Containment Lockdown timer
+  if (lockdownTimer > 0) {
+    lockdownTimer -= dt;
+    controller.setPaused(true);
+    if (lockdownTimer <= 0) {
+      lockdownTimer = 0;
+      if (!isAnyModalOpen()) {
+        controller.setPaused(false);
+      }
+      if (hud) hud.showContainmentWarning('');
+    }
+  }
+
+  // Energy capacitor recharge
+  if (playerEnergy < 100) {
+    playerEnergy = Math.min(100, playerEnergy + 24 * dt);
+    if (hud) hud.setEnergy(playerEnergy);
+  }
+
   controller.update(dt);
   world.update(dt, controller.position);
   updateProjectiles(dt);
@@ -569,6 +703,8 @@ function frame(dt) {
   if (hud) {
     hud.setPrompt(nearestStone);
     hud.updateRadar();
+    const p = controller.position;
+    hud.setCoordinates(`4D: X=${p.x.toFixed(1)} Y=${p.y.toFixed(1)} Z=${p.z.toFixed(1)} T=${gameTime.toFixed(1)}s`);
   }
 
   // Dynamic Reticle Lock-On Detection
@@ -576,14 +712,31 @@ function frame(dt) {
   const forward = new THREE.Vector3();
   camera.getWorldDirection(forward);
 
-  if (world.targets) {
+  // STEM Apparatus Interactive Nodes
+  if (world.labNodes) {
+    for (const node of world.labNodes) {
+      if (!node.active) continue;
+      const dist = camera.position.distanceTo(node.mesh.position);
+      if (dist > 50) continue;
+      const toN = node.mesh.position.clone().sub(camera.position).normalize();
+      if (toN.dot(forward) > 0.982) {
+        lockedObj = {
+          name: `[STEM TARGET] ${node.desc}`,
+          color: node.isCorrect ? '#00f5d4' : '#ff758c',
+        };
+        break;
+      }
+    }
+  }
+
+  if (!lockedObj && world.targets) {
     for (const tgt of world.targets) {
       if (!tgt.active) continue;
       const dist = camera.position.distanceTo(tgt.group.position);
       if (dist > 60) continue;
       const toTgt = tgt.group.position.clone().sub(camera.position).normalize();
       if (toTgt.dot(forward) > 0.985) {
-        lockedObj = { name: '🎯 TARGET DRONE', color: '#ff3b77' };
+        lockedObj = { name: '[TARGET DRONE]', color: '#ff3b77' };
         break;
       }
     }
@@ -594,7 +747,7 @@ function frame(dt) {
       if (dist > 40) continue;
       const toS = s.position.clone().sub(camera.position).normalize();
       if (toS.dot(forward) > 0.985) {
-        lockedObj = { name: '💎 KNOWLEDGE SHRINE', color: '#00f5d4' };
+        lockedObj = { name: '[KNOWLEDGE SHRINE]', color: '#00f5d4' };
         break;
       }
     }
@@ -605,7 +758,7 @@ function frame(dt) {
       if (dist > 40) continue;
       const toC = car.position.clone().sub(camera.position).normalize();
       if (toC.dot(forward) > 0.975) {
-        lockedObj = { name: '🏎️ VICE SUPERCAR', color: '#ffd166' };
+        lockedObj = { name: '[CYBER VEHICLE]', color: '#ffd166' };
         break;
       }
     }
@@ -617,7 +770,7 @@ function frame(dt) {
       if (dist > 40) continue;
       const toC = c.mesh.position.clone().sub(camera.position).normalize();
       if (toC.dot(forward) > 0.988) {
-        lockedObj = { name: '🪙 STAR COIN', color: '#ffd166' };
+        lockedObj = { name: '[DATA CREDIT]', color: '#ffd166' };
         break;
       }
     }

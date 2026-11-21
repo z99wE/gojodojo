@@ -72,25 +72,25 @@ export function createProgressModal({ container, onClose, onOpenTopic }) {
       <div class="ss-clay-modal ss-progress-modal" role="dialog" aria-modal="true">
         <!-- Header -->
         <div class="ss-clay-header ss-header-hub">
-          <div class="ss-mascot-avatar">📜</div>
+          <div class="ss-mascot-avatar">[LOG]</div>
           <div class="ss-clay-title-wrap">
-            <span class="ss-clay-pill ss-pill-hub">${lang === 'hi' ? 'साहसिक डायरी' : 'Adventure Log'}</span>
+            <span class="ss-tactical-tag">${lang === 'hi' ? 'सत्यापन डायरी' : 'VERIFICATION TELEMETRY'}</span>
             <h2 class="ss-clay-title">${t('progress.title')}</h2>
           </div>
-          <button class="ss-clay-close" aria-label="Close" id="ss-progress-close">✕</button>
+          <button class="ss-clay-close" aria-label="Close" id="ss-progress-close">&times;</button>
         </div>
 
         <div class="ss-clay-body">
-          <!-- 3 Cute Claymorphic Role Tabs -->
+          <!-- 3 Tactical Role Tabs -->
           <div class="ss-clay-tabs">
             <button class="ss-clay-tab ${activeTab === 'learner' ? 'active' : ''}" data-tab="learner" type="button">
-              <span>🎒</span> <span>${t('progress.learner')}</span>
+              <span>${t('progress.learner')}</span>
             </button>
             <button class="ss-clay-tab ${activeTab === 'parent' ? 'active' : ''}" data-tab="parent" type="button">
-              <span>👨‍👩‍👧</span> <span>${t('progress.parent')}</span>
+              <span>${t('progress.parent')}</span>
             </button>
             <button class="ss-clay-tab ${activeTab === 'teacher' ? 'active' : ''}" data-tab="teacher" type="button">
-              <span>👩‍🏫</span> <span>${t('progress.teacher')}</span>
+              <span>${t('progress.teacher')}</span>
             </button>
           </div>
 
@@ -120,7 +120,7 @@ export function createProgressModal({ container, onClose, onOpenTopic }) {
 
         <div class="ss-clay-footer" style="justify-content:space-between; flex-wrap:wrap; gap:10px;">
           <span class="ss-offline-badge-clay">
-            ⚡ ${lang === 'hi' ? '100% ऑफ़लाइन सुरक्षित (0 KB डेटा)' : '100% Offline (0 KB Data)'}
+            [OFFLINE] ${lang === 'hi' ? '100% ऑफ़लाइन सुरक्षित (0 KB डेटा)' : '100% Offline (0 KB Data)'}
           </span>
           <button class="ss-clay-primary-btn" id="ss-progress-done-btn" type="button">
             ${lang === 'hi' ? 'द्वीप पर लौटें' : 'Return to Island'}
@@ -174,10 +174,10 @@ export function createProgressModal({ container, onClose, onOpenTopic }) {
         if (speakingParent) {
           stopSpeaking();
           speakingParent = false;
-          parentVoiceBtn.innerHTML = sanitizeHtml(`<span>🔊</span> <span>${t('progress.parentVoiceSummary')}</span>`);
+          parentVoiceBtn.innerHTML = sanitizeHtml(`<span>[AUDIO]</span> <span>${t('progress.parentVoiceSummary')}</span>`);
         } else {
           speakingParent = true;
-          parentVoiceBtn.innerHTML = sanitizeHtml(`<span>⏹</span> <span>${t('quiz.stopAudio')}</span>`);
+          parentVoiceBtn.innerHTML = sanitizeHtml(`<span>[STOP]</span> <span>${t('quiz.stopAudio')}</span>`);
           const spokenText = lang === 'hi'
             ? `अभिभावक रिपोर्ट: आपके बच्चे ने कक्षा ${currentGrade} में कुल ${totalTopics} में से ${completedCount} अध्याय पूरे कर लिए हैं। बच्चे की शुद्धता ${accuracyPct} प्रतिशत है। बच्चे ने बहुत मन लगाकर अभ्यास किया है। आज शाम बच्चे की पीठ थपथपाएँ और उन्हें शाबाशी दें!`
             : `Parent Report: Your child has completed ${completedCount} out of ${totalTopics} topics in Class ${currentGrade} with an accuracy of ${accuracyPct} percent. Your child is making steady progress!`;
@@ -201,7 +201,7 @@ export function createProgressModal({ container, onClose, onOpenTopic }) {
         });
 
         navigator.clipboard.writeText(reportText).then(() => {
-          teacherCopyBtn.textContent = '✓ ' + t('progress.reportCopied');
+          teacherCopyBtn.textContent = '[COPIED] ' + t('progress.reportCopied');
           setTimeout(() => {
             if (teacherCopyBtn) teacherCopyBtn.textContent = t('progress.shareReport');
           }, 3000);
@@ -218,10 +218,10 @@ export function createProgressModal({ container, onClose, onOpenTopic }) {
     const scienceTopics = topicStats.filter((t) => t.subject === 'science');
 
     const badges = [
-      { icon: '🌱', name: lang === 'hi' ? 'आरंभक' : 'Starter', unlocked: completedCount >= 1 },
-      { icon: '📐', name: lang === 'hi' ? 'गणित नायक' : 'Maths Knight', unlocked: mathsTopics.every((t) => t.isDone) },
-      { icon: '🔬', name: lang === 'hi' ? 'विज्ञान खोजी' : 'Science Scout', unlocked: scienceTopics.every((t) => t.isDone) },
-      { icon: '👑', name: lang === 'hi' ? 'कक्षा विजेता' : 'Class Champion', unlocked: completedCount === totalTopics && totalTopics > 0 },
+      { code: 'STR', name: lang === 'hi' ? 'आरंभक' : 'Starter', unlocked: completedCount >= 1 },
+      { code: 'MTH', name: lang === 'hi' ? 'गणित नायक' : 'Maths Knight', unlocked: mathsTopics.every((t) => t.isDone) },
+      { code: 'SCI', name: lang === 'hi' ? 'विज्ञान खोजी' : 'Science Scout', unlocked: scienceTopics.every((t) => t.isDone) },
+      { code: 'EXP', name: lang === 'hi' ? 'कक्षा विजेता' : 'Class Champion', unlocked: completedCount === totalTopics && totalTopics > 0 },
     ];
 
     return `
@@ -232,7 +232,7 @@ export function createProgressModal({ container, onClose, onOpenTopic }) {
           <div class="ss-stat-label">${t('progress.topicsDone')}</div>
         </div>
         <div class="ss-rpg-stat-box">
-          <div class="ss-stat-num">⭐ ${totalScore}</div>
+          <div class="ss-stat-num">${totalScore}</div>
           <div class="ss-stat-label">${t('progress.totalStars')}</div>
         </div>
         <div class="ss-rpg-stat-box">
@@ -243,12 +243,12 @@ export function createProgressModal({ container, onClose, onOpenTopic }) {
 
       <!-- Achievement Badges -->
       <div class="ss-quest-heading">
-        <span>🏆 ${lang === 'hi' ? 'उपलब्धि पदक (Badges)' : 'Achievement Badges'}</span>
+        <span>${lang === 'hi' ? 'दक्षता बैज' : 'Competency Badges'}</span>
       </div>
       <div class="ss-badges-row">
         ${badges.map((b) => `
           <div class="ss-badge-card ${b.unlocked ? 'unlocked' : 'locked'}">
-            <span class="ss-badge-ico">${b.icon}</span>
+            <span class="ss-badge-ico">[${b.code}]</span>
             <span class="ss-badge-name">${b.name}</span>
           </div>
         `).join('')}
@@ -257,14 +257,14 @@ export function createProgressModal({ container, onClose, onOpenTopic }) {
       <!-- Revision Alert if any -->
       ${focusTopics.length > 0 ? `
         <div class="ss-focus-alert">
-          <div class="ss-focus-title">⚠️ ${t('progress.focusAreas')}</div>
+          <div class="ss-focus-title">[!] ${t('progress.focusAreas')}</div>
           <p class="ss-focus-desc">
             ${lang === 'hi' ? 'इन अध्यायों में कुछ गलतियाँ हुई थीं, एक बार फिर मुकाबला करें:' : 'Review these challenges to achieve 100% accuracy:'}
           </p>
           <div class="ss-focus-buttons">
             ${focusTopics.map((ft) => `
               <button class="ss-chip-action ss-quest-play-btn" data-id="${ft.id}">
-                🔄 ${ft.title[lang] || ft.title.hi}
+                ${ft.title[lang] || ft.title.hi}
               </button>
             `).join('')}
           </div>
@@ -273,7 +273,7 @@ export function createProgressModal({ container, onClose, onOpenTopic }) {
 
       <!-- Maths Isle Quests -->
       <div class="ss-quest-heading" style="color:#7d5fff;">
-        <span>📐 ${t('zone.maths')} (Ganit Dweep)</span>
+        <span>${t('zone.maths')} (Ganit Dweep)</span>
       </div>
       <div class="ss-quest-list">
         ${mathsTopics.map((topic) => renderQuestRow(topic, lang)).join('')}
@@ -281,7 +281,7 @@ export function createProgressModal({ container, onClose, onOpenTopic }) {
 
       <!-- Science Garden Quests -->
       <div class="ss-quest-heading" style="color:#2ed573; margin-top:20px;">
-        <span>🔬 ${t('zone.science')} (Vigyan Vatika)</span>
+        <span>${t('zone.science')} (Vigyan Vatika)</span>
       </div>
       <div class="ss-quest-list">
         ${scienceTopics.map((topic) => renderQuestRow(topic, lang)).join('')}
@@ -298,14 +298,14 @@ export function createProgressModal({ container, onClose, onOpenTopic }) {
         <div class="ss-parent-header-row">
           <div>
             <h3 class="ss-parent-greet">
-              ${lang === 'hi' ? 'नमस्ते अभिभावक जी! 🌸' : 'Hello Parents! 🌸'}
+              ${lang === 'hi' ? 'नमस्ते अभिभावक जी' : 'Parent Telemetry Briefing'}
             </h3>
             <p class="ss-parent-note">
               ${lang === 'hi' ? 'एक ही फोन पर बिना इंटरनेट के आपके बच्चे की सुरक्षित पढ़ाई।' : 'Your child\'s learning progress on this shared device.'}
             </p>
           </div>
           <button class="ss-clay-audio-btn" id="ss-parent-voice-btn" type="button">
-            <span>🔊</span> <span>${t('progress.parentVoiceSummary')}</span>
+            <span>${t('progress.parentVoiceSummary')}</span>
           </button>
         </div>
 
@@ -316,20 +316,20 @@ export function createProgressModal({ container, onClose, onOpenTopic }) {
           </div>
           <div class="ss-parent-stat">
             <span class="ss-pstat-label">${lang === 'hi' ? 'समझ और परिणाम' : 'Understanding'}</span>
-            <span class="ss-pstat-val" style="color:#2ed573;">${accuracyPct}% (${totalScore} ⭐)</span>
+            <span class="ss-pstat-val" style="color:#2ed573;">${accuracyPct}% (${totalScore} pts)</span>
           </div>
         </div>
       </div>
 
       <div class="ss-parent-tip-box">
-        <strong>💡 ${lang === 'hi' ? 'आज का पारिवारिक सुझाव (Parent Tip):' : 'Today\'s Parent Tip:'}</strong><br/>
+        <strong>${lang === 'hi' ? 'अभिभावक सुझाव:' : 'Parent Directive:'}</strong><br/>
         ${lang === 'hi'
           ? 'आज शाम बच्चे से पूछें: "तुमने आज कौन सा नया सवाल सीखा, मुझे भी सिखाओ!" बच्चे जब अपने माता-पिता को समझाते हैं, तो उनकी समझ 3 गुना पक्की हो जाती है।'
           : 'Praise your child today: "Show me one exciting problem you solved!" When kids teach what they learned, their memory retention triples.'}
       </div>
 
       <div class="ss-quest-heading">
-        <span>📖 ${lang === 'hi' ? 'अध्ययन विवरण (Completed Topics):' : 'Completed Topics:'}</span>
+        <span>${lang === 'hi' ? 'अध्ययन विवरण (Completed Topics):' : 'Completed Topics:'}</span>
       </div>
       <div class="ss-quest-list">
         ${completedTopics.length > 0
@@ -341,7 +341,7 @@ export function createProgressModal({ container, onClose, onOpenTopic }) {
                   ${ct.subject === 'maths' ? 'गणित (Maths)' : 'विज्ञान (Science)'} • ${ct.score}/${ct.total} अंक
                 </span>
               </div>
-              <span class="ss-quest-tag-done">✓ पूर्ण / Mastered</span>
+              <span class="ss-quest-tag-done">[COMPLETE] पूर्ण / Mastered</span>
             </div>
           `).join('')
           : `
@@ -382,7 +382,7 @@ export function createProgressModal({ container, onClose, onOpenTopic }) {
       </div>
 
       <div class="ss-quest-heading">
-        <span>📋 ${lang === 'hi' ? 'दक्षता मूल्यांकन विवरण (Diagnostic Assessment)' : 'Competency Matrix'}</span>
+        <span>[REPORT] ${lang === 'hi' ? 'दक्षता मूल्यांकन विवरण (Diagnostic Assessment)' : 'Competency Matrix'}</span>
       </div>
       <div class="ss-quest-list">
         ${topicStats.map((tItem) => {
@@ -410,18 +410,18 @@ export function createProgressModal({ container, onClose, onOpenTopic }) {
 
   function renderQuestRow(topic, lang) {
     const isDone = topic.isDone;
-    const scoreText = isDone ? `${topic.score}/${topic.total} ⭐` : '';
+    const scoreText = isDone ? `${topic.score}/${topic.total}` : '';
 
     return `
       <div class="ss-quest-row">
         <div class="ss-quest-info">
           <span class="ss-quest-title">${topic.title[lang] || topic.title.hi}</span>
           <span class="ss-quest-sub">
-            ${isDone ? `✓ ${t('progress.completed')} • ${scoreText}` : (lang === 'hi' ? 'चुनौती प्रतीक्षारत' : 'Quest Ready')}
+            ${isDone ? `[VERIFIED] • Score: ${scoreText}` : (lang === 'hi' ? 'मॉड्यूल प्रतीक्षारत' : 'Module Ready')}
           </span>
         </div>
         <button class="ss-clay-action-btn ss-quest-play-btn" data-id="${topic.id}" type="button">
-          ${isDone ? '🔄 ' + t('quiz.retry') : '▶ ' + t('progress.practice')}
+          ${isDone ? t('quiz.retry') : t('progress.practice')}
         </button>
       </div>
     `;
@@ -429,15 +429,15 @@ export function createProgressModal({ container, onClose, onOpenTopic }) {
 
   function generateWhatsAppReport({ grade, completedCount, totalTopics, accuracyPct, topicStats, lang }) {
     const dateStr = new Date().toLocaleDateString('en-IN');
-    const header = `📚 *संख्या स्ट्राइक (Sankhya Strike) - प्रगति रिपोर्ट*`;
-    const meta = `📅 दिनांक: ${dateStr}\n🏫 कक्षा: ${grade}\n🎯 पूर्ण विषय: ${completedCount}/${totalTopics} (${accuracyPct}% शुद्धता)`;
+    const header = `*संख्या स्ट्राइक (Sankhya Strike) - टेलीमेट्री रिपोर्ट*`;
+    const meta = `दिनांक: ${dateStr}\nकक्षा: ${grade}\nपूर्ण मॉड्यूल: ${completedCount}/${totalTopics} (${accuracyPct}% शुद्धता)`;
     const details = topicStats
       .filter((t) => t.isDone)
       .map((t) => `• ${t.title.hi}: ${t.score}/${t.total} अंक`)
       .join('\n');
 
-    const footer = `\n💡 *अभिभावक/शिक्षक संदेश:* नियमित अभ्यास जारी रखें। फ़ोन पर डेटा के बिना ऑफ़लाइन उपलब्ध।`;
-    return `${header}\n${meta}\n\n*सीखे गए अध्याय:*\n${details || '• कोई विषय अभी पूरा नहीं हुआ'}\n${footer}`;
+    const footer = `\nअभिभावक/शिक्षक संदेश: नियमित 4D STEM सिमुलेशन अभ्यास जारी रखें।`;
+    return `${header}\n${meta}\n\n*सत्यापित मॉड्यूल:*\n${details || '• कोई विषय अभी पूरा नहीं हुआ'}\n${footer}`;
   }
 
   function handleKeyDown(e) {

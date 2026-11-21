@@ -47,137 +47,222 @@
   right: 14px;
   display: flex;
   align-items: center;
+/* =========================================================================
+   1. TACTICAL FPS COMBAT HUD OVERLAY (Zero Emojis, Aerospace Telemetry)
+   ========================================================================= */
+
+.ss-hud-top-bar {
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  display: flex;
+  align-items: center;
   justify-content: space-between;
   gap: 12px;
   pointer-events: none;
   z-index: 50;
-  font-family: var(--font-game);
+  font-family: 'Fredoka', -apple-system, BlinkMacSystemFont, monospace, sans-serif;
 }
 
-/* Player Level & Currency Card */
-.ss-rpg-player-card {
+/* Tactical Combat Status Card */
+.ss-tactical-status-card {
   pointer-events: auto;
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 2.5px solid var(--k-pink-soft);
-  border-radius: var(--radius-lg);
-  padding: 6px 14px 6px 8px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  box-shadow: 0 8px 24px rgba(255, 183, 178, 0.35);
-  transition: transform 0.15s;
-}
-
-.ss-rpg-avatar {
-  font-size: 1.8rem;
-  background: var(--k-pink-bg);
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid var(--k-pink-soft);
-}
-
-.ss-rpg-info {
+  background: rgba(18, 10, 32, 0.88);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1.5px solid rgba(0, 245, 212, 0.5);
+  border-radius: 10px;
+  padding: 8px 14px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 5px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), inset 0 0 10px rgba(0, 245, 212, 0.1);
+  min-width: 190px;
 }
 
-.ss-rpg-level-row {
+.ss-stat-meter-row {
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: space-between;
+  gap: 8px;
 }
 
-.ss-rpg-level-badge {
-  background: var(--k-lilac-primary);
-  color: #fff;
+.ss-meter-label {
+  font-size: 0.72rem;
   font-weight: 800;
-  font-size: 0.75rem;
-  padding: 2px 7px;
-  border-radius: 999px;
-  line-height: 1;
+  letter-spacing: 1px;
+  color: #a0aec0;
+  width: 52px;
 }
 
-.ss-rpg-rank-title {
-  font-size: 0.85rem;
-  font-weight: 800;
-  color: var(--k-text-dark);
-}
-
-.ss-rpg-xp-track {
-  width: 80px;
-  height: 6px;
-  background: #f0e6ff;
-  border-radius: 999px;
+.ss-meter-track {
+  flex: 1;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
   overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-.ss-rpg-xp-fill {
+.ss-meter-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--k-lilac-primary), var(--k-mint-primary));
-  border-radius: 999px;
-  transition: width 0.3s ease;
+  border-radius: 4px;
+  transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.ss-rpg-currency {
+.ss-shield-fill {
+  background: linear-gradient(90deg, #00f5d4, #00bbf9);
+  box-shadow: 0 0 8px #00f5d4;
+}
+
+.ss-energy-fill {
+  background: linear-gradient(90deg, #ff3b77, #f72585);
+  box-shadow: 0 0 8px #ff3b77;
+}
+
+.ss-meter-val {
+  font-size: 0.76rem;
+  font-weight: 900;
+  color: #fff;
+  width: 38px;
+  text-align: right;
+  font-family: monospace;
+}
+
+.ss-telemetry-row {
   display: flex;
-  align-items: center;
-  gap: 6px;
-  border-left: 1.5px dashed #e2c6ff;
-  padding-left: 10px;
+  justify-content: space-between;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 4px;
+  margin-top: 2px;
 }
 
-.ss-coin-badge {
-  font-weight: 800;
-  font-size: 0.95rem;
-  color: #d48806;
+.ss-telem-chip {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #00f5d4;
+  letter-spacing: 0.5px;
+  font-family: monospace;
 }
 
-.ss-streak-badge {
-  font-weight: 800;
-  font-size: 0.85rem;
-  color: #ff4757;
-}
-
-/* GTA Active Mission Pill */
-.ss-gta-mission-pill {
+/* Tactical Directive Bar */
+.ss-tactical-directive-bar {
   pointer-events: auto;
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 2.5px solid var(--k-gold-soft);
-  border-radius: 999px;
+  background: rgba(18, 10, 32, 0.88);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1.5px solid rgba(255, 59, 119, 0.6);
+  border-radius: 8px;
   padding: 8px 18px;
   display: none;
+  flex-direction: column;
   align-items: center;
-  gap: 8px;
-  box-shadow: 0 8px 24px rgba(255, 165, 2, 0.25);
-  animation: ss-float-subtle 3s ease-in-out infinite;
+  gap: 2px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+  max-width: 520px;
+  text-align: center;
 }
 
 @media (min-width: 640px) {
-  .ss-gta-mission-pill {
+  .ss-tactical-directive-bar {
     display: flex;
   }
 }
 
-@keyframes ss-float-subtle {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
-}
-
-.ss-mission-icon {
-  font-size: 1.15rem;
+.ss-directive-tag {
+  font-size: 0.68rem;
+  font-weight: 900;
+  color: #ff3b77;
+  letter-spacing: 1.5px;
 }
 
 .ss-mission-text {
-  font-size: 0.92rem;
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.25;
+}
+
+/* Tactical Right Action Buttons */
+.ss-tactical-actions-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: auto;
+}
+
+.ss-tactical-btn {
+  background: rgba(18, 10, 32, 0.88);
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  border-radius: 8px;
+  padding: 6px 12px;
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  backdrop-filter: blur(8px);
+}
+
+.ss-tactical-btn:hover {
+  border-color: #00f5d4;
+  color: #00f5d4;
+  box-shadow: 0 0 10px rgba(0, 245, 212, 0.4);
+}
+
+/* Damage Vignette Screen Flash */
+.ss-damage-vignette {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 999;
+  background: radial-gradient(circle, transparent 60%, rgba(255, 0, 60, 0.55) 100%);
+  border: 4px solid #ff003c;
+  opacity: 0;
+  transition: opacity 0.1s ease;
+}
+
+.ss-damage-vignette.active {
+  opacity: 1;
+}
+
+/* Containment Lockdown Warning Banner */
+.ss-containment-alarm-banner {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(230, 0, 60, 0.92);
+  border: 2px solid #fff;
+  border-radius: 8px;
+  padding: 10px 24px;
+  text-align: center;
+  z-index: 950;
+  pointer-events: none;
+  box-shadow: 0 0 30px rgba(255, 0, 60, 0.8);
+  animation: ss-alarm-pulse 0.6s infinite alternate;
+}
+
+@keyframes ss-alarm-pulse {
+  0% { transform: translateX(-50%) scale(0.98); }
+  100% { transform: translateX(-50%) scale(1.02); }
+}
+
+.ss-alarm-title {
+  font-size: 0.95rem;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: 1px;
+}
+
+.ss-alarm-desc {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #ffe066;
+  margin-top: 3px;
+}
   font-weight: 700;
   color: var(--k-text-dark);
 }

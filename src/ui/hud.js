@@ -74,57 +74,66 @@ export function createHUD({
     const xpCurrent = playerXP % 100;
 
     hudContainer.innerHTML = sanitizeHtml(`
-      <!-- Top RPG Navigation Bar -->
+      <!-- Top Tactical Telemetry Bar -->
       <div class="ss-hud-top-bar">
-        <!-- Player Level & Treasury Card (Left) -->
-        <div class="ss-rpg-player-card">
-          <div class="ss-rpg-avatar">🧑‍🎓</div>
-          <div class="ss-rpg-info">
-            <div class="ss-rpg-level-row">
-              <span class="ss-rpg-level-badge">LVL ${playerLevel}</span>
-              <span class="ss-rpg-rank-title">${levelTitle} ${playerLevel}</span>
-            </div>
-            <div class="ss-rpg-xp-track">
-              <div class="ss-rpg-xp-fill" style="width: ${xpCurrent}%"></div>
-            </div>
+        <!-- Tactical Combat Status Card (Left) -->
+        <div class="ss-tactical-status-card">
+          <div class="ss-stat-meter-row">
+            <span class="ss-meter-label">SHIELD</span>
+            <div class="ss-meter-track"><div class="ss-meter-fill ss-shield-fill" id="ss-shield-bar" style="width: 100%"></div></div>
+            <span class="ss-meter-val" id="ss-shield-text">100%</span>
           </div>
-          <div class="ss-rpg-currency">
-            <span class="ss-coin-badge">🪙 ${playerGold}</span>
-            <span class="ss-streak-badge">🔥 ${playerStreak}x</span>
+          <div class="ss-stat-meter-row">
+            <span class="ss-meter-label">ENERGY</span>
+            <div class="ss-meter-track"><div class="ss-meter-fill ss-energy-fill" id="ss-energy-bar" style="width: 100%"></div></div>
+            <span class="ss-meter-val" id="ss-energy-text">100%</span>
+          </div>
+          <div class="ss-telemetry-row">
+            <span class="ss-telem-chip" id="ss-telem-status">SYS: ONLINE</span>
+            <span class="ss-telem-chip" id="ss-telem-coord">4D: t=0.0s</span>
           </div>
         </div>
 
-        <!-- GTA Active Mission Pill (Center) -->
-        <div class="ss-gta-mission-pill" id="ss-gta-mission-bar">
-          <span class="ss-mission-icon">🎯</span>
+        <!-- Tactical Active Mission Directive (Center) -->
+        <div class="ss-tactical-directive-bar" id="ss-gta-mission-bar">
+          <span class="ss-directive-tag">[ACTIVE STEM DIRECTIVE]</span>
           <span class="ss-mission-text" id="ss-active-mission-title">
             ${
               lang === 'hi'
-                ? 'मिशन: सोने के सिक्के इकट्ठा करें और गणित द्वीप पर जाएँ!'
-                : 'MISSION: Collect gold star coins & cross to Maths Isle!'
+                ? 'निर्देश: प्रयोगशाला टारगेट को शूट करें और भौतिकी व रसायन चक्र सक्रिय करें'
+                : 'DIRECTIVE: Shoot laboratory targets to calibrate physics & chemistry loops'
             }
           </span>
         </div>
 
-        <!-- Quick Game Toggles (Right) -->
-        <div class="ss-hud-actions-right">
-          <button class="ss-clay-btn ss-clay-grade-btn" id="ss-hud-grade-btn" type="button">
-            <span>🏫</span> <span>${lang === 'hi' ? 'कक्षा' : 'Class'} ${currentGrade}</span>
+        <!-- Tactical Quick Actions (Right) -->
+        <div class="ss-tactical-actions-right">
+          <button class="ss-tactical-btn" id="ss-hud-grade-btn" type="button">
+            ${lang === 'hi' ? 'मानक' : 'GRADE'} ${currentGrade}
           </button>
-          <button class="ss-clay-btn ss-clay-progress-btn" id="ss-hud-progress-btn" type="button" title="${t('hud.progress')}">
-            <span>📜</span> <span>${lang === 'hi' ? 'साहसिक डायरी' : 'Log'} [P]</span>
+          <button class="ss-tactical-btn" id="ss-hud-progress-btn" type="button" title="${t('hud.progress')}">
+            ${lang === 'hi' ? 'मिशन लॉग' : 'MISSION LOG'} [P]
           </button>
-          <button class="ss-clay-btn ss-clay-lang-btn" id="ss-hud-lang-btn" type="button">
-            <span>🌐</span> <span>${lang === 'hi' ? 'EN' : 'हिंदी'}</span>
+          <button class="ss-tactical-btn" id="ss-hud-lang-btn" type="button">
+            ${lang === 'hi' ? 'EN' : 'हिंदी'}
           </button>
         </div>
+      </div>
+
+      <!-- Damage Vignette Flash -->
+      <div class="ss-damage-vignette" id="ss-damage-vignette"></div>
+
+      <!-- Containment Breach Alarm Banner -->
+      <div class="ss-containment-alarm-banner" id="ss-containment-banner" style="display:none;">
+        <div class="ss-alarm-title">[!] CONTAINMENT BREACH DETECTED</div>
+        <div class="ss-alarm-desc" id="ss-alarm-desc">CRITICAL SHIELD DAMAGE: RE-CALIBRATING SYSTEM</div>
       </div>
 
       <!-- Proximity GTA Style Interaction Banner -->
       <div class="ss-gta-prompt-bubble" id="ss-stone-prompt-banner" style="display:none;">
         <div class="ss-prompt-key">E</div>
         <div class="ss-prompt-desc">
-          <span class="ss-prompt-sub" id="ss-prompt-sub">ज्ञान का चमकता पत्थर</span>
+          <span class="ss-prompt-sub" id="ss-prompt-sub">QUANTUM APPARATUS TERMINAL</span>
           <strong class="ss-prompt-main" id="ss-prompt-text"></strong>
         </div>
       </div>
@@ -133,7 +142,7 @@ export function createHUD({
       <div class="ss-gta-radar-container">
         <canvas id="ss-radar-canvas" width="130" height="130"></canvas>
         <div class="ss-radar-hud-label">
-          <span>SANKHYA RADAR</span>
+          <span>RADAR TELEMETRY</span>
         </div>
       </div>
 
@@ -223,7 +232,7 @@ export function createHUD({
     } else {
       const topic = getTopic(currentPromptStone.id, currentGrade);
       const title = topic?.title?.[lang] || topic?.title?.hi || currentPromptStone.topic;
-      const subj = currentPromptStone.zone === 'maths' ? '📐 GANIT' : '🔬 VIGYAN';
+      const subj = currentPromptStone.zone === 'maths' ? '[MTH] GANIT' : '[SCI] VIGYAN';
       subEl.textContent = `${subj} • ${lang === 'hi' ? 'कक्षा' : 'Class'} ${currentGrade}`;
       textEl.textContent = lang === 'hi' ? `चुनौती: ${title}` : `Challenge: ${title}`;
     }
@@ -381,6 +390,55 @@ export function createHUD({
     ctx.stroke();
   }
 
+  function setShield(hp) {
+    const bar = hudContainer.querySelector('#ss-shield-bar');
+    const txt = hudContainer.querySelector('#ss-shield-text');
+    const clamped = Math.max(0, Math.min(100, Math.round(hp)));
+    if (bar) bar.style.width = `${clamped}%`;
+    if (txt) txt.textContent = `${clamped}%`;
+  }
+
+  function setEnergy(energy) {
+    const bar = hudContainer.querySelector('#ss-energy-bar');
+    const txt = hudContainer.querySelector('#ss-energy-text');
+    const clamped = Math.max(0, Math.min(100, Math.round(energy)));
+    if (bar) bar.style.width = `${clamped}%`;
+    if (txt) txt.textContent = `${clamped}%`;
+  }
+
+  function setCoordinates(coordsText) {
+    const el = hudContainer.querySelector('#ss-telem-coord');
+    if (el) el.textContent = coordsText;
+  }
+
+  function triggerDamageFlash() {
+    const vig = hudContainer.querySelector('#ss-damage-vignette');
+    if (vig) {
+      vig.classList.add('active');
+      setTimeout(() => vig.classList.remove('active'), 280);
+    }
+  }
+
+  function showContainmentWarning(title, desc, durationMs = 3500) {
+    const banner = hudContainer.querySelector('#ss-containment-banner');
+    if (!banner) return;
+    const titleEl = banner.querySelector('.ss-alarm-title');
+    const descEl = banner.querySelector('#ss-alarm-desc');
+    if (titleEl) titleEl.textContent = title;
+    if (descEl) descEl.textContent = desc;
+    banner.style.display = 'block';
+    triggerDamageFlash();
+
+    setTimeout(() => {
+      if (banner) banner.style.display = 'none';
+    }, durationMs);
+  }
+
+  function setMissionDirective(text) {
+    const el = hudContainer.querySelector('#ss-active-mission-title');
+    if (el) el.textContent = text;
+  }
+
   render();
   container.appendChild(hudContainer);
 
@@ -388,6 +446,12 @@ export function createHUD({
     setPrompt,
     update: render,
     updateRadar,
+    setShield,
+    setEnergy,
+    setCoordinates,
+    triggerDamageFlash,
+    showContainmentWarning,
+    setMissionDirective,
     addGold,
     addQuizReward,
     destroy() {

@@ -25,6 +25,13 @@ import {
   makeAsphaltBoulevard,
   makeTargetDrone,
 } from './props.js';
+import {
+  makePrismLab,
+  makeBohrAtomLab,
+  makeTitrationLab,
+  makeMomentumLab,
+  makeSectorForcefield,
+} from './physics-labs.js';
 import { emit } from '../engine/events.js';
 
 const STONE_Y = 1.4;
@@ -93,6 +100,9 @@ export function createWorld(scene) {
   const clouds = [];
   const targets = [];
   const cars = [];
+  const labs = [];
+  const forcefields = [];
+  const labNodes = [];
 
   const colour = (hex) =>
     new THREE.MeshStandardMaterial({
@@ -422,6 +432,48 @@ export function createWorld(scene) {
     targets.push(drone);
   });
 
+  // -------------------------------------------------------------
+  // REAL 3D INTERACTIVE STEM LABORATORIES
+  // -------------------------------------------------------------
+  // 1. Prism Refraction Lab (Maths Isle)
+  const prismLab = makePrismLab(MATHS_CENTRE.x, 0, MATHS_CENTRE.z - 7.0);
+  scene.add(prismLab.group);
+  labs.push(prismLab);
+  labNodes.push(...prismLab.targetNodes);
+
+  // 2. Momentum Collider Lab (Maths Isle)
+  const momentumLab = makeMomentumLab(MATHS_CENTRE.x, 0, MATHS_CENTRE.z + 7.0);
+  scene.add(momentumLab.group);
+  labs.push(momentumLab);
+  labNodes.push(...momentumLab.targetNodes);
+
+  // 3. Bohr Quantum Atom Lab (Science Garden)
+  const atomLab = makeBohrAtomLab(SCIENCE_CENTRE.x, 0, SCIENCE_CENTRE.z - 7.0);
+  scene.add(atomLab.group);
+  labs.push(atomLab);
+  labNodes.push(...atomLab.targetNodes);
+
+  // 4. Chemical Titration Neutralization Lab (Science Garden)
+  const titrationLab = makeTitrationLab(SCIENCE_CENTRE.x, 0, SCIENCE_CENTRE.z + 7.0);
+  scene.add(titrationLab.group);
+  labs.push(titrationLab);
+  labNodes.push(...titrationLab.targetNodes);
+
+  // -------------------------------------------------------------
+  // SECTOR FORCEFIELD SECURITY GATES
+  // -------------------------------------------------------------
+  const gateMaths = makeSectorForcefield('gate-maths', -14, BRIDGE_Z, 4.2, 4.5, 0x00f5d4);
+  scene.add(gateMaths.group);
+  forcefields.push(gateMaths);
+  const gateMathsCol = { id: 'gate-maths-col', type: 'box', minX: -14.6, maxX: -13.4, minZ: BRIDGE_Z - BRIDGE_HALF_WIDTH, maxZ: BRIDGE_Z + BRIDGE_HALF_WIDTH };
+  colliders.push(gateMathsCol);
+
+  const gateScience = makeSectorForcefield('gate-science', 14, BRIDGE_Z, 4.2, 4.5, 0x7d5fff);
+  scene.add(gateScience.group);
+  forcefields.push(gateScience);
+  const gateScienceCol = { id: 'gate-science-col', type: 'box', minX: 13.4, maxX: 14.6, minZ: BRIDGE_Z - BRIDGE_HALF_WIDTH, maxZ: BRIDGE_Z + BRIDGE_HALF_WIDTH };
+  colliders.push(gateScienceCol);
+
   // Sakura Fluttering Petals Particle System
   const petalCount = 150;
   const petalPos = new Float32Array(petalCount * 3);
@@ -452,11 +504,24 @@ export function createWorld(scene) {
     coins,
     targets,
     cars,
+    labs,
+    forcefields,
+    labNodes,
+    disengageGate(gateId) {
+      const gate = forcefields.find((f) => f.id === gateId);
+      if (gate) gate.disengage();
+      const colIdx = colliders.findIndex((c) => c.id === `${gateId}-col`);
+      if (colIdx >= 0) colliders.splice(colIdx, 1);
+    },
     groundHeight() {
       return 0;
     },
     update(dt, playerPos) {
       elapsed += dt;
+
+      // Update interactive STEM laboratories & forcefield gates
+      labs.forEach((lab) => lab.update(dt));
+      forcefields.forEach((ff) => ff.update(dt, elapsed));
 
       // 0. Animate Sun pulse & skyline beacon shimmer
       if (sunMesh) {

@@ -8,7 +8,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "node --check src/main.js src/save.js src/flags.js src/ui/sanitize.js src/ui/quiz.js src/ui/board-modal.js src/ui/hud.js src/ui/progress.js src/world/world.js src/world/props.js",
+    "lint": "node --check src/main.js src/save.js src/flags.js src/ui/sanitize.js src/ui/quiz.js src/ui/board-modal.js src/ui/hud.js src/ui/progress.js src/world/world.js src/world/props.js src/world/physics-labs.js",
     "test": "node --test test/*.test.js",
     "test:e2e": "node test/browser-verification.js",
     "deploy": "wrangler pages deploy dist --project-name sankhya-strike --branch main"
