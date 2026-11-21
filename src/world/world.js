@@ -11,6 +11,14 @@ import {
   makeBeaconPillar,
   makeCollectibleCoin,
   makeToriiArch,
+  makeViceCityCar,
+  makeKoreanStoreBuilding,
+  makeVendingMachine,
+  makePalmTree,
+  makeHoloAtom,
+  makeHoloMathSymbols,
+  makeFloatingClouds,
+  makeWaterPlane,
 } from './props.js';
 import { emit } from '../engine/events.js';
 
@@ -19,9 +27,8 @@ const MATHS_CENTRE = { x: -38, z: -6 };
 const SCIENCE_CENTRE = { x: 38, z: -6 };
 const BRIDGE_Z = -3;
 const BRIDGE_HALF_WIDTH = 1.75;
-const COIN_PICKUP_RANGE = 1.35;
+const COIN_PICKUP_RANGE = 1.4;
 
-// Pastel Grid Floor Texture
 function makePastelGridTexture(groundHex, lineHex, inkHex) {
   const size = 256;
   const canvas = document.createElement('canvas');
@@ -68,6 +75,7 @@ export function createWorld(scene) {
   const bobbers = [];
   const beacons = [];
   const coins = [];
+  const clouds = [];
 
   const colour = (hex) =>
     new THREE.MeshStandardMaterial({
@@ -78,15 +86,30 @@ export function createWorld(scene) {
       flatShading: true,
     });
 
-  // Register a glowing challenge stone with vertical GTA-style waypoint beacon
+  // -------------------------------------------------------------
+  // 0. SHIMMERING OCEAN & DRIFTING PASTEL CLOUDS
+  // -------------------------------------------------------------
+  const water = makeWaterPlane();
+  scene.add(water.mesh);
+
+  // 6 Floating Puffy Clouds
+  for (let i = 0; i < 6; i++) {
+    const cloud = makeFloatingClouds();
+    const cx = (i - 3) * 36 + Math.random() * 10;
+    const cy = 20 + Math.random() * 8;
+    const cz = -25 + (i % 3) * 20;
+    cloud.position.set(cx, cy, cz);
+    scene.add(cloud);
+    clouds.push({ mesh: cloud, speed: 0.8 + Math.random() * 0.4 });
+  }
+
   function addStone(id, zone, x, z, topic) {
     const glowHex = ZONES[zone].palette.glow;
-    const mesh = new THREE.Mesh(new THREE.OctahedronGeometry(0.52, 0), colour(glowHex));
+    const mesh = new THREE.Mesh(new THREE.OctahedronGeometry(0.55, 0), colour(glowHex));
     mesh.position.set(x, STONE_Y, z);
     scene.add(mesh);
     bobbers.push({ mesh, phase: stones.length * 0.7 });
 
-    // Waypoint light beam
     const beacon = makeBeaconPillar(glowHex);
     beacon.group.position.set(x, 0, z);
     scene.add(beacon.group);
@@ -96,7 +119,7 @@ export function createWorld(scene) {
   }
 
   // -------------------------------------------------------------
-  // 1. CENTRAL HUB ISLAND (Vanilla Cream & Sakura Haven)
+  // 1. CENTRAL HUB ISLAND (Vice City Plaza & Korean Cyber Street)
   // -------------------------------------------------------------
   const hubRadius = 14;
   const hubThickness = 3.5;
@@ -114,44 +137,62 @@ export function createWorld(scene) {
   hubFloor.position.y = 0.02;
   scene.add(hubFloor);
 
-  // Sakura Trees around Hub rim
-  for (let i = 0; i < 7; i++) {
-    const angle = (i / 7) * Math.PI * 2 + 0.3;
-    const dist = 11.2;
-    const wx = Math.cos(angle) * dist;
-    const wz = Math.sin(angle) * dist;
-    // Keep bridges clear (near z = -3)
-    if (Math.abs(wz - BRIDGE_Z) > 3.0) {
-      const tree = makeSakuraTree();
-      tree.position.set(wx, 0, wz);
-      scene.add(tree);
-      colliders.push({ type: 'circle', x: wx, z: wz, r: 0.8 });
-    }
-  }
+  // Vice City Retro Pastel Sports Cars in Hub Plaza
+  const car1 = makeViceCityCar(0xff758c); // Strawberry pink
+  car1.position.set(-6, 0, 7.5);
+  car1.rotation.y = Math.PI / 4;
+  scene.add(car1);
+  colliders.push({ type: 'box', minX: -7.5, maxX: -4.5, minZ: 6.0, maxZ: 9.0 });
 
-  // Soft decorative rocks & lamps on Hub
-  for (let i = 0; i < 6; i++) {
-    const seed = i * 13.7 + 1.2;
-    const a = (i / 6) * Math.PI * 2 + 0.8;
-    const r = 7.5;
-    const wx = Math.cos(a) * r;
-    const wz = Math.sin(a) * r;
-    const rock = makeRock(seed);
-    rock.position.set(wx, 0, wz);
-    scene.add(rock);
+  const car2 = makeViceCityCar(0x70e3db); // Pastel cyan
+  car2.position.set(6, 0, 7.5);
+  car2.rotation.y = -Math.PI / 4;
+  scene.add(car2);
+  colliders.push({ type: 'box', minX: 4.5, maxX: 7.5, minZ: 6.0, maxZ: 9.0 });
 
-    if (i % 2 === 0) {
-      const lamp = makeLamp();
-      lamp.position.set(wx * 1.2, 0, wz * 1.2);
-      scene.add(lamp);
-      colliders.push({ type: 'circle', x: wx * 1.2, z: wz * 1.2, r: 0.5 });
-    }
+  // Korean Pastel Cyber Cafes & Buildings on Hub Edge
+  const shop1 = makeKoreanStoreBuilding('수학 빵집 (Maths Cafe)', 0xffb7b2);
+  shop1.position.set(-7, 0, -8);
+  shop1.rotation.y = 0.3;
+  scene.add(shop1);
+  colliders.push({ type: 'box', minX: -9.5, maxX: -4.5, minZ: -10, maxZ: -6 });
+
+  const shop2 = makeKoreanStoreBuilding('SANKHYA ARCADE', 0x7d5fff);
+  shop2.position.set(7, 0, -8);
+  shop2.rotation.y = -0.3;
+  scene.add(shop2);
+  colliders.push({ type: 'box', minX: 4.5, maxX: 9.5, minZ: -10, maxZ: -6 });
+
+  // Vending Machines on Hub
+  const vm1 = makeVendingMachine();
+  vm1.position.set(-3.5, 0, -7.5);
+  scene.add(vm1);
+
+  const vm2 = makeVendingMachine();
+  vm2.position.set(3.5, 0, -7.5);
+  scene.add(vm2);
+
+  // Tropical Palm Trees & Sakura Trees on Hub
+  const palm1 = makePalmTree();
+  palm1.position.set(-9.5, 0, 3);
+  scene.add(palm1);
+
+  const palm2 = makePalmTree();
+  palm2.position.set(9.5, 0, 3);
+  scene.add(palm2);
+
+  // Sakura Trees along Hub
+  for (const [tx, tz] of [[-10, -3], [10, -3], [0, 11]]) {
+    const sTree = makeSakuraTree();
+    sTree.position.set(tx, 0, tz);
+    scene.add(sTree);
+    colliders.push({ type: 'circle', x: tx, z: tz, r: 0.8 });
   }
 
   // Central Hub Board Stone (गुरु पटल)
   addStone('hub-1', 'hub', 0, 2.5, 'board');
 
-  // Golden path tiles leading to bridges
+  // Golden path tiles
   const pathMat = new THREE.MeshStandardMaterial({ color: 0xffd1dc, roughness: 0.5, flatShading: true });
   const pathGeo = new THREE.BoxGeometry(1.6, 0.05, 2.4);
   for (let x = -13; x <= 13; x += 2.2) {
@@ -161,7 +202,7 @@ export function createWorld(scene) {
   }
 
   // -------------------------------------------------------------
-  // 2. GANIT DWEEP / MATHS ISLE (Taro Lilac & Cyan Crystals)
+  // 2. GANIT DWEEP / MATHS ISLE (Holo Math Wonder & Lilac Crystals)
   // -------------------------------------------------------------
   const mathsGroup = new THREE.Group();
   mathsGroup.position.set(MATHS_CENTRE.x, 0, MATHS_CENTRE.z);
@@ -180,7 +221,12 @@ export function createWorld(scene) {
   mathsGroup.add(mathsFloor);
   scene.add(mathsGroup);
 
-  // Welcoming Gateway Arch to Ganit Dweep
+  // Giant 3D Holographic Math Symbols floating in the sky
+  const holoMath = makeHoloMathSymbols();
+  holoMath.group.position.set(MATHS_CENTRE.x, 0, MATHS_CENTRE.z);
+  scene.add(holoMath.group);
+
+  // Gateway Arch
   const mathsArch = makeToriiArch(0xb39ddb);
   mathsArch.position.set(-25, 0, BRIDGE_Z);
   mathsArch.rotation.y = Math.PI / 2;
@@ -193,32 +239,19 @@ export function createWorld(scene) {
   scene.add(giantCrystal);
   colliders.push({ type: 'circle', x: MATHS_CENTRE.x, z: MATHS_CENTRE.z, r: 1.2 });
 
-  // Outer Sakura trees on Maths Isle
-  for (let i = 0; i < 5; i++) {
-    const angle = (i / 5) * Math.PI * 2;
-    const wx = MATHS_CENTRE.x + Math.cos(angle) * 11;
-    const wz = MATHS_CENTRE.z + Math.sin(angle) * 11;
-    if (Math.abs(wz - BRIDGE_Z) > 3.0) {
-      const tree = makeSakuraTree();
-      tree.position.set(wx, 0, wz);
-      scene.add(tree);
-      colliders.push({ type: 'circle', x: wx, z: wz, r: 0.8 });
-    }
-  }
-
-  // Maths challenge stones (4 cardinal points)
+  // Maths challenge stones
   const mathsStones = [
-    ['maths-1', 'ratio-percentage', -4.5, 0],
-    ['maths-2', 'algebra', 4.5, 0],
-    ['maths-3', 'mensuration', 0, -4.5],
-    ['maths-4', 'linear-equations', 0, 4.5],
+    ['maths-1', 'ratio-percentage', -4.8, 0],
+    ['maths-2', 'algebra', 4.8, 0],
+    ['maths-3', 'mensuration', 0, -4.8],
+    ['maths-4', 'linear-equations', 0, 4.8],
   ];
   for (const [id, topic, x, z] of mathsStones) {
     addStone(id, 'maths', MATHS_CENTRE.x + x, MATHS_CENTRE.z + z, topic);
   }
 
   // -------------------------------------------------------------
-  // 3. VIGYAN VATIKA / SCIENCE GARDEN (Matcha & Amber Energy)
+  // 3. VIGYAN VATIKA / SCIENCE GARDEN (Holo Atom & Matcha Energy)
   // -------------------------------------------------------------
   const scienceGroup = new THREE.Group();
   scienceGroup.position.set(SCIENCE_CENTRE.x, 0, SCIENCE_CENTRE.z);
@@ -237,42 +270,37 @@ export function createWorld(scene) {
   scienceGroup.add(scienceFloor);
   scene.add(scienceGroup);
 
-  // Welcoming Gateway Arch to Vigyan Vatika
+  // Giant 3D Holographic Atomic Model hovering in the sky
+  const holoAtom = makeHoloAtom();
+  holoAtom.group.position.set(SCIENCE_CENTRE.x, 0, SCIENCE_CENTRE.z);
+  scene.add(holoAtom.group);
+
+  // Gateway Arch
   const scienceArch = makeToriiArch(0xa5d6a7);
   scienceArch.position.set(25, 0, BRIDGE_Z);
   scienceArch.rotation.y = -Math.PI / 2;
   scene.add(scienceArch);
 
-  // Central glowing Energy Tree / Garden centerpiece
+  // Science Center Tree
   const scienceCenterTree = makeTree();
   scienceCenterTree.scale.set(1.5, 1.5, 1.5);
   scienceCenterTree.position.set(SCIENCE_CENTRE.x, 0, SCIENCE_CENTRE.z);
   scene.add(scienceCenterTree);
   colliders.push({ type: 'circle', x: SCIENCE_CENTRE.x, z: SCIENCE_CENTRE.z, r: 1.2 });
 
-  // Floating glowing energy orbs around Science garden
-  const orbGeo = new THREE.SphereGeometry(0.35, 12, 10);
-  const orbMat = colour(ZONES.science.palette.glow);
-  for (const [ox, oz] of [[-6, -2], [6, -2], [-3, 6], [3, 6]]) {
-    const orb = new THREE.Mesh(orbGeo, orbMat);
-    orb.position.set(SCIENCE_CENTRE.x + ox, 1.6, SCIENCE_CENTRE.z + oz);
-    scene.add(orb);
-    bobbers.push({ mesh: orb, phase: ox + oz });
-  }
-
-  // Science challenge stones (4 cardinal points)
+  // Science challenge stones
   const scienceStones = [
-    ['science-1', 'force-pressure', -4.5, 0],
-    ['science-2', 'acids-bases', 4.5, 0],
-    ['science-3', 'light', 0, -4.5],
-    ['science-4', 'cell-structure', 0, 4.5],
+    ['science-1', 'force-pressure', -4.8, 0],
+    ['science-2', 'acids-bases', 4.8, 0],
+    ['science-3', 'light', 0, -4.8],
+    ['science-4', 'cell-structure', 0, 4.8],
   ];
   for (const [id, topic, x, z] of scienceStones) {
     addStone(id, 'science', SCIENCE_CENTRE.x + x, SCIENCE_CENTRE.z + z, topic);
   }
 
   // -------------------------------------------------------------
-  // 4. BRIDGES CONNECTING THE ISLANDS
+  // 4. BRIDGES
   // -------------------------------------------------------------
   const bridges = [
     { x0: -25, x1: -14 },
@@ -287,30 +315,25 @@ export function createWorld(scene) {
   }
 
   // -------------------------------------------------------------
-  // 5. 3D COLLECTIBLE STAR COINS (Vice City / RPG reward tokens)
+  // 5. 3D COLLECTIBLE STAR COINS
   // -------------------------------------------------------------
   const coinLocations = [
-    // Hub plaza coins
     { x: 0, z: -1 },
     { x: -5, z: 2 },
     { x: 5, z: 2 },
     { x: 0, z: 6 },
-    { x: -6, z: -5 },
-    { x: 6, z: -5 },
-    // West Bridge to Maths
+    { x: -6, z: -4 },
+    { x: 6, z: -4 },
     { x: -16, z: BRIDGE_Z },
     { x: -20, z: BRIDGE_Z },
     { x: -24, z: BRIDGE_Z },
-    // Maths Isle plaza
     { x: MATHS_CENTRE.x - 3, z: MATHS_CENTRE.z - 3 },
     { x: MATHS_CENTRE.x + 3, z: MATHS_CENTRE.z - 3 },
     { x: MATHS_CENTRE.x - 3, z: MATHS_CENTRE.z + 3 },
     { x: MATHS_CENTRE.x + 3, z: MATHS_CENTRE.z + 3 },
-    // East Bridge to Science
     { x: 16, z: BRIDGE_Z },
     { x: 20, z: BRIDGE_Z },
     { x: 24, z: BRIDGE_Z },
-    // Science Isle plaza
     { x: SCIENCE_CENTRE.x - 3, z: SCIENCE_CENTRE.z - 3 },
     { x: SCIENCE_CENTRE.x + 3, z: SCIENCE_CENTRE.z + 3 },
   ];
@@ -329,27 +352,27 @@ export function createWorld(scene) {
     });
   });
 
-  // Pastel floating magical fairy motes (sparkles)
-  const moteCount = 200;
-  const motePos = new Float32Array(moteCount * 3);
-  for (let i = 0; i < moteCount; i++) {
-    motePos[i * 3] = (Math.random() - 0.5) * 110;
-    motePos[i * 3 + 1] = 0.5 + Math.random() * 6;
-    motePos[i * 3 + 2] = (Math.random() - 0.5) * 40 - 3;
+  // Sakura Fluttering Petals Particle System
+  const petalCount = 150;
+  const petalPos = new Float32Array(petalCount * 3);
+  for (let i = 0; i < petalCount; i++) {
+    petalPos[i * 3] = (Math.random() - 0.5) * 110;
+    petalPos[i * 3 + 1] = 0.5 + Math.random() * 8;
+    petalPos[i * 3 + 2] = (Math.random() - 0.5) * 40 - 3;
   }
-  const moteGeo = new THREE.BufferGeometry();
-  moteGeo.setAttribute('position', new THREE.BufferAttribute(motePos, 3));
-  const motes = new THREE.Points(
-    moteGeo,
+  const petalGeo = new THREE.BufferGeometry();
+  petalGeo.setAttribute('position', new THREE.BufferAttribute(petalPos, 3));
+  const petals = new THREE.Points(
+    petalGeo,
     new THREE.PointsMaterial({
-      color: 0xffe5ec,
-      size: 0.16,
+      color: 0xffb7b2,
+      size: 0.22,
       transparent: true,
-      opacity: 0.75,
+      opacity: 0.85,
       depthWrite: false,
     })
   );
-  scene.add(motes);
+  scene.add(petals);
 
   let elapsed = 0;
 
@@ -363,26 +386,58 @@ export function createWorld(scene) {
     update(dt, playerPos) {
       elapsed += dt;
 
-      // Bobbing challenge stones
+      // 1. Animate Water Shimmer
+      const pos = water.geo.attributes.position;
+      for (let i = 0; i < pos.count; i++) {
+        const u = pos.getX(i);
+        const v = pos.getY(i);
+        pos.setZ(i, Math.sin(u * 0.15 + elapsed * 1.5) * Math.cos(v * 0.15 + elapsed * 1.5) * 0.18);
+      }
+      water.geo.attributes.position.needsUpdate = true;
+
+      // 2. Animate Drifting Clouds
+      clouds.forEach((c) => {
+        c.mesh.position.x += dt * c.speed;
+        if (c.mesh.position.x > 75) c.mesh.position.x = -75;
+      });
+
+      // 3. Animate 3D Holographic Math Symbols
+      if (holoMath) {
+        holoMath.infinity.rotation.x += dt * 0.8;
+        holoMath.infinity.rotation.y += dt * 1.2;
+        holoMath.ring1.rotation.z += dt * 0.5;
+        holoMath.ring2.rotation.x += dt * 0.6;
+      }
+
+      // 4. Animate 3D Holographic Atomic Orbitals
+      if (holoAtom) {
+        holoAtom.nucleus.rotation.y += dt * 1.0;
+        holoAtom.rings.forEach((r, idx) => {
+          r.ringMesh.rotation.z += dt * r.speed;
+          const a = elapsed * r.speed * 2.0;
+          r.electron.position.set(Math.cos(a) * 3.6, Math.sin(a) * 3.6, 0);
+          r.electron.applyEuler(r.ringMesh.rotation);
+        });
+      }
+
+      // 5. Animate Challenge Stones & Waypoints
       for (const { mesh, phase } of bobbers) {
         mesh.position.y = STONE_Y + Math.sin(elapsed * 2.2 + phase) * 0.16;
         mesh.rotation.y += dt * 0.9;
       }
 
-      // Animating waypoint light beams
       for (const b of beacons) {
         b.beam.rotation.y += dt * 0.3;
         const ringScale = 1.0 + Math.sin(elapsed * 2.5) * 0.12;
         b.ring.scale.set(ringScale, ringScale, 1.0);
       }
 
-      // Animating & checking collectible star coins
+      // 6. Animate Star Coins & Check Collisions
       for (const c of coins) {
         if (!c.collected) {
           c.mesh.rotation.y += dt * 3.5;
           c.mesh.position.y = 1.1 + Math.sin(elapsed * 3.0 + c.phase) * 0.15;
 
-          // Check proximity to player
           if (playerPos) {
             const dx = playerPos.x - c.x;
             const dz = playerPos.z - c.z;
@@ -396,7 +451,14 @@ export function createWorld(scene) {
         }
       }
 
-      motes.rotation.y = elapsed * 0.015;
+      // 7. Animate Fluttering Sakura Petals
+      const petPos = petals.geometry.attributes.position;
+      for (let i = 0; i < petalCount; i++) {
+        let y = petPos.getY(i) - dt * 0.8;
+        if (y < 0.2) y = 7.5;
+        petPos.setY(i, y);
+      }
+      petals.geometry.attributes.position.needsUpdate = true;
     },
   };
 }

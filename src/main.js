@@ -5,6 +5,7 @@ import { createInput, isTouch } from './engine/input.js';
 import { createController } from './engine/controller.js';
 import { startLoop } from './engine/loop.js';
 import { createWorld } from './world/world.js';
+import { makeViewmodelHand } from './world/props.js';
 import { emit, on } from './engine/events.js';
 import { t, applyDom } from './i18n/index.js';
 import { loadProgress, saveProgress, flushProgress } from './save.js';
@@ -52,6 +53,11 @@ sun.shadow.camera.top = 60;
 sun.shadow.camera.bottom = -60;
 sun.shadow.bias = -0.0005;
 scene.add(sun);
+
+// First-Person 3D Viewmodel Hand (Attached directly to Camera)
+const viewmodel = makeViewmodelHand();
+camera.add(viewmodel.group);
+scene.add(camera);
 
 const world = createWorld(scene);
 const input = createInput(canvas);
@@ -278,6 +284,8 @@ canvas.addEventListener('click', () => {
   if (!started || isTouch) return;
   if (isAnyModalOpen()) return;
   if (controller.isPaused()) requestLock();
+  // Trigger punch animation on click
+  punchTime = 1.0;
 });
 
 // Start button click
@@ -306,6 +314,9 @@ function findNearestStone() {
   return best;
 }
 
+let animTime = 0;
+let punchTime = 0;
+
 function frame(dt) {
   controller.update(dt);
   world.update(dt, controller.position);
@@ -316,7 +327,36 @@ function frame(dt) {
     hud.updateRadar();
   }
 
+  // 1. Viewmodel Hand Animation (First-Person Immersion)
+  animTime += dt;
+  const move = input.getMove();
+  const isMoving = Math.hypot(move.x, move.z) > 0.1;
+  const isSprinting = input.isSprinting();
+
+  // Dynamic Camera FOV (Vice City speed rush)
+  const targetFov = isSprinting && isMoving ? 68 : 60;
+  camera.fov += (targetFov - camera.fov) * (dt * 6.0);
+  camera.updateProjectionMatrix();
+
+  // Natural head-bobbing / hand sway
+  const bobSpeed = isSprinting ? 12 : 7;
+  const bobAmountY = isMoving ? Math.sin(animTime * bobSpeed) * 0.014 : Math.sin(animTime * 2) * 0.004;
+  const bobAmountX = isMoving ? Math.cos(animTime * (bobSpeed * 0.5)) * 0.01 : 0;
+
+  let handZ = 0;
+  if (punchTime > 0) {
+    punchTime -= dt * 4.5;
+    handZ = -Math.sin(punchTime * Math.PI) * 0.16;
+    viewmodel.knuckleCrystal.scale.setScalar(1.5);
+  } else {
+    viewmodel.knuckleCrystal.scale.setScalar(1.0);
+  }
+
+  viewmodel.group.position.set(bobAmountX, bobAmountY, handZ);
+
+  // 2. Interaction consume
   if (input.consumeInteract() && !controller.isPaused() && !isAnyModalOpen()) {
+    punchTime = 1.0;
     if (nearestStone) {
       emit('stone:interact', { id: nearestStone.id, zone: nearestStone.zone, topic: nearestStone.topic });
     }
