@@ -124,7 +124,7 @@ export function makeViceCityCar(color = 0xff758c) {
   const neonMat = new THREE.MeshBasicMaterial({
     color: 0x70e3db,
     transparent: true,
-    opacity: 0.45,
+    opacity: 0.55,
     side: THREE.DoubleSide,
   });
   const neonGlow = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 4.6), neonMat);
@@ -132,6 +132,7 @@ export function makeViceCityCar(color = 0xff758c) {
   neonGlow.position.y = 0.05;
 
   g.add(lowerBody, cabin, spoilerBar, leftMount, rightMount, leftLight, rightLight, tailBar, neonGlow);
+  g.userData = { isCar: true, underglow: neonGlow, lowerBody };
   return g;
 }
 
@@ -637,4 +638,241 @@ export function makeToriiArch(color = 0xffb7b2) {
 
   g.add(leftPillar, rightPillar, beam, subBeam);
   return g;
+}
+
+// 20. Vice City 80s Synthwave Gradient Sky Dome
+export function makeViceCitySky() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 512;
+  const ctx = canvas.getContext('2d');
+  const grad = ctx.createLinearGradient(0, 0, 0, 512);
+  grad.addColorStop(0.0, '#0c021c'); // Midnight synthwave violet
+  grad.addColorStop(0.3, '#210740'); // Dark neon violet
+  grad.addColorStop(0.55, '#5d0e70'); // Magenta purple
+  grad.addColorStop(0.72, '#c2185b'); // Vice City neon fuchsia
+  grad.addColorStop(0.85, '#e91e63'); // Hot pink
+  grad.addColorStop(0.94, '#ff6d00'); // Radiant sunset orange
+  grad.addColorStop(1.0, '#ffd54f'); // Horizon golden glow
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 512, 512);
+
+  // Subtle synth stars in upper canopy
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+  for (let i = 0; i < 110; i++) {
+    const sx = (Math.sin(i * 12.3) * 0.5 + 0.5) * 512;
+    const sy = (Math.cos(i * 7.9) * 0.5 + 0.5) * 260;
+    const r = ((i % 3) + 1) * 0.7;
+    ctx.beginPath();
+    ctx.arc(sx, sy, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  const texture = new THREE.CanvasTexture(canvas);
+  const geo = new THREE.SphereGeometry(280, 32, 24);
+  const mat = new THREE.MeshBasicMaterial({
+    map: texture,
+    side: THREE.BackSide,
+    depthWrite: false,
+    fog: false,
+  });
+  const sky = new THREE.Mesh(geo, mat);
+  sky.position.y = 10;
+  return sky;
+}
+
+// 21. Giant Sliced Neon Sunset Sun Disk
+export function makeViceCitySun() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 512;
+  const ctx = canvas.getContext('2d');
+
+  // Sun radial gradient
+  const grad = ctx.createRadialGradient(256, 256, 30, 256, 256, 240);
+  grad.addColorStop(0.0, '#fffbe6');
+  grad.addColorStop(0.25, '#ffe066');
+  grad.addColorStop(0.55, '#ff5e7e');
+  grad.addColorStop(0.85, '#e60067');
+  grad.addColorStop(1.0, '#900048');
+
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.arc(256, 256, 240, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Horizontal scanline slices in lower half (Iconic 80s Outrun / GTA Vice City Sun)
+  ctx.globalCompositeOperation = 'destination-out';
+  const slices = 9;
+  for (let i = 0; i < slices; i++) {
+    const y = 260 + i * 24;
+    const thickness = 4 + i * 2.4;
+    ctx.fillRect(0, y, 512, thickness);
+  }
+  ctx.globalCompositeOperation = 'source-over';
+
+  const texture = new THREE.CanvasTexture(canvas);
+  const geo = new THREE.PlaneGeometry(68, 68);
+  const mat = new THREE.MeshBasicMaterial({
+    map: texture,
+    transparent: true,
+    side: THREE.DoubleSide,
+    depthWrite: false,
+    fog: false,
+  });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.set(0, 34, -145);
+  return mesh;
+}
+
+// 22. Distant Vice City Skyline Silhouettes
+export function makeDistantSkyline() {
+  const g = new THREE.Group();
+  const bldgMat = new THREE.MeshStandardMaterial({
+    color: 0x120824,
+    roughness: 0.8,
+    metalness: 0.3,
+  });
+  const winColors = [0x70e3db, 0xff758c, 0xffd166, 0xb892ff];
+
+  for (let i = -14; i <= 14; i++) {
+    if (Math.abs(i) <= 2) continue; // Keep open silhouette window for sunset sun in center!
+    const bx = i * 8.8 + Math.sin(i * 3.3) * 2.0;
+    const bw = 5.2 + Math.abs(Math.sin(i * 1.5)) * 4.2;
+    const bh = 14 + Math.abs(Math.cos(i * 2.2)) * 28;
+    const bd = 6 + Math.abs(Math.sin(i * 4.1)) * 4;
+
+    const bldg = new THREE.Mesh(new THREE.BoxGeometry(bw, bh, bd), bldgMat);
+    bldg.position.set(bx, bh * 0.5 - 2, -132 + Math.sin(i) * 5);
+    g.add(bldg);
+
+    // Glowing neon window panels
+    const winMat = new THREE.MeshBasicMaterial({
+      color: winColors[Math.abs(i) % winColors.length],
+    });
+    const winMesh = new THREE.Mesh(new THREE.PlaneGeometry(bw * 0.72, bh * 0.6), winMat);
+    winMesh.position.set(bx, bh * 0.42, -132 + Math.sin(i) * 5 + bd * 0.51);
+    g.add(winMesh);
+
+    // Rooftop warning beacon
+    if (i % 2 === 0) {
+      const spireMat = new THREE.MeshBasicMaterial({ color: 0xff0055 });
+      const spire = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.16, 5, 4), spireMat);
+      spire.position.set(bx, bh + 1.5, -132 + Math.sin(i) * 5);
+      g.add(spire);
+    }
+  }
+  return g;
+}
+
+// 23. Vice City Ocean Drive / Cyber Asphalt Boulevard
+export function makeAsphaltBoulevard(length = 26, width = 6) {
+  const g = new THREE.Group();
+
+  // Dark sleek asphalt surface
+  const asphaltMat = new THREE.MeshStandardMaterial({
+    color: 0x16151f,
+    roughness: 0.65,
+    metalness: 0.2,
+  });
+  const roadMesh = new THREE.Mesh(new THREE.BoxGeometry(length, 0.08, width), asphaltMat);
+  roadMesh.position.y = 0.04;
+  g.add(roadMesh);
+
+  // Glowing neon pink dashed center double divider line
+  const dashMat = new THREE.MeshBasicMaterial({ color: 0xff3b77 });
+  const dashCount = Math.floor(length / 2.5);
+  for (let i = 0; i < dashCount; i++) {
+    const dx = -length * 0.45 + i * 2.5;
+    const stripe1 = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 0.1), dashMat);
+    stripe1.rotation.x = -Math.PI / 2;
+    stripe1.position.set(dx, 0.09, -0.16);
+    const stripe2 = stripe1.clone();
+    stripe2.position.z = 0.16;
+    g.add(stripe1, stripe2);
+  }
+
+  // Glowing neon cyan shoulder lines
+  const shoulderMat = new THREE.MeshBasicMaterial({ color: 0x00f5d4 });
+  const shoulderGeo = new THREE.PlaneGeometry(length, 0.12);
+  const leftShoulder = new THREE.Mesh(shoulderGeo, shoulderMat);
+  leftShoulder.rotation.x = -Math.PI / 2;
+  leftShoulder.position.set(0, 0.09, -width * 0.46);
+  const rightShoulder = leftShoulder.clone();
+  rightShoulder.position.z = width * 0.46;
+  g.add(leftShoulder, rightShoulder);
+
+  // Checkered retro curb blocks along edges
+  const curbGeo = new THREE.BoxGeometry(1.2, 0.16, 0.35);
+  const curbMat1 = new THREE.MeshStandardMaterial({ color: 0xff85a1, roughness: 0.5 });
+  const curbMat2 = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.5 });
+  const curbSteps = Math.floor(length / 1.3);
+  for (let i = 0; i < curbSteps; i++) {
+    const cx = -length * 0.48 + i * 1.3;
+    const mat = i % 2 === 0 ? curbMat1 : curbMat2;
+    const curbL = new THREE.Mesh(curbGeo, mat);
+    curbL.position.set(cx, 0.1, -width * 0.5 - 0.18);
+    const curbR = new THREE.Mesh(curbGeo, mat);
+    curbR.position.set(cx, 0.1, width * 0.5 + 0.18);
+    g.add(curbL, curbR);
+  }
+
+  return g;
+}
+
+// 24. Floating Shootable Target Drone
+export function makeTargetDrone(id, x, y, z) {
+  const g = new THREE.Group();
+  g.position.set(x, y, z);
+
+  // Outer glowing neon cyan torus ring
+  const outerRingMat = new THREE.MeshBasicMaterial({
+    color: 0x00f5d4,
+    wireframe: true,
+  });
+  const outerRing = new THREE.Mesh(new THREE.TorusGeometry(0.85, 0.05, 8, 24), outerRingMat);
+  g.add(outerRing);
+
+  // Inner glowing neon hot-pink ring (angled)
+  const innerRingMat = new THREE.MeshBasicMaterial({
+    color: 0xff3b77,
+    wireframe: true,
+  });
+  const innerRing = new THREE.Mesh(new THREE.TorusGeometry(0.55, 0.04, 8, 20), innerRingMat);
+  innerRing.rotation.x = Math.PI / 3;
+  g.add(innerRing);
+
+  // Glowing holographic crystal core
+  const coreMat = new THREE.MeshStandardMaterial({
+    color: 0xffffff,
+    emissive: 0xffd166,
+    emissiveIntensity: 1.2,
+    metalness: 0.4,
+    roughness: 0.1,
+  });
+  const core = new THREE.Mesh(new THREE.OctahedronGeometry(0.32, 0), coreMat);
+  g.add(core);
+
+  // Crosshair brackets / targeting fins around drone
+  const finMat = new THREE.MeshBasicMaterial({ color: 0xffe66d });
+  const finGeo = new THREE.BoxGeometry(0.08, 0.28, 0.08);
+  for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 2) {
+    const fin = new THREE.Mesh(finGeo, finMat);
+    fin.position.set(Math.cos(angle) * 1.05, Math.sin(angle) * 1.05, 0);
+    g.add(fin);
+  }
+
+  return {
+    id,
+    group: g,
+    outerRing,
+    innerRing,
+    core,
+    baseX: x,
+    baseY: y,
+    baseZ: z,
+    hitRadius: 1.4,
+    active: true,
+    respawnTimer: 0,
+  };
 }

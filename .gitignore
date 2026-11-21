@@ -23,3 +23,4 @@ pnpm-debug.log*
 # Tooling and audit cache
 .codebenders/
 .soloknuckle/
+screenshot-*.png

@@ -14,11 +14,16 @@ import { createQuizModal } from './ui/quiz.js';
 import { createProgressModal } from './ui/progress.js';
 import { createBoardModal } from './ui/board-modal.js';
 import { createHUD } from './ui/hud.js';
-import { playCoinSound } from './ui/audio.js';
+import {
+  playCoinSound,
+  playLaserShotSound,
+  playTargetHitSound,
+  playCarHornSound,
+} from './ui/audio.js';
 
 const INTERACT_RANGE = 2.8;
-// Dreamy South Korean Pastel Anime Sky
-const BG_COLOR = 0xfff0f5;
+// Vice City Synthwave Twilight Sky / Ocean Tone
+const BG_COLOR = 0x120324;
 
 const container = document.getElementById('app');
 const ui = document.getElementById('ui') || document.body;
@@ -30,7 +35,7 @@ const aspect = (container.clientWidth || window.innerWidth) /
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(BG_COLOR);
-scene.fog = new THREE.Fog(BG_COLOR, 35, 160);
+scene.fog = new THREE.FogExp2(0x1a0736, 0.0048);
 
 const camera = new THREE.PerspectiveCamera(60, aspect, 0.1, 400);
 
@@ -38,13 +43,13 @@ const rend = createRenderer(container);
 const renderer = rend.renderer;
 const canvas = renderer.domElement;
 
-// Warm pastel ambient hemisphere light
-const hemi = new THREE.HemisphereLight(0xfff5f8, 0xd4bbf9, 1.1);
+// Warm sunset ambient hemisphere light
+const hemi = new THREE.HemisphereLight(0xffb7b2, 0x4a154b, 1.25);
 scene.add(hemi);
 
-// Sunny pastel directional light
-const sun = new THREE.DirectionalLight(0xfff8ee, 1.5);
-sun.position.set(30, 50, 20);
+// Sunny sunset directional light
+const sun = new THREE.DirectionalLight(0xffecd2, 1.8);
+sun.position.set(20, 45, -30);
 sun.castShadow = true;
 sun.shadow.mapSize.set(2048, 2048);
 sun.shadow.camera.left = -60;
@@ -63,22 +68,52 @@ const world = createWorld(scene);
 const input = createInput(canvas);
 const controller = createController(camera, input, world);
 
-// Crosshair (delicate pastel dot)
-const crosshair = document.createElement('div');
-crosshair.style.cssText = [
+// Dynamic Targeting Reticle
+const reticleWrap = document.createElement('div');
+reticleWrap.id = 'ss-reticle-wrap';
+reticleWrap.style.cssText = [
   'position:fixed',
   'left:50%',
   'top:50%',
-  'width:8px',
-  'height:8px',
-  'margin:-4px 0 0 -4px',
-  'border-radius:50%',
-  'background:rgba(255,117,140,0.85)',
-  'box-shadow:0 0 4px rgba(255,255,255,0.9), 0 0 10px rgba(255,117,140,0.5)',
+  'transform:translate(-50%, -50%)',
   'pointer-events:none',
-  'z-index:40',
+  'z-index:45',
+  'display:flex',
+  'flex-direction:column',
+  'align-items:center',
+  'justify-content:center',
+  'transition:all 0.1s ease-out',
 ].join(';');
-ui.appendChild(crosshair);
+
+const reticleDot = document.createElement('div');
+reticleDot.style.cssText = [
+  'width:10px',
+  'height:10px',
+  'border-radius:50%',
+  'border:2px solid #00f5d4',
+  'background:rgba(255, 59, 119, 0.9)',
+  'box-shadow:0 0 8px #00f5d4, 0 0 16px #ff3b77',
+  'transition:transform 0.12s ease',
+].join(';');
+
+const reticleLabel = document.createElement('div');
+reticleLabel.style.cssText = [
+  'margin-top:8px',
+  'padding:2px 8px',
+  'font:800 11px "Fredoka", sans-serif',
+  'color:#fff',
+  'background:rgba(18, 3, 36, 0.88)',
+  'border:1.5px solid #00f5d4',
+  'border-radius:6px',
+  'letter-spacing:1px',
+  'text-transform:uppercase',
+  'display:none',
+  'box-shadow:0 2px 12px rgba(0,0,0,0.6)',
+].join(';');
+
+reticleWrap.appendChild(reticleDot);
+reticleWrap.appendChild(reticleLabel);
+ui.appendChild(reticleWrap);
 
 // Pause hint overlay
 const hint = document.createElement('div');
@@ -243,16 +278,20 @@ on('stone:interact', ({ id, zone, topic }) => {
   }
 });
 
-// Keyboard shortcut: P for Adventure Log / Progress
+// Keyboard shortcuts: P for Adventure Log / Progress, Space or F for Blaster Fire
 window.addEventListener('keydown', (e) => {
+  if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+
   if ((e.key === 'p' || e.key === 'P' || e.code === 'KeyP') && !e.ctrlKey && !e.metaKey && !e.altKey) {
-    if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
     if (progressModal.isOpen()) {
       progressModal.close();
     } else {
       onModalOpen();
       progressModal.open('learner');
     }
+  } else if ((e.code === 'Space' || e.code === 'KeyF') && started && !isAnyModalOpen()) {
+    e.preventDefault();
+    fireBlaster();
   }
 });
 
@@ -274,6 +313,205 @@ document.addEventListener('pointerlockchange', () => {
   }
 });
 
+// -------------------------------------------------------------
+// BLASTER COMBAT & PROJECTILE SYSTEM
+// -------------------------------------------------------------
+const projectiles = [];
+const particles = [];
+
+// Reusable geometry for projectiles & sparks
+const projGeo = new THREE.CylinderGeometry(0.06, 0.06, 0.7, 8);
+projGeo.rotateX(Math.PI / 2);
+const projMat = new THREE.MeshBasicMaterial({
+  color: 0x00f5d4,
+});
+
+const sparkGeo = new THREE.DodecahedronGeometry(0.09, 0);
+
+function spawnSparks(x, y, z, color = 0x00f5d4, count = 16) {
+  const sparkMat = new THREE.MeshBasicMaterial({ color });
+  for (let i = 0; i < count; i++) {
+    const mesh = new THREE.Mesh(sparkGeo, sparkMat);
+    mesh.position.set(x, y, z);
+    scene.add(mesh);
+    const speed = 4 + Math.random() * 6;
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.random() * Math.PI;
+    particles.push({
+      mesh,
+      vx: Math.sin(phi) * Math.cos(theta) * speed,
+      vy: Math.abs(Math.cos(phi)) * speed + 2.5,
+      vz: Math.sin(phi) * Math.sin(theta) * speed,
+      life: 0.45 + Math.random() * 0.25,
+      maxLife: 0.7,
+    });
+  }
+}
+
+function showFloatingCombatText(text, color = '#ff3b77') {
+  const el = document.createElement('div');
+  el.textContent = text;
+  el.style.cssText = [
+    'position:fixed',
+    'left:50%',
+    'top:45%',
+    'transform:translate(-50%, -50%)',
+    'font:900 20px "Fredoka", "Baloo 2", sans-serif',
+    'color:' + color,
+    'text-shadow:0 0 12px rgba(255,255,255,0.85), 0 2px 6px #000',
+    'pointer-events:none',
+    'z-index:120',
+    'animation:combatFloat 0.9s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards',
+  ].join(';');
+  ui.appendChild(el);
+  setTimeout(() => {
+    if (el.parentNode) el.parentNode.removeChild(el);
+  }, 900);
+}
+
+function fireBlaster() {
+  if (!started || controller.isPaused() || isAnyModalOpen()) return;
+
+  playLaserShotSound();
+  punchTime = 1.0;
+  if (viewmodel && viewmodel.knuckleCrystal) {
+    viewmodel.knuckleCrystal.scale.setScalar(2.2);
+  }
+
+  const dir = new THREE.Vector3();
+  camera.getWorldDirection(dir);
+
+  const startPos = new THREE.Vector3();
+  camera.getWorldPosition(startPos);
+  startPos.addScaledVector(dir, 0.6);
+
+  const mesh = new THREE.Mesh(projGeo, projMat);
+  mesh.position.copy(startPos);
+  mesh.quaternion.copy(camera.quaternion);
+  scene.add(mesh);
+
+  projectiles.push({
+    mesh,
+    pos: mesh.position,
+    dir: dir.clone().normalize(),
+    speed: 70,
+    distance: 0,
+    maxDistance: 95,
+  });
+}
+
+function updateProjectiles(dt) {
+  for (let i = projectiles.length - 1; i >= 0; i--) {
+    const p = projectiles[i];
+    const travel = p.speed * dt;
+    p.pos.addScaledVector(p.dir, travel);
+    p.distance += travel;
+
+    let hit = false;
+
+    // 1. Target Drones
+    if (world.targets) {
+      for (const tgt of world.targets) {
+        if (!tgt.active) continue;
+        const d = p.pos.distanceTo(tgt.group.position);
+        if (d <= tgt.hitRadius) {
+          hit = true;
+          tgt.active = false;
+          tgt.group.visible = false;
+          tgt.respawnTimer = 4.0;
+          playTargetHitSound();
+          spawnSparks(tgt.group.position.x, tgt.group.position.y, tgt.group.position.z, 0xff3b77, 24);
+          if (hud) {
+            hud.addGold(15);
+            hud.addQuizReward(1, 1);
+          }
+          showFloatingCombatText('+25 XP 🎯 TARGET DOWN!', '#00f5d4');
+          break;
+        }
+      }
+    }
+
+    // 2. Star Coins (shoot from distance to collect)
+    if (!hit && world.coins) {
+      for (const c of world.coins) {
+        if (c.collected) continue;
+        const d = p.pos.distanceTo(c.mesh.position);
+        if (d <= 1.5) {
+          hit = true;
+          c.collected = true;
+          scene.remove(c.mesh);
+          playCoinSound();
+          spawnSparks(c.mesh.position.x, c.mesh.position.y, c.mesh.position.z, 0xffd166, 18);
+          emit('coin:collect', { id: c.id, amount: 10 });
+          showFloatingCombatText('+10 🪙 SHOT COIN!', '#ffd166');
+          break;
+        }
+      }
+    }
+
+    // 3. Shrines / Knowledge Stones
+    if (!hit && world.stones) {
+      for (const s of world.stones) {
+        const d = p.pos.distanceTo(s.position);
+        if (d <= 1.7) {
+          hit = true;
+          spawnSparks(s.position.x, s.position.y, s.position.z, 0xbb86fc, 20);
+          showFloatingCombatText('💎 SHRINE ACTIVATED!', '#ff758c');
+          emit('stone:interact', { id: s.id, zone: s.zone, topic: s.topic });
+          break;
+        }
+      }
+    }
+
+    // 4. Vice City Sports Cars
+    if (!hit && world.cars) {
+      for (const car of world.cars) {
+        const d = p.pos.distanceTo(car.position);
+        if (d <= 2.5) {
+          hit = true;
+          playCarHornSound();
+          car.flareTimer = 1.4;
+          spawnSparks(p.pos.x, p.pos.y, p.pos.z, 0x70e3db, 16);
+          showFloatingCombatText('🏎️ SUPERCAR HONK!', '#70e3db');
+          break;
+        }
+      }
+    }
+
+    // 5. Floor or Max Range
+    if (!hit && (p.pos.y <= 0 || p.distance >= p.maxDistance)) {
+      hit = true;
+      spawnSparks(p.pos.x, Math.max(0.05, p.pos.y), p.pos.z, 0xffffff, 8);
+    }
+
+    if (hit) {
+      scene.remove(p.mesh);
+      projectiles.splice(i, 1);
+    }
+  }
+
+  // Update particles
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const pt = particles[i];
+    pt.life -= dt;
+    if (pt.life <= 0) {
+      scene.remove(pt.mesh);
+      particles.splice(i, 1);
+      continue;
+    }
+    pt.vy -= 9.8 * dt;
+    pt.mesh.position.x += pt.vx * dt;
+    pt.mesh.position.y += pt.vy * dt;
+    pt.mesh.position.z += pt.vz * dt;
+    if (pt.mesh.position.y < 0.05) {
+      pt.mesh.position.y = 0.05;
+      pt.vy *= -0.35;
+    }
+    const scale = pt.life / pt.maxLife;
+    pt.mesh.scale.set(scale, scale, scale);
+  }
+}
+
 canvas.addEventListener('click', () => {
   if (!started) return;
   if (isAnyModalOpen()) return;
@@ -281,8 +519,7 @@ canvas.addEventListener('click', () => {
     requestLock();
   }
   resumeGame();
-  // Trigger punch animation on click
-  punchTime = 1.0;
+  fireBlaster();
 });
 
 // Start button click & touch handling
@@ -326,11 +563,79 @@ let punchTime = 0;
 function frame(dt) {
   controller.update(dt);
   world.update(dt, controller.position);
+  updateProjectiles(dt);
 
   const nearestStone = findNearestStone();
   if (hud) {
     hud.setPrompt(nearestStone);
     hud.updateRadar();
+  }
+
+  // Dynamic Reticle Lock-On Detection
+  let lockedObj = null;
+  const forward = new THREE.Vector3();
+  camera.getWorldDirection(forward);
+
+  if (world.targets) {
+    for (const tgt of world.targets) {
+      if (!tgt.active) continue;
+      const dist = camera.position.distanceTo(tgt.group.position);
+      if (dist > 60) continue;
+      const toTgt = tgt.group.position.clone().sub(camera.position).normalize();
+      if (toTgt.dot(forward) > 0.985) {
+        lockedObj = { name: '🎯 TARGET DRONE', color: '#ff3b77' };
+        break;
+      }
+    }
+  }
+  if (!lockedObj && world.stones) {
+    for (const s of world.stones) {
+      const dist = camera.position.distanceTo(s.position);
+      if (dist > 40) continue;
+      const toS = s.position.clone().sub(camera.position).normalize();
+      if (toS.dot(forward) > 0.985) {
+        lockedObj = { name: '💎 KNOWLEDGE SHRINE', color: '#00f5d4' };
+        break;
+      }
+    }
+  }
+  if (!lockedObj && world.cars) {
+    for (const car of world.cars) {
+      const dist = camera.position.distanceTo(car.position);
+      if (dist > 40) continue;
+      const toC = car.position.clone().sub(camera.position).normalize();
+      if (toC.dot(forward) > 0.975) {
+        lockedObj = { name: '🏎️ VICE SUPERCAR', color: '#ffd166' };
+        break;
+      }
+    }
+  }
+  if (!lockedObj && world.coins) {
+    for (const c of world.coins) {
+      if (c.collected) continue;
+      const dist = camera.position.distanceTo(c.mesh.position);
+      if (dist > 40) continue;
+      const toC = c.mesh.position.clone().sub(camera.position).normalize();
+      if (toC.dot(forward) > 0.988) {
+        lockedObj = { name: '🪙 STAR COIN', color: '#ffd166' };
+        break;
+      }
+    }
+  }
+
+  if (lockedObj) {
+    reticleDot.style.transform = 'scale(1.7)';
+    reticleDot.style.borderColor = lockedObj.color;
+    reticleDot.style.background = lockedObj.color;
+    reticleLabel.style.display = 'block';
+    reticleLabel.textContent = lockedObj.name;
+    reticleLabel.style.borderColor = lockedObj.color;
+    reticleLabel.style.color = lockedObj.color;
+  } else {
+    reticleDot.style.transform = 'scale(1.0)';
+    reticleDot.style.borderColor = '#00f5d4';
+    reticleDot.style.background = 'rgba(255, 59, 119, 0.9)';
+    reticleLabel.style.display = 'none';
   }
 
   // 1. Viewmodel Hand Animation (First-Person Immersion)
