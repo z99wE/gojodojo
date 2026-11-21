@@ -4,7 +4,7 @@ import path from 'path';
 
 // Automated E2E verification test using Chrome Headless & CDP WebSocket for 8-Bit Racing Game
 async function run() {
-  console.log('🚀 Starting Vite Preview Server on port 4173...');
+  console.log('[START] Starting Vite Preview Server on port 4173...');
   const server = spawn('npx', ['vite', 'preview', '--port', '4173'], { stdio: 'pipe' });
 
   // Wait for server to be ready
@@ -18,7 +18,7 @@ async function run() {
   }
 
   const port = 9222;
-  console.log('🖥️ Launching Google Chrome in headless mode with debugging port ' + port + '...');
+  console.log('[CHROME] Launching Google Chrome in headless mode with debugging port ' + port + '...');
   const chrome = spawn(chromePath, [
     '--headless=new',
     `--remote-debugging-port=${port}`,
@@ -262,7 +262,7 @@ async function run() {
   const screenshotData = await send('Page.captureScreenshot', { format: 'png' });
   const screenshotPath = path.resolve(process.cwd(), 'screenshot-8bit-racing.png');
   fs.writeFileSync(screenshotPath, Buffer.from(screenshotData.data, 'base64'));
-  console.log('📸 Saved verification screenshot to:', screenshotPath);
+  console.log('[SCREENSHOT] Saved verification screenshot to:', screenshotPath);
 
   // Clean shutdown
   ws.close();
@@ -271,12 +271,12 @@ async function run() {
 
   console.log('Browser Console Messages:', consoleMessages);
   if (uncaughtErrors.length > 0) {
-    console.error('❌ Found uncaught errors during browser execution:');
+    console.error('[ERROR] Found uncaught errors during browser execution:');
     uncaughtErrors.forEach((e) => console.error('  -', e));
     process.exit(1);
   }
 
-  console.log('✅ 8-Bit Racing Browser Verification Succeeded with 0 uncaught errors!');
+  console.log('[SUCCESS] 8-Bit Racing Browser Verification Succeeded with 0 uncaught errors!');
   process.exit(0);
 }
 

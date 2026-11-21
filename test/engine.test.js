@@ -27,10 +27,10 @@ test('Sanitize HTML prevents script injection and dangerous attributes', () => {
 });
 
 test('Feature flag engine correctly checks configured flags', () => {
-  assert.strictEqual(isFeatureEnabled(FEATURES.VICE_CITY_MODE), true);
-  assert.strictEqual(isFeatureEnabled(FEATURES.KOREAN_PASTEL_THEME), true);
-  assert.strictEqual(isFeatureEnabled(FEATURES.OFFLINE_VOICE_TTS), true);
-  assert.strictEqual(isFeatureEnabled(FEATURES.RADAR_MINIMAP), true);
+  assert.strictEqual(isFeatureEnabled(FEATURES.RETRO_8BIT_MODE), true);
+  assert.strictEqual(isFeatureEnabled(FEATURES.CHIPTUNE_AUDIO), true);
+  assert.strictEqual(isFeatureEnabled(FEATURES.STEM_RADIO_QUIZ), true);
+  assert.strictEqual(isFeatureEnabled(FEATURES.TOUCH_CONTROLS), true);
   assert.strictEqual(isFeatureEnabled('nonExistentFlag'), true, 'Defaults to true for unlisted flags');
 });
 

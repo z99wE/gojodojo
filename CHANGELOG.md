@@ -1,17 +1,18 @@
 # Changelog
 
-All notable changes to the Sankhya Strike 3D Educational Engine are documented in this file.
+All notable changes to Sankhya Turbo are documented in this file.
 
-## [1.0.0] - 2026-11-21
+## [2.0.0] - 2026-11-21
 
 ### Added
-- 3D First-Person Point-of-View exploration world with Three.js rendering and procedural geometry.
-- South Korean pastel claymorphism visual aesthetic featuring candy buttons, soft volumetric drop shadows, and expressive emotional mascot feedback.
-- Interactive Vice City retro sports cars, cherry blossom trees, futuristic neon shrines, and holographic atomic/infinity models.
-- Circular Radar Minimap HUD with player orientation pointer, boundary compass, and shrine blips.
-- First-person viewmodel gauntlet with harmonic movement sway, dynamic field-of-view speed rushes, and spellcast gestures.
-- Full bilingual state-board STEM syllabus covering Grades 1 through 8 in Hindi and English.
-- Voice-enabled Doubt Solving engine leveraging native Web Speech synthesis and speech recognition without external cloud dependencies.
-- Photo question scanner simulator for textbook image capture and automated clue hints.
-- Comprehensive local progress persistence with profile switches for Learner, Guardian/Parent, and Teacher/Volunteer.
-- Production readiness verification via SoloKnuckle checks, SAST sanitization, and automated test suite.
+- Complete transformation to authentic 8-bit retro arcade drag racing and Grand Prix motorsport engine inspired by 8bit-peter/Racing-Game.
+- Pure HTML5 Canvas 8-bit pixel renderer running at 320x240 internal arcade resolution with CRT scanline simulation.
+- Web Audio API procedural chiptune sound generator producing pulse-wave engine audio, screeching noise bursts, and nitro overdrive harmonics with zero external sound files.
+- Manual 4-speed drag racing transmission physics with green tachometer sweet spot (5800-7000 RPM) for Perfect Shifts.
+- High-stakes STEM Radio Pitstop quiz system providing 100% Super Nitro refills on correct answers and containment stalls on incorrect answers.
+- 3-lane track maneuvering with dynamic pickups (Nitro) and hazards (oil slicks).
+- Complete curriculum questions across Grades 1 through 8 in Physics, Chemistry, Biology, and Mathematics in Hindi and English.
+- Full mobile touch control bar with UP LANE, DOWN LANE, GEAR -, SHIFT, and NITRO action triggers.
+
+### Removed
+- Removed legacy 3D graphics, Three.js dependencies, and unused legacy 3D city assets.

@@ -1,68 +1,92 @@
-# संख्या स्ट्राइक (Sankhya Strike)
-### South Korean Pastel 3D RPG Edition | The Last-Mile Tutor
+# Sankhya Turbo: 8-Bit Grand Prix (संख्या टर्बो)
 
-> **A high-definition, first-person open-world RPG game inspired by GTA / Vice City with a delicious South Korean pastel aesthetic — built to make Math & Science education wildly fun, visual, and accessible for Grades 1 to 8 across India.**
+An authentic 8-bit retro arcade drag racing and Grand Prix STEM motorsport game for Grades 1 through 8 in Hindi and English. Inspired by classic 8-bit racers like 8bit-peter/Racing-Game.
 
-🌐 **Live on Cloudflare:** [https://sankhya-strike.pages.dev](https://sankhya-strike.pages.dev)
+Live on Cloudflare: https://sankhya-strike.pages.dev
 
----
-
-## 🌸 Visual Identity & Aesthetic (South Korean Pastel Claymorphism)
-- **Palette**: Strawberry Milk Pink (`#FF758C`), Taro Lilac (`#7D5FFF`), Matcha Mint (`#2ED573`), Banana Cream Gold (`#FFA502`), and Vanilla Foam (`#FFFFFF`).
-- **Claymorphic 3D Depth**: Chunky squircle buttons with soft double-shadows, pillowy highlights, and tactile jelly bounce.
-- **Visual Typography**: Rounded, ultra-friendly typography powered by **Fredoka** & **Baloo 2** for both Hindi and English.
-- **Cute In-Game Mascot**: **GURU BOT (गुरु बॉट)** — an expressive in-game companion (with dynamic moods: 😸 Happy, 🧐 Thinking, 🎉 Cheering, ✨ Scanning) instead of dry text forms or awkward AI boxes.
+GitHub Repository: https://github.com/z99wE/sankhya-strike
 
 ---
 
-## 🕹️ GTA / Vice City RPG Mechanics
-- **Circular Minimap Radar**: Real-time heading-up radar displaying player compass arrow, island coastlines, bridges, gold collectible coin positions, and glowing mission beacons.
-- **Vertical Waypoint Light Beacons**: Towering light pillars shooting into the sky above every challenge stone, visible across the entire archipelago just like GTA mission markers.
-- **3D Collectible Star Coins**: 18+ floating, spinning 3D star coins scattered along bridges and pathways that award gold and trigger flying `+10 🪙` text popups when walked through.
-- **RPG Progression System**: Player Level, XP track, coin treasury, and combo streaks (`🔥 3x`).
-- **Active Quest Banner**: GTA-style dynamic mission bar guiding the player to the next challenge.
-- **Victory Chests & Confetti**: Completing quizzes unlocks animated golden treasure chests with star cascades and celebratory fanfare.
+## Game Overview
+
+Sankhya Turbo transforms STEM education (Physics, Chemistry, Biology, and Mathematics) into an exhilarating 8-bit drag racing and circuit championship:
+
+- Pure 8-Bit Pixel Renderer: Custom HTML5 Canvas retro renderer running at 320x240 internal resolution with authentic CRT scanline overlays, procedural road perspectives, roadside pylons, and animated 8-bit dragsters.
+- Procedural Chiptune Audio Synthesizer: Pure Web Audio API procedural sound engine generating 8-bit pulse/square engine revs, downshift engine braking, tire screech noise bursts, nitro overdrive warbles, and 8-bit fanfare melodies.
+- Manual Gear Shifting & Drag Physics: Realistic acceleration torque curves across 4 manual gears. Hit the green RPM sweet spot (5800 - 7000 RPM) on the tachometer to achieve a "PERFECT SHIFT" and earn Nitro refill bonuses. Shifting too early bogs down the engine; shifting beyond 8000 RPM hits the rev limiter.
+- 3-Lane Track Navigation: Dodge oil slicks and hazards while collecting Nitro canisters across 3 lanes.
+- STEM Radio Pitstop Intercom: Pitstop questions delivered directly to the cockpit during the race. Answering correctly unleashes a 100% Super Nitro overdrive boost and awards +1000 championship points. Incorrect answers trigger an engine containment stall penalty and -25% shield loss.
 
 ---
 
-## 📚 Curriculum & AI Tutor (Grades 1 to 8)
-- **State Board / NCERT Aligned**: Complete curriculum for Grades 1 through 8 across Mathematics and Science.
-- **Bilingual End-to-End**: 100% playable in **हिंदी (Hindi)** and **English** with instant on-the-fly toggling.
-- **Adaptive In-Game Guidance**:
-  - `💡 संकेत (Secret Hint)`: Intuitive hints without giving away answers.
-  - `🎤 बोलकर पूछें (Voice Lens)`: Voice input for students who find typing in regional scripts hard.
-  - `📷 फोटो से पूछें (Cyber Scanner)`: Simulated textbook snapshot problem scanner.
-  - `🔊 सुनें (Audio Aloud)`: Instant browser-native speech synthesis (`hi-IN` / `en-IN`) with 0 KB audio download.
-- **Tri-Perspective Adventure Log (`P` key)**:
-  - 🎒 **शिक्षार्थी (Learner)**: Quest map, achievement badges, and revision focus areas.
-  - 👨‍👩‍👧 **अभिभावक (Parent)**: Non-technical summary with one-click **"🔊 आज की प्रगति सुनें"** spoken voiceover in Hindi.
-  - 👩‍🏫 **शिक्षक / स्वयंसेवक (Teacher)**: State Board syllabus competency matrix and 1-click WhatsApp plain text report.
+## Circuits and Curriculum (Grades 1 to 8)
+
+Four Grand Prix circuits aligned with State Board and NCERT STEM standards:
+
+1. Physics Velocity: Kinematics, forces, work and energy, optics, electromagnetism, and orbital gravitation.
+2. Chemistry Reactor: Chemical reactions, acids and bases, periodic trends, stoichiometry, atomic structures, and organic bonding.
+3. Biology Bio-Sprint: Cell structures, photosynthesis, genetics, human anatomy, circulatory systems, and ecological networks.
+4. Maths Matrix 500: Arithmetic, algebraic formulas, geometric theorems, coordinate systems, trigonometry, and probability.
+
+Language Toggle: Seamless instant switching between Hindi and English at any point in the race.
 
 ---
 
-## 🕹️ Controls
+## Controls
 
-| Action | Desktop Keyboard | Mobile / Touch |
-| :--- | :--- | :--- |
-| **Move** | `W`, `A`, `S`, `D` / Arrows | Left Touch Joystick |
-| **Look** | Mouse (Pointer Lock) | Right Touch Swipe |
-| **Sprint / Turbo** | `Shift` | Automatic on fast stick |
-| **Interact (Stone/Board)**| `E` key | On-Screen **(E)** Action Button |
-| **Adventure Log / Progress**| `P` key | Top HUD **[📜 साहसिक डायरी]** Button |
-| **Language Toggle** | Top HUD Button | Top HUD **[🌐 EN / हिंदी]** Button |
-| **Grade Selector** | Top HUD Badge | Top HUD **[🏫 कक्षा 8]** Badge |
+### Desktop Keyboard
+- Shift Up: SPACEBAR (Target the green zone on the tachometer)
+- Shift Down: DOWN ARROW or S key
+- Steer Lanes: UP ARROW (Lane Up) / DOWN ARROW (Lane Down) or W / S keys
+- Activate Nitro: N key
+- Answer STEM Intercom: Keys 1, 2, 3, 4
+
+### Mobile Touch Controls
+- Dedicated on-screen arcade buttons for UP LANE, DOWN LANE, GEAR -, SHIFT, and NITRO.
+- Instant touch options for STEM quiz answers.
 
 ---
 
-## 🚀 Development & Build
+## Tech Stack & Architecture
 
+- Engine: Custom vanilla JavaScript ES modules (0 external runtime dependencies)
+- Bundler: Vite 5
+- Audio: Web Audio API procedural chiptune synthesizer
+- Storage: Zero-PII offline local persistence (localStorage)
+- Hosting: Cloudflare Pages with edge global CDN distribution
+- CI/CD: GitHub Actions automated lint, typecheck, unit tests, and build pipeline
+
+---
+
+## Development and Testing
+
+Install dependencies:
 ```bash
-# Install dependencies
 npm install
+```
 
-# Start local Vite development server
+Start local development server:
+```bash
 npm run dev
+```
 
-# Compile optimized static bundle
+Build production bundle:
+```bash
 npm run build
+```
+
+Run unit test suite:
+```bash
+npm test
+```
+
+Run headless browser end-to-end verification:
+```bash
+npm run test:e2e
+```
+
+Deploy to Cloudflare Pages:
+```bash
+npm run deploy
 ```

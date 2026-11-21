@@ -1,22 +1,22 @@
 {
   "flags": {
-    "viceCityMode": {
-      "description": "3D retro sports cars, neon palm blips, and first-person POV immersion",
+    "retro8BitMode": {
+      "description": "8-bit retro arcade drag racing engine and scanline renderer",
       "enabled": true,
       "rolloutPercentage": 100
     },
-    "koreanPastelTheme": {
-      "description": "South Korean pastel aesthetic with claymorphic cards and candy buttons",
+    "chiptuneAudio": {
+      "description": "Synthesized 8-bit square and noise wave procedural chiptune engine",
       "enabled": true,
       "rolloutPercentage": 100
     },
-    "offlineVoiceTts": {
-      "description": "Web Speech synthesis & speech recognition offline tutor mode",
+    "stemRadioQuiz": {
+      "description": "Interactive STEM pitstop quiz providing super nitro boosts",
       "enabled": true,
       "rolloutPercentage": 100
     },
-    "radarMinimap": {
-      "description": "Vice City circular radar HUD with player heading compass and shrine blips",
+    "touchControls": {
+      "description": "Mobile touch steering and gear shifting HUD",
       "enabled": true,
       "rolloutPercentage": 100
     }

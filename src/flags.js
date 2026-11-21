@@ -1,6 +1,6 @@
 /**
- * Sankhya Strike - Feature Flag Engine
- * Controls gradual rollouts for Vice City 3D elements, pastel shaders, and voice accessibility.
+ * Sankhya Turbo - Feature Flag Engine
+ * Controls gradual rollouts for 8-bit racing mechanics, chiptune audio, and STEM quizzes.
  */
 
 import flagsData from '../flags.json' with { type: 'json' };
@@ -21,8 +21,8 @@ export function isFeatureEnabled(flagName) {
  * All registered system feature flags.
  */
 export const FEATURES = {
-  VICE_CITY_MODE: 'viceCityMode',
-  KOREAN_PASTEL_THEME: 'koreanPastelTheme',
-  OFFLINE_VOICE_TTS: 'offlineVoiceTts',
-  RADAR_MINIMAP: 'radarMinimap'
+  RETRO_8BIT_MODE: 'retro8BitMode',
+  CHIPTUNE_AUDIO: 'chiptuneAudio',
+  STEM_RADIO_QUIZ: 'stemRadioQuiz',
+  TOUCH_CONTROLS: 'touchControls'
 };

@@ -119,7 +119,7 @@ class GameApp {
       this.langBtn.textContent = this.activeLang === 'hi' ? 'LANG: हिंदी' : 'LANG: ENGLISH';
     }
     if (this.startBtn) {
-      this.startBtn.textContent = `${t['app.start']} ➔`;
+      this.startBtn.textContent = t['app.start'];
     }
   }
 
