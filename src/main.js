@@ -75,6 +75,11 @@ const world = createWorld(scene);
 const input = createInput(canvas);
 const controller = createController(camera, input, world);
 
+// Expose safe debug hook for automated E2E browser verification
+if (typeof window !== 'undefined') {
+  window.__SANKHYA__ = { world, controller };
+}
+
 // Dynamic Targeting Reticle
 const reticleWrap = document.createElement('div');
 reticleWrap.id = 'ss-reticle-wrap';

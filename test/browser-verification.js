@@ -114,7 +114,7 @@ async function run() {
   // Wait 1 second for 3D game loop to run
   await new Promise((resolve) => setTimeout(resolve, 1000));
 
-  // 2. Check HUD and Canvas
+  // 2. Check HUD, Canvas, 4D Telemetry and 3D World State
   const hudCheck = await send('Runtime.evaluate', {
     expression: `
       (() => {
@@ -124,6 +124,11 @@ async function run() {
         const reticle = document.getElementById('ss-reticle-wrap');
         const missionText = document.getElementById('ss-active-mission-title')?.textContent;
         const progressBtn = document.getElementById('ss-hud-progress-btn');
+        const coordsText = document.getElementById('ss-hud-coords')?.textContent;
+        const world = window.__SANKHYA__?.world;
+        const labsCount = world?.labs?.length || 0;
+        const carsCount = world?.cars?.length || 0;
+        const car0InitialX = world?.cars?.[0]?.position?.x;
         return {
           hasHud: !!hud,
           hasCanvas: !!canvas,
@@ -131,14 +136,30 @@ async function run() {
           hasReticle: !!reticle,
           missionText,
           hasProgressBtn: !!progressBtn,
+          coordsText,
           canvasWidth: canvas?.width,
           canvasHeight: canvas?.height,
+          labsCount,
+          carsCount,
+          car0InitialX,
         };
       })()
     `,
     returnByValue: true,
   });
   console.log('Game State Check:', hudCheck.result.value);
+
+  // Assertions on 3D world state in browser
+  const state = hudCheck.result.value;
+  if (!state.hasHud || !state.hasCanvas || !state.startHidden) {
+    uncaughtErrors.push('HUD or Canvas not initialized properly after start click');
+  }
+  if (state.labsCount < 9) {
+    uncaughtErrors.push(`Expected at least 9 STEM laboratories in browser, found ${state.labsCount}`);
+  }
+  if (state.carsCount < 4) {
+    uncaughtErrors.push(`Expected at least 4 cruising GTA sports cars, found ${state.carsCount}`);
+  }
 
   // 3. Test Clicking Canvas to Fire Blaster Bolts
   console.log('Testing Canvas Click / Blaster Combat Fire...');
@@ -158,6 +179,24 @@ async function run() {
   });
   console.log('Blaster Fire Result:', fireCheck.result.value);
 
+  await new Promise((resolve) => setTimeout(resolve, 800));
+
+  // 4. Verify Cruising AI Cars have moved along Ocean Drive
+  const carMotionCheck = await send('Runtime.evaluate', {
+    expression: `
+      (() => {
+        const world = window.__SANKHYA__?.world;
+        const car0CurrentX = world?.cars?.[0]?.position?.x;
+        return { car0CurrentX };
+      })()
+    `,
+    returnByValue: true,
+  });
+  console.log('Car Motion Check:', carMotionCheck.result.value);
+  if (carMotionCheck.result.value?.car0CurrentX === state.car0InitialX) {
+    uncaughtErrors.push('Cruising cars failed to move along Ocean Drive highway');
+  }
+
   await new Promise((resolve) => setTimeout(resolve, 1000));
 
   // 4. Capture Screenshot
@@ -171,6 +210,7 @@ async function run() {
   chrome.kill();
   server.kill();
 
+  console.log('Browser Console Messages:', consoleMessages);
   if (uncaughtErrors.length > 0) {
     console.error('❌ Found uncaught errors during browser execution:');
     uncaughtErrors.forEach((e) => console.error('  -', e));
