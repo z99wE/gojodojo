@@ -152,4 +152,59 @@ test('Physics simulation advances player and rival distances over time', () => {
   assert.ok(typeof telemetry.speed === 'number');
   assert.ok(typeof telemetry.rpm === 'number');
   assert.ok(typeof telemetry.distance === 'number');
+  assert.ok(typeof telemetry.bpm === 'number');
+});
+
+test('Manual throttle accelerates and active brake decelerates the vehicle', () => {
+  const engine = new RacingEngine();
+  engine.startRace();
+
+  engine.setThrottle(true);
+  engine.update(0.5);
+  const speedAfterGas = engine.player.speed;
+  assert.ok(speedAfterGas > 0, 'Car must accelerate when throttle is held');
+
+  engine.setThrottle(false);
+  engine.setBrake(true);
+  engine.update(0.2);
+  assert.ok(engine.player.speed < speedAfterGas, 'Car must decelerate when brake is applied');
+  assert.strictEqual(engine.player.isBraking, true);
+});
+
+test('Rival vehicle collision causes shield damage and screen impact crunch', () => {
+  const engine = new RacingEngine();
+  engine.startRace();
+
+  engine.player.shield = 100;
+  engine.player.distance = 100;
+  engine.player.x = 0.0;
+
+  engine.rival.distance = 101; // Overlapping distance
+  engine.rival.x = 0.05; // Overlapping lateral position
+
+  engine.checkRivalCollision(0.1);
+
+  assert.ok(engine.player.shield < 100, 'Collision must reduce shield');
+  assert.ok(engine.screenShake > 0, 'Collision must trigger screen shake');
+  assert.ok(engine.crashEvent !== null, 'Collision event must be recorded');
+});
+
+test('Anxiety BPM model increases under stress and calms with Zen breath', () => {
+  const engine = new RacingEngine();
+  engine.startRace();
+
+  // Low shield and high speed stress the player
+  engine.player.shield = 20;
+  engine.player.speed = 240;
+  engine.update(1.0);
+
+  const highBpm = engine.player.bpm;
+  assert.ok(highBpm > 90, 'Heart rate must rise under high stress/speed');
+
+  // Activate Pranayama Zen Breath
+  const zenActivated = engine.activateFocus();
+  assert.strictEqual(zenActivated, true);
+  assert.strictEqual(engine.player.focusActive, true);
+  assert.strictEqual(engine.player.bpm, 72, 'Zen breath resets vagus nerve back to resting 72 BPM');
+  assert.ok(engine.timeScale < 1.0, 'Focus breath slows down simulation time');
 });

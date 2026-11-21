@@ -1,15 +1,19 @@
 /**
  * @fileoverview STEM Radio Pitstop Controller for 8-bit Grand Prix.
- * Delivers NCERT/ICSE Class 1-8 questions on the cockpit radio console.
+ * Delivers NCERT/State Board Class 1-8 questions or custom user-selected/spoken topics.
  */
 
 import { topicsForGrade, getTopic } from '../content/index.js';
+import { AiTutor } from '../ai/ai-tutor.js';
 
 export class QuizController {
   constructor(options = {}) {
     this.grade = options.grade || 5;
     this.circuitId = options.circuitId || 'physics';
     this.lang = options.lang || 'hi';
+    this.customTopic = options.customTopic || '';
+    this.aiTutor = new AiTutor();
+
     this.currentQuestion = null;
     this.isActive = false;
     this.answered = false;
@@ -29,14 +33,38 @@ export class QuizController {
     this.lang = lang === 'en' ? 'en' : 'hi';
   }
 
+  setCustomTopic(topic) {
+    this.customTopic = (topic || '').trim();
+  }
+
   /**
-   * Selects an appropriate STEM question for the current grade & track circuit.
+   * Selects or synthesizes an appropriate STEM question for the current grade & custom topic.
    */
   nextQuestion() {
+    // 1. If user entered a custom topic, use AI Tutor to generate tailored questions
+    if (this.customTopic && this.customTopic.length > 1) {
+      const customQuestions = this.aiTutor.generateCustomQuiz(this.customTopic, this.grade, this.lang);
+      if (customQuestions && customQuestions.length > 0) {
+        const q = customQuestions[Math.floor(Math.random() * customQuestions.length)];
+        this.currentQuestion = {
+          topicTitle: this.customTopic,
+          subject: 'custom',
+          text: q.text,
+          options: q.options,
+          correctIndex: q.correctIndex,
+          hint: q.hint,
+          explain: q.explain
+        };
+        this.isActive = true;
+        this.answered = false;
+        return this.currentQuestion;
+      }
+    }
+
+    // 2. Otherwise load from standard curriculum index
     const topics = topicsForGrade(this.grade);
     if (!topics || topics.length === 0) return null;
 
-    // Filter by subject matching the circuit if possible
     let targetSubject = 'science';
     if (this.circuitId === 'maths') targetSubject = 'maths';
 

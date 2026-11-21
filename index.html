@@ -8,7 +8,7 @@
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Press+Start+2P&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="/src/ui/styles.css" />
   </head>
   <body class="arcade-body">
@@ -22,26 +22,40 @@
       <!-- Mobile Touch Controls Bar -->
       <div id="touch-controls" class="hidden">
         <div class="touch-steer-group">
-          <button id="btn-steer-up" class="touch-btn" type="button">UP LANE</button>
-          <button id="btn-steer-down" class="touch-btn" type="button">DOWN LANE</button>
+          <button id="btn-steer-left" class="touch-btn" type="button">STEER L</button>
+          <button id="btn-steer-right" class="touch-btn" type="button">STEER R</button>
+          <button id="btn-brake" class="touch-btn brake-btn" type="button">BRAKE [S]</button>
+          <button id="btn-gas" class="touch-btn gas-btn" type="button">GAS [W]</button>
         </div>
         <div class="touch-action-group">
           <button id="btn-shift-down" class="touch-btn" type="button">GEAR -</button>
           <button id="btn-shift-up" class="touch-btn pulse-glow" type="button">SHIFT [SPACE]</button>
           <button id="btn-nitro" class="touch-btn nitro-btn" type="button">NITRO [N]</button>
+          <button id="btn-zen" class="touch-btn zen-btn" type="button">ZEN [B]</button>
+          <button id="btn-open-tutor" class="touch-btn tutor-btn" type="button">TUTOR [T]</button>
         </div>
       </div>
 
       <!-- Start / Garage Menu Overlay -->
       <div id="start" class="overlay">
         <div class="arcade-card">
-          <div class="arcade-header-tag">[ ARCADE MOTORSPORT SYSTEM ]</div>
-          <h1 class="arcade-title">संख्या टर्बो</h1>
-          <div class="arcade-sub">SANKHYA TURBO: 8-BIT GRAND PRIX</div>
+          <div class="arcade-header-tag">[ ARCADE MOTORSPORT & STUDY SYSTEM ]</div>
+          <h1 class="arcade-title">संख्या टर्बो: 8-बिट ग्रैंड प्रिक्स</h1>
+          <div class="arcade-sub">SANKHYA TURBO: RETRO STEM RACER</div>
+
+          <!-- Study Angle: What do you want to learn today? -->
+          <div class="topic-study-section">
+            <label class="selector-label" for="custom-topic-input">आज आप क्या सीखना चाहते हैं? / WHAT DO YOU WANT TO STUDY?</label>
+            <div class="topic-input-row">
+              <input type="text" id="custom-topic-input" class="arcade-text-input" placeholder="उदा: घर्षण, प्रकाश संश्लेषण, Fractions, Newton's Laws..." />
+              <button id="btn-voice-topic" class="arcade-mic-btn" type="button">बोलकर चुनें (MIC)</button>
+            </div>
+            <div id="topic-voice-feedback" class="transcription-live-bubble"></div>
+          </div>
 
           <!-- Grade Selector (Class 1 - 8) -->
           <div class="selector-section">
-            <label class="selector-label">कक्षा / CLASS STANDARD:</label>
+            <label class="selector-label">कक्षा मानक / CLASS STANDARD:</label>
             <div id="grade-selector" class="chip-group">
               <button class="chip-btn" data-grade="1">G1</button>
               <button class="chip-btn" data-grade="2">G2</button>
@@ -56,7 +70,7 @@
 
           <!-- Grand Prix Track Circuit Selector -->
           <div class="selector-section">
-            <label class="selector-label">सर्किट / CIRCUIT:</label>
+            <label class="selector-label">सर्किट विषय / SUBJECT CIRCUIT:</label>
             <div id="circuit-selector" class="chip-group circuit-group">
               <button class="chip-btn circuit-btn active" data-circuit="physics">PHYSICS VELOCITY</button>
               <button class="chip-btn circuit-btn" data-circuit="chemistry">CHEMISTRY REACTOR</button>
@@ -68,16 +82,24 @@
           <!-- Controls Quick Reference -->
           <div class="controls-guide">
             <div class="guide-item">
+              <span class="guide-key">W / S</span>
+              <span class="guide-desc">Accelerate (Gas) / Active Brake (Slow Down)</span>
+            </div>
+            <div class="guide-item">
+              <span class="guide-key">A / D</span>
+              <span class="guide-desc">Steer Left / Right (Dodge Hazards, Stay On-Track!)</span>
+            </div>
+            <div class="guide-item">
               <span class="guide-key">SPACEBAR</span>
-              <span class="guide-desc">Shift Up (Hit GREEN Zone on Tachometer!)</span>
+              <span class="guide-desc">Shift Up (Hit GREEN sweet spot on Tachometer!)</span>
             </div>
             <div class="guide-item">
-              <span class="guide-key">UP / DOWN</span>
-              <span class="guide-desc">Switch Lanes (Dodge Slicks, Grab Nitro)</span>
+              <span class="guide-key">B KEY</span>
+              <span class="guide-desc">Pranayama Zen Breath (Bullet-Time Calm Focus & Vagus Reset)</span>
             </div>
             <div class="guide-item">
-              <span class="guide-key">1, 2, 3, 4</span>
-              <span class="guide-desc">Answer STEM Radio Pitstop for Super Nitro</span>
+              <span class="guide-key">T KEY</span>
+              <span class="guide-desc">AI STEM Tutor (Ask Doubts & Concept Explanations)</span>
             </div>
           </div>
 
@@ -91,7 +113,7 @@
       </div>
     </div>
 
-    <!-- UI Overlay Mounting for Modals / Telemetry -->
+    <!-- UI Overlay for In-Game STEM Quiz & AI Tutor Drawer -->
     <div id="ui"></div>
 
     <script type="module" src="/src/main.js"></script>

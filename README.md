@@ -8,43 +8,53 @@ GitHub Repository: https://github.com/z99wE/sankhya-strike
 
 ---
 
-## Game Overview
+## Game Overview & New Physics Laws
 
-Sankhya Turbo transforms STEM education (Physics, Chemistry, Biology, and Mathematics) into an exhilarating 8-bit drag racing and circuit championship:
+Sankhya Turbo combines authentic arcade vehicle kinematics, comprehensive STEM education (Physics, Chemistry, Biology, Mathematics), and neuroscience-backed test anxiety regulation:
 
-- Pure 8-Bit Pixel Renderer: Custom HTML5 Canvas retro renderer running at 320x240 internal resolution with authentic CRT scanline overlays, procedural road perspectives, roadside pylons, and animated 8-bit dragsters.
-- Procedural Chiptune Audio Synthesizer: Pure Web Audio API procedural sound engine generating 8-bit pulse/square engine revs, downshift engine braking, tire screech noise bursts, nitro overdrive warbles, and 8-bit fanfare melodies.
-- Manual Gear Shifting & Drag Physics: Realistic acceleration torque curves across 4 manual gears. Hit the green RPM sweet spot (5800 - 7000 RPM) on the tachometer to achieve a "PERFECT SHIFT" and earn Nitro refill bonuses. Shifting too early bogs down the engine; shifting beyond 8000 RPM hits the rev limiter.
-- 3-Lane Track Navigation: Dodge oil slicks and hazards while collecting Nitro canisters across 3 lanes.
-- STEM Radio Pitstop Intercom: Pitstop questions delivered directly to the cockpit during the race. Answering correctly unleashes a 100% Super Nitro overdrive boost and awards +1000 championship points. Incorrect answers trigger an engine containment stall penalty and -25% shield loss.
-
----
-
-## Circuits and Curriculum (Grades 1 to 8)
-
-Four Grand Prix circuits aligned with State Board and NCERT STEM standards:
-
-1. Physics Velocity: Kinematics, forces, work and energy, optics, electromagnetism, and orbital gravitation.
-2. Chemistry Reactor: Chemical reactions, acids and bases, periodic trends, stoichiometry, atomic structures, and organic bonding.
-3. Biology Bio-Sprint: Cell structures, photosynthesis, genetics, human anatomy, circulatory systems, and ecological networks.
-4. Maths Matrix 500: Arithmetic, algebraic formulas, geometric theorems, coordinate systems, trigonometry, and probability.
-
-Language Toggle: Seamless instant switching between Hindi and English at any point in the race.
+- Real Vehicle Kinematics & Continuous Lateral Steering:
+  - Free lateral maneuvering across the entire asphalt track and grass shoulders.
+  - Manual Throttle (Gas) and Active Braking (Brake) controls with illuminated rear brake lights.
+  - Off-road surface friction: driving off the asphalt onto the grass/dirt shoulder increases rolling resistance, caps vehicle speed at 40 km/h, rumbles the chassis, and kicks up grass/dirt particles.
+- Physical Collisions & Consequential Damage:
+  - Rival vehicle impacts: Overlapping with rival cars triggers physical bounce rebounds, metal crunch sound effects, spark cascades, screen shake, and -15% shield loss.
+  - Roadside barrier and guardrail crashes: Hitting track barriers at high lateral speed causes high-intensity screen shake, crash sparks, heavy deceleration, and -20% shield damage.
+  - Track hazards (Oil slicks): Causes immediate lateral skids with tire squeals, speed drops, and shield damage.
+- Integrated Exam Anxiety & Composure Management:
+  - Physiological Pulse BPM Gauge (70 - 170 BPM): Tracks student stress levels under high speed, rival proximity, low shield, and checkpoint timers.
+  - Auditory and visual anxiety cues: Rhythmic procedural heartbeat pulse (lub-dub) and soft red vignette border when pulse exceeds 125 BPM.
+  - Pranayama Zen Breath Mechanic (B key / Zen touch button): Deep vagus nerve reset that slows simulation time by 50% (bullet-time calm focus for 3.5 seconds), drops pulse back to resting 72 BPM, steadies handling, and awards +300 Calm Clarity points.
+- Study Angle & Custom Topic Selector:
+  - "What do you want to study today?" (आज आप क्या सीखना चाहते हैं?): Students can select grade curriculum topics OR type/speak any custom chapter (e.g. "Newton's laws of motion", "Friction", "Photosynthesis", "Fractions", "Acids and Bases").
+  - The AI engine dynamically structures customized checkpoint quizzes around the chosen topic.
+- Crystal-Clear Devanagari & Latin Typography:
+  - Native Devanagari complex script rendering using Mukta and Noto Sans Devanagari at 16px - 18px font size with high-contrast text and full line heights, eliminating illegible pixel-font clipping.
+- Speech Recognition Voice Input:
+  - Working SpeechRecognition supporting Hindi (hi-IN) and English (en-IN).
+  - Speak custom study topics into the microphone or answer quiz options by speaking "one", "two", "three", "four", "ek", "do", "teen", "char", "A", "B", "C", "D".
+- Bundled Screen Reader TTS:
+  - Clean Web Speech Synthesis helper reading questions, hints, and explanations on demand.
+- In-Browser AI STEM Pit Crew (Guru Bot):
+  - Accessible via T key or Tutor button.
+  - Answers any student doubt with intuitive real-life analogies, formulas, and cognitive anxiety reframing tips.
 
 ---
 
 ## Controls
 
 ### Desktop Keyboard
+- Accelerate / Throttle: W key or UP ARROW
+- Active Brake: S key or DOWN ARROW
+- Steer Left / Right: A / D keys or LEFT / RIGHT ARROWS
 - Shift Up: SPACEBAR (Target the green zone on the tachometer)
-- Shift Down: DOWN ARROW or S key
-- Steer Lanes: UP ARROW (Lane Up) / DOWN ARROW (Lane Down) or W / S keys
+- Shift Down: X key or SHIFT
 - Activate Nitro: N key
-- Answer STEM Intercom: Keys 1, 2, 3, 4
+- Pranayama Zen Breath: B key (Bullet-time calm focus)
+- AI STEM Tutor / Doubt Solver: T key
+- Answer STEM Checkpoints: Keys 1, 2, 3, 4 (or Speak into microphone)
 
 ### Mobile Touch Controls
-- Dedicated on-screen arcade buttons for UP LANE, DOWN LANE, GEAR -, SHIFT, and NITRO.
-- Instant touch options for STEM quiz answers.
+- Dedicated on-screen arcade buttons for STEER L, STEER R, GAS [W], BRAKE [S], SHIFT [SPACE], NITRO [N], ZEN [B], and TUTOR [T].
 
 ---
 
@@ -52,41 +62,8 @@ Language Toggle: Seamless instant switching between Hindi and English at any poi
 
 - Engine: Custom vanilla JavaScript ES modules (0 external runtime dependencies)
 - Bundler: Vite 5
-- Audio: Web Audio API procedural chiptune synthesizer
+- Audio: Web Audio API procedural chiptune & heartbeat synthesizer
+- Speech: Web Speech Recognition & SpeechSynthesis APIs
 - Storage: Zero-PII offline local persistence (localStorage)
 - Hosting: Cloudflare Pages with edge global CDN distribution
 - CI/CD: GitHub Actions automated lint, typecheck, unit tests, and build pipeline
-
----
-
-## Development and Testing
-
-Install dependencies:
-```bash
-npm install
-```
-
-Start local development server:
-```bash
-npm run dev
-```
-
-Build production bundle:
-```bash
-npm run build
-```
-
-Run unit test suite:
-```bash
-npm test
-```
-
-Run headless browser end-to-end verification:
-```bash
-npm run test:e2e
-```
-
-Deploy to Cloudflare Pages:
-```bash
-npm run deploy
-```

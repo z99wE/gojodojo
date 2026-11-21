@@ -1,6 +1,7 @@
 /**
  * @fileoverview Zero-dependency Web Audio API 8-Bit Chiptune Synthesizer.
- * Generates retro arcade engine revs, gear shift clunks, nitro blasts, and chiptune melodies.
+ * Generates retro arcade engine revs, gear shifts, nitro blasts, metal collision crunches,
+ * physiological anxiety heartbeat pulses, and Zen focus chimes.
  */
 
 export class ChiptuneAudio {
@@ -9,8 +10,7 @@ export class ChiptuneAudio {
     this.muted = false;
     this.engineOsc = null;
     this.engineGain = null;
-    this.bgmTimer = null;
-    this.isBgmPlaying = false;
+    this.lastHeartbeatTime = 0;
   }
 
   init() {
@@ -101,7 +101,6 @@ export class ChiptuneAudio {
       osc.type = 'square';
 
       if (type === 'perfect') {
-        // High harmonic sparkle arpeggio
         osc.frequency.setValueAtTime(523.25, t); // C5
         osc.frequency.setValueAtTime(659.25, t + 0.06); // E5
         osc.frequency.setValueAtTime(783.99, t + 0.12); // G5
@@ -113,7 +112,6 @@ export class ChiptuneAudio {
         osc.start(t);
         osc.stop(t + 0.35);
       } else if (type === 'early') {
-        // Low sluggish clunk
         osc.frequency.setValueAtTime(140, t);
         osc.frequency.exponentialRampToValueAtTime(90, t + 0.15);
         gain.gain.setValueAtTime(0.15, t);
@@ -123,16 +121,127 @@ export class ChiptuneAudio {
         osc.start(t);
         osc.stop(t + 0.18);
       } else {
-        // Solid mechanical clutch snap
-        osc.frequency.setValueAtTime(280, t);
-        osc.frequency.exponentialRampToValueAtTime(160, t + 0.08);
+        osc.frequency.setValueAtTime(260, t);
+        osc.frequency.exponentialRampToValueAtTime(180, t + 0.08);
         gain.gain.setValueAtTime(0.12, t);
-        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.10);
         osc.connect(gain);
         gain.connect(this.ctx.destination);
         osc.start(t);
-        osc.stop(t + 0.1);
+        osc.stop(t + 0.10);
       }
+    } catch (e) {
+      void e;
+    }
+  }
+
+  playCrash(intensity = 1.0) {
+    if (!this.ctx || this.muted) return;
+    this.resume();
+    try {
+      const t = this.ctx.currentTime;
+      const dur = 0.3 * intensity;
+      const bufferSize = this.ctx.sampleRate * dur;
+      const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+      const output = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        output[i] = Math.random() * 2 - 1;
+      }
+
+      const whiteNoise = this.ctx.createBufferSource();
+      whiteNoise.buffer = buffer;
+
+      const filter = this.ctx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(650, t);
+      filter.frequency.exponentialRampToValueAtTime(80, t + dur);
+
+      const gain = this.ctx.createGain();
+      gain.gain.setValueAtTime(0.35 * intensity, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + dur);
+
+      whiteNoise.connect(filter);
+      filter.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      whiteNoise.start(t);
+    } catch (e) {
+      void e;
+    }
+  }
+
+  playScreech() {
+    if (!this.ctx || this.muted) return;
+    this.resume();
+    try {
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(880, t);
+      osc.frequency.linearRampToValueAtTime(440, t + 0.25);
+
+      gain.gain.setValueAtTime(0.15, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.25);
+    } catch (e) {
+      void e;
+    }
+  }
+
+  playHeartbeat(bpm) {
+    if (!this.ctx || this.muted) return;
+    const now = performance.now();
+    const intervalMs = (60 / Math.max(70, Math.min(180, bpm))) * 1000;
+    if (now - this.lastHeartbeatTime < intervalMs) return;
+    this.lastHeartbeatTime = now;
+
+    try {
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'sine';
+      // Low thud
+      osc.frequency.setValueAtTime(55, t);
+      osc.frequency.exponentialRampToValueAtTime(28, t + 0.08);
+
+      gain.gain.setValueAtTime(0.25, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.09);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.09);
+    } catch (e) {
+      void e;
+    }
+  }
+
+  playZenBreath() {
+    if (!this.ctx || this.muted) return;
+    this.resume();
+    try {
+      const t = this.ctx.currentTime;
+      const chords = [392.00, 493.88, 587.33, 783.99]; // G major serene chime
+      chords.forEach((freq, idx) => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, t + idx * 0.06);
+
+        gain.gain.setValueAtTime(0.12, t + idx * 0.06);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + 1.2);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(t + idx * 0.06);
+        osc.stop(t + 1.2);
+      });
     } catch (e) {
       void e;
     }
@@ -143,87 +252,20 @@ export class ChiptuneAudio {
     this.resume();
     try {
       const t = this.ctx.currentTime;
-      // White noise roar with bandpass filter
-      const bufferSize = this.ctx.sampleRate * 0.4;
-      const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        data[i] = Math.random() * 2 - 1;
-      }
-
-      const noise = this.ctx.createBufferSource();
-      noise.buffer = buffer;
-
-      const filter = this.ctx.createBiquadFilter();
-      filter.type = 'bandpass';
-      filter.frequency.setValueAtTime(800, t);
-      filter.frequency.exponentialRampToValueAtTime(3200, t + 0.3);
-
-      const gain = this.ctx.createGain();
-      gain.gain.setValueAtTime(0.2, t);
-      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.4);
-
-      noise.connect(filter);
-      filter.connect(gain);
-      gain.connect(this.ctx.destination);
-      noise.start(t);
-    } catch (e) {
-      void e;
-    }
-  }
-
-  playRadioBeep() {
-    if (!this.ctx || this.muted) return;
-    this.resume();
-    try {
-      const t = this.ctx.currentTime;
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(880, t);
-      osc.frequency.setValueAtTime(1760, t + 0.08);
-      gain.gain.setValueAtTime(0.15, t);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
+
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(220, t);
+      osc.frequency.exponentialRampToValueAtTime(1320, t + 0.4);
+
+      gain.gain.setValueAtTime(0.22, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
+
       osc.connect(gain);
       gain.connect(this.ctx.destination);
       osc.start(t);
-      osc.stop(t + 0.2);
-    } catch (e) {
-      void e;
-    }
-  }
-
-  playQuizResult(correct) {
-    if (!this.ctx || this.muted) return;
-    this.resume();
-    try {
-      const t = this.ctx.currentTime;
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-
-      if (correct) {
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(440, t);
-        osc.frequency.setValueAtTime(554.37, t + 0.08);
-        osc.frequency.setValueAtTime(659.25, t + 0.16);
-        osc.frequency.setValueAtTime(880, t + 0.24);
-        gain.gain.setValueAtTime(0.18, t);
-        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start(t);
-        osc.stop(t + 0.4);
-      } else {
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(180, t);
-        osc.frequency.setValueAtTime(120, t + 0.15);
-        gain.gain.setValueAtTime(0.2, t);
-        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start(t);
-        osc.stop(t + 0.35);
-      }
+      osc.stop(t + 0.5);
     } catch (e) {
       void e;
     }
@@ -236,15 +278,75 @@ export class ChiptuneAudio {
       const t = this.ctx.currentTime;
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
+
       osc.type = 'square';
-      const freq = count === 0 ? 880 : 440; // High tone on GO
+      const freq = count === 0 ? 880 : 440;
       osc.frequency.setValueAtTime(freq, t);
+
       gain.gain.setValueAtTime(0.2, t);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + (count === 0 ? 0.4 : 0.15));
+      gain.gain.exponentialRampToValueAtTime(0.001, t + (count === 0 ? 0.45 : 0.2));
+
       osc.connect(gain);
       gain.connect(this.ctx.destination);
       osc.start(t);
-      osc.stop(t + (count === 0 ? 0.4 : 0.15));
+      osc.stop(t + (count === 0 ? 0.45 : 0.2));
+    } catch (e) {
+      void e;
+    }
+  }
+
+  playRadioBeep() {
+    if (!this.ctx || this.muted) return;
+    this.resume();
+    try {
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(950, t);
+      osc.frequency.setValueAtTime(1400, t + 0.08);
+
+      gain.gain.setValueAtTime(0.18, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.22);
+    } catch (e) {
+      void e;
+    }
+  }
+
+  playQuizResult(isCorrect) {
+    if (!this.ctx || this.muted) return;
+    this.resume();
+    try {
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'square';
+      if (isCorrect) {
+        osc.frequency.setValueAtTime(440, t);
+        osc.frequency.setValueAtTime(554.37, t + 0.08);
+        osc.frequency.setValueAtTime(659.25, t + 0.16);
+        osc.frequency.setValueAtTime(880, t + 0.24);
+        gain.gain.setValueAtTime(0.2, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
+      } else {
+        osc.frequency.setValueAtTime(220, t);
+        osc.frequency.setValueAtTime(185, t + 0.12);
+        osc.frequency.setValueAtTime(130, t + 0.24);
+        gain.gain.setValueAtTime(0.2, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+      }
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.45);
     } catch (e) {
       void e;
     }
