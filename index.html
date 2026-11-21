@@ -3,162 +3,97 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#ffd1dc" />
-    <title>संख्या स्ट्राइक | Sankhya Strike - RPG Edition</title>
+    <meta name="theme-color" content="#0a0520" />
+    <title>संख्या टर्बो: 8-बिट ग्रैंड प्रिक्स | Sankhya Turbo: 8-Bit GP</title>
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <style>
-      :root {
-        --k-pink: #ffb7b2;
-        --k-lilac: #e2c6ff;
-        --k-mint: #bffcc6;
-        --k-yellow: #fffaa0;
-        --k-sky: #c7ceea;
-        --k-peach: #ffd1dc;
-        --k-cream: #fffaf5;
-        --k-text-dark: #2d2438;
-      }
-      * {
-        box-sizing: border-box;
-      }
-      body {
-        margin: 0;
-        overflow: hidden;
-        background: #fdf5f7;
-        font-family: 'Baloo 2', 'Fredoka', 'Noto Sans Devanagari', system-ui, sans-serif;
-        user-select: none;
-        -webkit-user-select: none;
-      }
-      #app,
-      #app canvas {
-        width: 100vw;
-        height: 100vh;
-        height: 100dvh;
-        display: block;
-      }
-      .overlay {
-        position: fixed;
-        inset: 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        background: radial-gradient(circle at center, rgba(255, 245, 248, 0.94) 0%, rgba(226, 198, 255, 0.92) 100%);
-        color: var(--k-text-dark);
-        text-align: center;
-        padding: 24px;
-        z-index: 1000;
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-      }
-      .overlay.hidden,
-      .hidden {
-        display: none !important;
-      }
-      .start-card {
-        background: #ffffff;
-        border: 3.5px solid var(--k-pink);
-        border-radius: 28px;
-        box-shadow: 0 16px 40px rgba(255, 183, 178, 0.35), 0 6px 0 var(--k-pink);
-        padding: 32px 28px;
-        max-width: 440px;
-        width: 100%;
-        animation: k-float 3s ease-in-out infinite;
-      }
-      @keyframes k-float {
-        0%, 100% { transform: translateY(0px); }
-        50% { transform: translateY(-8px); }
-      }
-      .start-mascot {
-        font-size: 3.5rem;
-        margin-bottom: 8px;
-        filter: drop-shadow(0 4px 10px rgba(0,0,0,0.1));
-      }
-      .start-title {
-        font-size: 2.2rem;
-        font-weight: 800;
-        margin: 0;
-        color: #ff6b81;
-        letter-spacing: -0.5px;
-        text-shadow: 0 2px 0 rgba(255, 255, 255, 0.8);
-      }
-      .start-sub {
-        font-size: 1.15rem;
-        font-weight: 700;
-        color: #7d5fff;
-        margin: 2px 0 12px 0;
-      }
-      .start-desc {
-        font-size: 0.95rem;
-        color: #635274;
-        line-height: 1.5;
-        margin-bottom: 20px;
-        font-weight: 500;
-      }
-      .start-badges {
-        display: flex;
-        justify-content: center;
-        gap: 8px;
-        margin-bottom: 24px;
-        flex-wrap: wrap;
-      }
-      .start-badge {
-        background: #f7f1ff;
-        border: 1.5px solid #d4bbff;
-        color: #5f3dc4;
-        border-radius: 999px;
-        padding: 4px 12px;
-        font-size: 0.8rem;
-        font-weight: 700;
-      }
-      #start-btn {
-        min-height: 56px;
-        width: 100%;
-        padding: 0 24px;
-        font-size: 1.3rem;
-        font-weight: 800;
-        font-family: inherit;
-        border: none;
-        border-radius: 20px;
-        background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%);
-        color: #ffffff;
-        cursor: pointer;
-        box-shadow: 0 8px 24px rgba(255, 117, 140, 0.45), 0 4px 0 #e0526e;
-        transition: transform 0.15s, box-shadow 0.15s;
-      }
-      #start-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 12px 28px rgba(255, 117, 140, 0.55), 0 4px 0 #e0526e;
-      }
-      #start-btn:active {
-        transform: translateY(3px);
-        box-shadow: 0 2px 8px rgba(255, 117, 140, 0.35), 0 1px 0 #e0526e;
-      }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/src/ui/styles.css" />
   </head>
-  <body>
-    <div id="app"></div>
-    <div id="ui"></div>
-    <div id="start" class="overlay">
-      <div class="start-card">
-        <div class="start-mascot">✨🎮✨</div>
-        <h1 class="start-title">संख्या स्ट्राइक</h1>
-        <div class="start-sub">Sankhya Strike • RPG Edition</div>
-        <div class="start-badges">
-          <span class="start-badge">🌸 Korean Pastel 3D</span>
-          <span class="start-badge">🎯 Vice City RPG</span>
-          <span class="start-badge">⚡ 100% Offline</span>
+  <body class="arcade-body">
+    <div id="arcade-container">
+      <!-- CRT Screen Bezel & Canvas -->
+      <div id="crt-screen">
+        <canvas id="game-canvas"></canvas>
+        <div class="crt-scanlines"></div>
+      </div>
+
+      <!-- Mobile Touch Controls Bar -->
+      <div id="touch-controls" class="hidden">
+        <div class="touch-steer-group">
+          <button id="btn-steer-up" class="touch-btn" type="button">▲ LANE</button>
+          <button id="btn-steer-down" class="touch-btn" type="button">▼ LANE</button>
         </div>
-        <p class="start-desc">
-          द्वीप घूमें, सिक्के इकट्ठा करें और चमकते पत्थरों से गणित व विज्ञान के ज्ञान को जीतें!
-          <br/>
-          <em>Explore the 3D islands, gather star coins & master Maths and Science!</em>
-        </p>
-        <button id="start-btn" type="button">खेले / START PLAYING ➔</button>
+        <div class="touch-action-group">
+          <button id="btn-shift-down" class="touch-btn" type="button">GEAR -</button>
+          <button id="btn-shift-up" class="touch-btn pulse-glow" type="button">SHIFT [SPACE]</button>
+          <button id="btn-nitro" class="touch-btn nitro-btn" type="button">NITRO [N]</button>
+        </div>
+      </div>
+
+      <!-- Start / Garage Menu Overlay -->
+      <div id="start" class="overlay">
+        <div class="arcade-card">
+          <div class="arcade-header-tag">[ ARCADE MOTORSPORT SYSTEM ]</div>
+          <h1 class="arcade-title">संख्या टर्बो</h1>
+          <div class="arcade-sub">SANKHYA TURBO: 8-BIT GRAND PRIX</div>
+
+          <!-- Grade Selector (Class 1 - 8) -->
+          <div class="selector-section">
+            <label class="selector-label">कक्षा / CLASS STANDARD:</label>
+            <div id="grade-selector" class="chip-group">
+              <button class="chip-btn" data-grade="1">G1</button>
+              <button class="chip-btn" data-grade="2">G2</button>
+              <button class="chip-btn" data-grade="3">G3</button>
+              <button class="chip-btn" data-grade="4">G4</button>
+              <button class="chip-btn active" data-grade="5">G5</button>
+              <button class="chip-btn" data-grade="6">G6</button>
+              <button class="chip-btn" data-grade="7">G7</button>
+              <button class="chip-btn" data-grade="8">G8</button>
+            </div>
+          </div>
+
+          <!-- Grand Prix Track Circuit Selector -->
+          <div class="selector-section">
+            <label class="selector-label">सर्किट / CIRCUIT:</label>
+            <div id="circuit-selector" class="chip-group circuit-group">
+              <button class="chip-btn circuit-btn active" data-circuit="physics">PHYSICS VELOCITY</button>
+              <button class="chip-btn circuit-btn" data-circuit="chemistry">CHEMISTRY REACTOR</button>
+              <button class="chip-btn circuit-btn" data-circuit="biology">BIOLOGY BIO-SPRINT</button>
+              <button class="chip-btn circuit-btn" data-circuit="maths">MATHS MATRIX 500</button>
+            </div>
+          </div>
+
+          <!-- Controls Quick Reference -->
+          <div class="controls-guide">
+            <div class="guide-item">
+              <span class="guide-key">SPACEBAR</span>
+              <span class="guide-desc">Shift Up (Hit GREEN Zone on Tachometer!)</span>
+            </div>
+            <div class="guide-item">
+              <span class="guide-key">▲ / ▼</span>
+              <span class="guide-desc">Switch Lanes (Dodge Slicks, Grab Nitro)</span>
+            </div>
+            <div class="guide-item">
+              <span class="guide-key">1, 2, 3, 4</span>
+              <span class="guide-desc">Answer STEM Radio Pitstop for Super Nitro</span>
+            </div>
+          </div>
+
+          <!-- Controls Buttons -->
+          <div class="arcade-action-bar">
+            <button id="lang-btn" class="arcade-secondary-btn" type="button">LANG: EN/HI</button>
+            <button id="audio-btn" class="arcade-secondary-btn" type="button">AUDIO: ON</button>
+            <button id="start-btn" class="arcade-start-btn" type="button">START RACE ➔</button>
+          </div>
+        </div>
       </div>
     </div>
+
+    <!-- UI Overlay Mounting for Modals / Telemetry -->
+    <div id="ui"></div>
+
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

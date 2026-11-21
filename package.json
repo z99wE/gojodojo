@@ -1,20 +1,17 @@
 {
   "name": "sankhya-strike",
-  "version": "1.0.0",
-  "description": "Vice City Style 3D Hindi & English Last-Mile STEM RPG for Grades 1-8",
+  "version": "2.0.0",
+  "description": "8-Bit Arcade Drag & Grand Prix STEM Racer for Grades 1-8 in Hindi & English",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "node --check src/main.js src/save.js src/flags.js src/ui/sanitize.js src/ui/quiz.js src/ui/board-modal.js src/ui/hud.js src/ui/progress.js src/world/world.js src/world/props.js src/world/physics-labs.js",
+    "lint": "node --check src/main.js src/save.js src/flags.js src/ui/sanitize.js src/game/racing-engine.js src/game/pixel-renderer.js src/game/chiptune-audio.js src/game/quiz-controller.js",
     "test": "node --test test/*.test.js",
     "test:e2e": "vite build && node test/browser-verification.js",
     "deploy": "wrangler pages deploy dist --project-name sankhya-strike --branch main"
-  },
-  "dependencies": {
-    "three": "0.169.0"
   },
   "devDependencies": {
     "vite": "5.4.0"

@@ -1,9 +1,8 @@
-import http from 'http';
 import { spawn } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 
-// Automated E2E verification test using Chrome Headless & CDP WebSocket
+// Automated E2E verification test using Chrome Headless & CDP WebSocket for 8-Bit Racing Game
 async function run() {
   console.log('🚀 Starting Vite Preview Server on port 4173...');
   const server = spawn('npx', ['vite', 'preview', '--port', '4173'], { stdio: 'pipe' });
@@ -69,15 +68,13 @@ async function run() {
     if (msg.method === 'Runtime.consoleAPICalled') {
       const text = msg.params.args.map((a) => a.value || a.description || '').join(' ');
       consoleMessages.push(text);
-      if (msg.params.type === 'error' && !text.includes('WebGL context could not be created') && !text.includes('Error creating WebGL context')) {
+      if (msg.params.type === 'error') {
         uncaughtErrors.push(text);
       }
     }
     if (msg.method === 'Runtime.exceptionThrown') {
       const desc = msg.params.exceptionDetails.exception?.description || msg.params.exceptionDetails.text;
-      if (!desc.includes('WebGL') && !desc.includes('context could not be created')) {
-        uncaughtErrors.push(desc);
-      }
+      uncaughtErrors.push(desc);
     }
     if (msg.id && pending.has(msg.id)) {
       const { resolve, reject } = pending.get(msg.id);
@@ -96,8 +93,8 @@ async function run() {
   // Wait 1.5s for page script execution
   await new Promise((resolve) => setTimeout(resolve, 1500));
 
-  // 1. Click Start Button
-  console.log('Testing Start Button Click...');
+  // 1. Click Start Race Button
+  console.log('Testing Start Race Button Click...');
   const clickStart = await send('Runtime.evaluate', {
     expression: `
       (() => {
@@ -111,97 +108,159 @@ async function run() {
   });
   console.log('Click Start Result:', clickStart.result.value);
 
-  // Wait 1 second for 3D game loop to run
-  await new Promise((resolve) => setTimeout(resolve, 1000));
+  await new Promise((resolve) => setTimeout(resolve, 800));
 
-  // 2. Check HUD, Canvas, 4D Telemetry and 3D World State
-  const hudCheck = await send('Runtime.evaluate', {
+  // 2. Check 8-Bit Canvas & Engine State
+  const gameStateCheck = await send('Runtime.evaluate', {
     expression: `
       (() => {
-        const hud = document.querySelector('.ss-hud-root') || document.getElementById('ss-gta-mission-bar');
-        const canvas = document.querySelector('canvas');
+        const canvas = document.getElementById('game-canvas');
         const startModal = document.getElementById('start');
-        const reticle = document.getElementById('ss-reticle-wrap');
-        const missionText = document.getElementById('ss-active-mission-title')?.textContent;
-        const progressBtn = document.getElementById('ss-hud-progress-btn');
-        const coordsText = document.getElementById('ss-hud-coords')?.textContent;
-        const world = window.__SANKHYA__?.world;
-        const labsCount = world?.labs?.length || 0;
-        const carsCount = world?.cars?.length || 0;
-        const car0InitialX = world?.cars?.[0]?.position?.x;
+        const app = window.__SANKHYA__;
+        const engine = app?.engine;
+        const quiz = app?.quiz;
         return {
-          hasHud: !!hud,
           hasCanvas: !!canvas,
-          startHidden: startModal ? startModal.style.display === 'none' : true,
-          hasReticle: !!reticle,
-          missionText,
-          hasProgressBtn: !!progressBtn,
-          coordsText,
+          startHidden: startModal ? startModal.classList.contains('hidden') : true,
           canvasWidth: canvas?.width,
           canvasHeight: canvas?.height,
-          labsCount,
-          carsCount,
-          car0InitialX,
+          engineStatus: engine?.status,
+          initialGear: engine?.player?.gear,
+          initialRpm: engine?.player?.rpm,
+          trackLength: engine?.trackLength,
+          rivalName: engine?.rival?.name
         };
       })()
     `,
     returnByValue: true,
   });
-  console.log('Game State Check:', hudCheck.result.value);
+  console.log('Game State Check:', gameStateCheck.result.value);
 
-  // Assertions on 3D world state in browser
-  const state = hudCheck.result.value;
-  if (!state.hasHud || !state.hasCanvas || !state.startHidden) {
-    uncaughtErrors.push('HUD or Canvas not initialized properly after start click');
+  const state = gameStateCheck.result.value;
+  if (!state.hasCanvas || !state.startHidden) {
+    uncaughtErrors.push('8-bit canvas or Start overlay not in expected state');
   }
-  if (state.labsCount < 9) {
-    uncaughtErrors.push(`Expected at least 9 STEM laboratories in browser, found ${state.labsCount}`);
-  }
-  if (state.carsCount < 4) {
-    uncaughtErrors.push(`Expected at least 4 cruising GTA sports cars, found ${state.carsCount}`);
+  if (!state.engineStatus || state.initialGear !== 1) {
+    uncaughtErrors.push('Engine state invalid after race start');
   }
 
-  // 3. Test Clicking Canvas to Fire Blaster Bolts
-  console.log('Testing Canvas Click / Blaster Combat Fire...');
-  const fireCheck = await send('Runtime.evaluate', {
+  // 3. Test Tachometer Gear Shifting in Green Zone
+  console.log('Testing Gear Shifting (Perfect Shift in Sweet Spot)...');
+  const shiftCheck = await send('Runtime.evaluate', {
     expression: `
       (() => {
-        const canvas = document.querySelector('canvas');
-        if (!canvas) return { error: 'canvas not found' };
-        // Click 3 times to fire laser shots
-        canvas.dispatchEvent(new MouseEvent('click', { clientX: 400, clientY: 300, bubbles: true }));
-        canvas.dispatchEvent(new MouseEvent('click', { clientX: 400, clientY: 300, bubbles: true }));
-        canvas.dispatchEvent(new MouseEvent('click', { clientX: 400, clientY: 300, bubbles: true }));
-        return { fired: true };
+        const engine = window.__SANKHYA__?.engine;
+        engine.status = 'racing';
+        engine.player.rpm = 6400; // Inside green sweet spot (5800-7000)
+        engine.shiftUp();
+        return {
+          gear: engine.player.gear,
+          feedbackText: engine.player.shiftFeedback.text,
+          feedbackType: engine.player.shiftFeedback.type,
+          perfectCount: engine.player.perfectShifts,
+          nitro: engine.player.nitro
+        };
       })()
     `,
     returnByValue: true,
   });
-  console.log('Blaster Fire Result:', fireCheck.result.value);
+  console.log('Shift Result:', shiftCheck.result.value);
 
-  await new Promise((resolve) => setTimeout(resolve, 800));
+  if (shiftCheck.result.value?.gear !== 2 || shiftCheck.result.value?.feedbackType !== 'perfect') {
+    uncaughtErrors.push('Perfect Shift failed to advance gear or award bonus');
+  }
 
-  // 4. Verify Cruising AI Cars have moved along Ocean Drive
-  const carMotionCheck = await send('Runtime.evaluate', {
+  // 4. Test Lane Steering
+  console.log('Testing Lane Steering (Lane 1 -> Lane 2)...');
+  const steerCheck = await send('Runtime.evaluate', {
     expression: `
       (() => {
-        const world = window.__SANKHYA__?.world;
-        const car0CurrentX = world?.cars?.[0]?.position?.x;
-        return { car0CurrentX };
+        const engine = window.__SANKHYA__?.engine;
+        engine.steerLane(1);
+        return { lane: engine.player.lane };
       })()
     `,
     returnByValue: true,
   });
-  console.log('Car Motion Check:', carMotionCheck.result.value);
-  if (carMotionCheck.result.value?.car0CurrentX === state.car0InitialX) {
-    uncaughtErrors.push('Cruising cars failed to move along Ocean Drive highway');
+  console.log('Steer Result:', steerCheck.result.value);
+  if (steerCheck.result.value?.lane !== 2) {
+    uncaughtErrors.push('Lane steering failed to change lane');
   }
 
-  await new Promise((resolve) => setTimeout(resolve, 1000));
+  // 5. Test Super Nitro Activation
+  console.log('Testing Nitro Overdrive Activation...');
+  const nitroCheck = await send('Runtime.evaluate', {
+    expression: `
+      (() => {
+        const engine = window.__SANKHYA__?.engine;
+        engine.player.nitro = 60;
+        const activated = engine.activateNitro();
+        return {
+          activated,
+          isNitroActive: engine.player.isNitroActive,
+          remainingNitro: engine.player.nitro
+        };
+      })()
+    `,
+    returnByValue: true,
+  });
+  console.log('Nitro Result:', nitroCheck.result.value);
+  if (!nitroCheck.result.value?.isNitroActive) {
+    uncaughtErrors.push('Nitro activation failed');
+  }
 
-  // 4. Capture Screenshot
+  // 6. Test STEM Radio Checkpoint Question
+  console.log('Testing STEM Pitstop Intercom Question Answering...');
+  const quizCheck = await send('Runtime.evaluate', {
+    expression: `
+      (() => {
+        const app = window.__SANKHYA__;
+        const q = app.quiz.nextQuestion();
+        const correctIndex = q.correctIndex;
+        // Submit correct answer
+        app.handleQuizSubmit(correctIndex);
+        return {
+          questionText: q.text,
+          correctIndex,
+          score: app.engine.player.score,
+          nitro: app.engine.player.nitro,
+          streak: app.quiz.streak
+        };
+      })()
+    `,
+    returnByValue: true,
+  });
+  console.log('STEM Quiz Result:', quizCheck.result.value);
+  if (quizCheck.result.value?.streak !== 1 || quizCheck.result.value?.score < 1000) {
+    uncaughtErrors.push('STEM Quiz failed to process correct answer and award score');
+  }
+
+  // Wait 1.2s for race loop and rendering
+  await new Promise((resolve) => setTimeout(resolve, 1200));
+
+  // 7. Verify Car Distance Progress
+  const distanceCheck = await send('Runtime.evaluate', {
+    expression: `
+      (() => {
+        const engine = window.__SANKHYA__?.engine;
+        return {
+          playerDist: engine.player.distance,
+          rivalDist: engine.rival.distance,
+          speed: engine.player.speed,
+          rpm: engine.player.rpm
+        };
+      })()
+    `,
+    returnByValue: true,
+  });
+  console.log('Distance Check:', distanceCheck.result.value);
+  if (distanceCheck.result.value?.playerDist <= 0) {
+    uncaughtErrors.push('Player vehicle failed to advance distance down the track');
+  }
+
+  // 8. Capture Screenshot
   const screenshotData = await send('Page.captureScreenshot', { format: 'png' });
-  const screenshotPath = path.resolve(process.cwd(), 'screenshot-vice-city.png');
+  const screenshotPath = path.resolve(process.cwd(), 'screenshot-8bit-racing.png');
   fs.writeFileSync(screenshotPath, Buffer.from(screenshotData.data, 'base64'));
   console.log('📸 Saved verification screenshot to:', screenshotPath);
 
@@ -217,7 +276,7 @@ async function run() {
     process.exit(1);
   }
 
-  console.log('✅ Browser Verification Succeeded with 0 uncaught errors!');
+  console.log('✅ 8-Bit Racing Browser Verification Succeeded with 0 uncaught errors!');
   process.exit(0);
 }
 
