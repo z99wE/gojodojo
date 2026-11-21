@@ -1,4 +1,4 @@
-// Learning Board Modal (गुरु पटल) at the Hub Island
+// Learning Board Modal (गुरु पटल) at the Hub Island - South Korean Pastel RPG Edition
 import { BOARD, getGrade, setGrade, GRADES } from '../content/index.js';
 import { t, getLang } from '../i18n/index.js';
 import { playClickSound, speakText, stopSpeaking } from './audio.js';
@@ -24,74 +24,81 @@ export function createBoardModal({ container, onClose, onOpenProgress }) {
     const body = BOARD.body[lang] || BOARD.body.hi;
 
     modalEl = document.createElement('div');
-    modalEl.className = 'ss-modal-backdrop';
+    modalEl.className = 'ss-clay-backdrop';
 
     modalEl.innerHTML = `
-      <div class="ss-modal" role="dialog" aria-modal="true">
-        <div class="ss-modal-header">
-          <div class="ss-modal-title-group">
-            <span class="ss-badge ss-badge-hub">🏛 ${lang === 'hi' ? 'केंद्र' : 'Hub'}</span>
-            <h2 class="ss-modal-title">${title}</h2>
+      <div class="ss-clay-modal" role="dialog" aria-modal="true">
+        <!-- Header -->
+        <div class="ss-clay-header ss-header-hub">
+          <div class="ss-mascot-avatar">🏛️</div>
+          <div class="ss-clay-title-wrap">
+            <span class="ss-clay-pill ss-pill-hub">${lang === 'hi' ? 'केंद्रीय गिल्ड हॉल' : 'Central Guild Hall'}</span>
+            <h2 class="ss-clay-title">${title}</h2>
           </div>
-          <button class="ss-close-btn" aria-label="Close" id="ss-board-close">&times;</button>
+          <button class="ss-clay-close" aria-label="Close" id="ss-board-close">✕</button>
         </div>
 
-        <div class="ss-modal-body">
-          <div style="background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:16px; margin-bottom:16px;">
-            <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:10px;">
-              <h3 style="margin:0; font-size:1.1rem; color:var(--accent-gold);">
-                ${lang === 'hi' ? 'नमस्ते शिक्षार्थी!' : 'Welcome Learner!'}
-              </h3>
-              <button class="ss-audio-btn" id="ss-board-audio" type="button">
+        <div class="ss-clay-body">
+          <div class="ss-clay-card" style="border-left: 6px solid #ffa502;">
+            <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:12px;">
+              <div>
+                <h3 style="margin:0 0 4px 0; font-size:1.2rem; color:#ff4757; font-weight:800;">
+                  ${lang === 'hi' ? 'नमस्ते युवा साहसी! 🌸' : 'Welcome Young Adventurer! 🌸'}
+                </h3>
+                <span style="font-size:0.86rem; color:#7d6c8f; font-weight:600;">
+                  ${lang === 'hi' ? 'संख्या स्ट्राइक की दुनिया में आपका स्वागत है' : 'Welcome to the world of Sankhya Strike'}
+                </span>
+              </div>
+              <button class="ss-clay-audio-btn" id="ss-board-audio" type="button">
                 <span>🔊</span> <span>${t('quiz.listen')}</span>
               </button>
             </div>
-            <p style="font-size:0.95rem; line-height:1.6; color:#fff; white-space:pre-line; margin:0;">
+            <p style="font-size:1rem; line-height:1.6; color:#2d2438; white-space:pre-line; margin:0; font-weight:600;">
               ${body}
             </p>
           </div>
 
-          <!-- Grade Selector -->
-          <div style="margin-bottom:16px;">
-            <div style="font-size:0.86rem; color:var(--text-muted); margin-bottom:8px;">
-              ${lang === 'hi' ? 'आप किस कक्षा में पढ़ते हैं? (कक्षा चुनें):' : 'Select your class/grade:'}
+          <!-- Grade Level Selector -->
+          <div style="margin:16px 0;">
+            <div style="font-size:0.9rem; font-weight:700; color:#5f4577; margin-bottom:8px;">
+              ${lang === 'hi' ? 'कक्षा स्तर चुनें (Grade Selection):' : 'Select Grade Level:'}
             </div>
-            <div class="ss-grade-bar">
+            <div class="ss-grade-chips">
               ${GRADES.map((g) => `
-                <button class="ss-grade-chip ${g === currentGrade ? 'active' : ''}" data-grade="${g}" type="button">
-                  ${lang === 'hi' ? 'कक्षा' : 'Class'} ${g}
+                <button class="ss-grade-btn ${g === currentGrade ? 'active' : ''}" data-grade="${g}" type="button">
+                  ${lang === 'hi' ? 'कक्षा' : 'Grade'} ${g}
                 </button>
               `).join('')}
             </div>
           </div>
 
-          <!-- Quick Navigation Cards -->
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px;">
-            <div style="background:rgba(127, 227, 196, 0.1); border:1px solid rgba(127, 227, 196, 0.3); border-radius:var(--radius-md); padding:12px;">
-              <div style="font-size:0.9rem; font-weight:700; color:var(--accent-cyan); margin-bottom:4px;">
+          <!-- Island Guide Cards -->
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px;">
+            <div class="ss-clay-card" style="padding:14px; background:#f7f1ff; border:2px solid #d4bbff;">
+              <div style="font-size:0.95rem; font-weight:800; color:#7d5fff; margin-bottom:4px;">
                 📐 ${t('zone.maths')}
               </div>
-              <p style="font-size:0.8rem; color:var(--text-secondary); margin:0;">
-                ${lang === 'hi' ? 'पश्चिम पुल पार करें: 4 गणितीय संप्रदाय।' : 'Cross west bridge: 4 maths topics.'}
+              <p style="font-size:0.82rem; color:#635274; margin:0; line-height:1.4; font-weight:500;">
+                ${lang === 'hi' ? 'पश्चिम पुल पार करें: 4 गणितीय चुनौतियाँ।' : 'Cross west bridge: 4 maths challenges.'}
               </p>
             </div>
-            <div style="background:rgba(242, 179, 90, 0.1); border:1px solid rgba(242, 179, 90, 0.3); border-radius:var(--radius-md); padding:12px;">
-              <div style="font-size:0.9rem; font-weight:700; color:var(--accent-amber); margin-bottom:4px;">
+            <div class="ss-clay-card" style="padding:14px; background:#f0fff4; border:2px solid #b7eb8f;">
+              <div style="font-size:0.95rem; font-weight:800; color:#2ed573; margin-bottom:4px;">
                 🔬 ${t('zone.science')}
               </div>
-              <p style="font-size:0.8rem; color:var(--text-secondary); margin:0;">
-                ${lang === 'hi' ? 'पूर्व पुल पार करें: 4 विज्ञान विषय।' : 'Cross east bridge: 4 science topics.'}
+              <p style="font-size:0.82rem; color:#635274; margin:0; line-height:1.4; font-weight:500;">
+                ${lang === 'hi' ? 'पूर्व पुल पार करें: 4 विज्ञान चुनौतियाँ।' : 'Cross east bridge: 4 science challenges.'}
               </p>
             </div>
           </div>
         </div>
 
-        <div class="ss-modal-footer" style="justify-content:space-between; flex-wrap:wrap; gap:10px;">
-          <button class="ss-btn-secondary" id="ss-board-progress-btn" type="button">
-            📊 ${t('progress.title')} [P]
+        <div class="ss-clay-footer" style="justify-content:space-between; flex-wrap:wrap; gap:10px;">
+          <button class="ss-chip-action" id="ss-board-progress-btn" type="button">
+            📜 ${t('progress.title')} [P]
           </button>
-          <button class="ss-btn-primary" id="ss-board-done-btn" type="button">
-            ${lang === 'hi' ? 'सीखना शुरू करें' : 'Start Exploring'}
+          <button class="ss-clay-primary-btn" id="ss-board-done-btn" type="button">
+            ${lang === 'hi' ? 'साहसिक खोज जारी रखें ➔' : 'Continue Adventure ➔'}
           </button>
         </div>
       </div>
@@ -112,7 +119,7 @@ export function createBoardModal({ container, onClose, onOpenProgress }) {
       if (onOpenProgress) onOpenProgress();
     });
 
-    modalEl.querySelectorAll('.ss-grade-chip').forEach((chip) => {
+    modalEl.querySelectorAll('.ss-grade-btn').forEach((chip) => {
       chip.addEventListener('click', () => {
         playClickSound();
         const g = parseInt(chip.getAttribute('data-grade'), 10);
@@ -124,7 +131,6 @@ export function createBoardModal({ container, onClose, onOpenProgress }) {
     container.appendChild(modalEl);
   }
 
-  // Close on Escape key
   function handleKeyDown(e) {
     if (e.key === 'Escape' && modalEl) {
       close();

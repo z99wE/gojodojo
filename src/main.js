@@ -8,14 +8,16 @@ import { createWorld } from './world/world.js';
 import { emit, on } from './engine/events.js';
 import { t, applyDom } from './i18n/index.js';
 import { loadProgress, saveProgress, flushProgress } from './save.js';
-import { getGrade, setGrade, progressKey } from './content/index.js';
+import { getGrade, progressKey } from './content/index.js';
 import { createQuizModal } from './ui/quiz.js';
 import { createProgressModal } from './ui/progress.js';
 import { createBoardModal } from './ui/board-modal.js';
 import { createHUD } from './ui/hud.js';
+import { playCoinSound } from './ui/audio.js';
 
-const INTERACT_RANGE = 2.5;
-const BG_COLOR = 0xcfe3d6;
+const INTERACT_RANGE = 2.8;
+// Dreamy South Korean Pastel Anime Sky
+const BG_COLOR = 0xfff0f5;
 
 const container = document.getElementById('app');
 const ui = document.getElementById('ui') || document.body;
@@ -27,7 +29,7 @@ const aspect = (container.clientWidth || window.innerWidth) /
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(BG_COLOR);
-scene.fog = new THREE.Fog(BG_COLOR, 30, 140);
+scene.fog = new THREE.Fog(BG_COLOR, 35, 160);
 
 const camera = new THREE.PerspectiveCamera(60, aspect, 0.1, 400);
 
@@ -35,10 +37,12 @@ const rend = createRenderer(container);
 const renderer = rend.renderer;
 const canvas = renderer.domElement;
 
-const hemi = new THREE.HemisphereLight(0xffffff, 0x556b4a, 0.9);
+// Warm pastel ambient hemisphere light
+const hemi = new THREE.HemisphereLight(0xfff5f8, 0xd4bbf9, 1.1);
 scene.add(hemi);
 
-const sun = new THREE.DirectionalLight(0xffffff, 1.4);
+// Sunny pastel directional light
+const sun = new THREE.DirectionalLight(0xfff8ee, 1.5);
 sun.position.set(30, 50, 20);
 sun.castShadow = true;
 sun.shadow.mapSize.set(2048, 2048);
@@ -53,7 +57,7 @@ const world = createWorld(scene);
 const input = createInput(canvas);
 const controller = createController(camera, input, world);
 
-// Crosshair (plain CSS, no emoji).
+// Crosshair (delicate pastel dot)
 const crosshair = document.createElement('div');
 crosshair.style.cssText = [
   'position:fixed',
@@ -63,13 +67,14 @@ crosshair.style.cssText = [
   'height:8px',
   'margin:-4px 0 0 -4px',
   'border-radius:50%',
-  'background:rgba(255,255,255,0.85)',
-  'box-shadow:0 0 2px rgba(0,0,0,0.6)',
+  'background:rgba(255,117,140,0.85)',
+  'box-shadow:0 0 4px rgba(255,255,255,0.9), 0 0 10px rgba(255,117,140,0.5)',
   'pointer-events:none',
+  'z-index:40',
 ].join(';');
 ui.appendChild(crosshair);
 
-// Pause hint, shown when desktop pointer lock is lost.
+// Pause hint overlay
 const hint = document.createElement('div');
 hint.textContent = t('app.clickToContinue');
 hint.style.cssText = [
@@ -77,15 +82,16 @@ hint.style.cssText = [
   'left:50%',
   'top:60%',
   'transform:translateX(-50%)',
-  'padding:8px 16px',
-  'background:rgba(15,31,27,0.85)',
-  'color:#f4f1e8',
-  'font:14px sans-serif',
-  'border-radius:8px',
-  'border:1px solid rgba(255,255,255,0.15)',
+  'padding:10px 20px',
+  'background:rgba(255,255,255,0.95)',
+  'color:#2d2438',
+  'font:800 15px "Baloo 2", sans-serif',
+  'border-radius:999px',
+  'border:2.5px solid #ffb7b2',
+  'box-shadow:0 8px 24px rgba(255,183,178,0.4)',
   'pointer-events:none',
   'display:none',
-  'z-index:30',
+  'z-index:150',
 ].join(';');
 ui.appendChild(hint);
 
@@ -120,7 +126,6 @@ function resumeGame() {
   showHint(false);
 }
 
-// Check if any UI dialog is currently displayed
 function isAnyModalOpen() {
   return (
     (quizModal && quizModal.isOpen()) ||
@@ -129,7 +134,6 @@ function isAnyModalOpen() {
   );
 }
 
-// Handlers when modals open or close
 function onModalOpen() {
   controller.setPaused(true);
   showHint(false);
@@ -145,7 +149,6 @@ function onModalClose() {
   }
 }
 
-// Progress saving helper
 function handleSaveProgress(stoneId, grade, result) {
   const currentProgress = loadProgress();
   const key = progressKey(stoneId, grade);
@@ -176,6 +179,9 @@ quizModal = createQuizModal({
   container: ui,
   getProgress: loadProgress,
   onSaveProgress: handleSaveProgress,
+  onReward: (score, total) => {
+    if (hud) hud.addQuizReward(score, total);
+  },
   onOpenProgress: () => {
     onModalOpen();
     progressModal.open('learner');
@@ -203,6 +209,8 @@ boardModal = createBoardModal({
 
 hud = createHUD({
   container: ui,
+  getController: () => controller,
+  getWorld: () => world,
   onOpenProgress: (tab = 'learner') => {
     onModalOpen();
     progressModal.open(tab);
@@ -213,7 +221,13 @@ hud = createHUD({
   },
 });
 
-// Event listener for stone interaction
+// Coin Pickup Sound and XP Event
+on('coin:collect', ({ id, amount }) => {
+  playCoinSound();
+  if (hud) hud.addGold(amount);
+});
+
+// Stone Interaction Event
 on('stone:interact', ({ id, zone, topic }) => {
   onModalOpen();
   if (id === 'hub-1') {
@@ -223,7 +237,7 @@ on('stone:interact', ({ id, zone, topic }) => {
   }
 });
 
-// Keyboard shortcut: P for Progress
+// Keyboard shortcut: P for Adventure Log / Progress
 window.addEventListener('keydown', (e) => {
   if ((e.key === 'p' || e.key === 'P') && !e.ctrlKey && !e.metaKey && !e.altKey) {
     if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
@@ -236,7 +250,7 @@ window.addEventListener('keydown', (e) => {
   }
 });
 
-// Pause and resume on tab visibility.
+// Pause on visibility change
 document.addEventListener('visibilitychange', () => {
   if (!started) return;
   if (document.hidden) {
@@ -248,7 +262,7 @@ document.addEventListener('visibilitychange', () => {
   }
 });
 
-// Pause and resume on pointer lock changes (desktop only).
+// Pointer lock change listener
 document.addEventListener('pointerlockchange', () => {
   if (!started || isTouch) return;
   if (document.pointerLockElement === canvas) {
@@ -266,7 +280,7 @@ canvas.addEventListener('click', () => {
   if (controller.isPaused()) requestLock();
 });
 
-// Start overlay.
+// Start button click
 startBtn.addEventListener('click', () => {
   if (startEl) startEl.style.display = 'none';
   started = true;
@@ -299,6 +313,7 @@ function frame(dt) {
   const nearestStone = findNearestStone();
   if (hud) {
     hud.setPrompt(nearestStone);
+    hud.updateRadar();
   }
 
   if (input.consumeInteract() && !controller.isPaused() && !isAnyModalOpen()) {

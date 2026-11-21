@@ -104,5 +104,9 @@ export function createController(camera, input, world) {
     return paused;
   }
 
-  return { position, update, setPaused, isPaused };
+  function getYaw() {
+    return yaw;
+  }
+
+  return { position, update, setPaused, isPaused, getYaw };
 }

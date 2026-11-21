@@ -1,18 +1,36 @@
-// Zone definitions: identity, translation key and colour palette per zone.
+// South Korean Pastel RPG Zone Definitions
 export const ZONES = {
   hub: {
     id: 'hub',
     nameKey: 'zone.hub',
-    palette: { ground: 0xe8d8b0, accent: 0xf5d28a, glow: 0xffe2a8, fog: 0xf7efe0, sky: 0xfdf6e3 },
+    palette: {
+      ground: 0xfff0f5, // Lavender blush / vanilla milk
+      accent: 0xffb7b2, // Pastel sakura coral
+      glow: 0xffd166,   // Warm pastel sunflower
+      fog: 0xfcf2f8,    // Pastel lilac fog
+      sky: 0xffeef4,    // Soft morning sunrise
+    },
   },
   maths: {
     id: 'maths',
     nameKey: 'zone.maths',
-    palette: { ground: 0xdfe9e2, accent: 0x7fe3c4, glow: 0x8e6bff, fog: 0xe6f0ff, sky: 0xdfe8ff },
+    palette: {
+      ground: 0xede7f6, // Pastel Taro Lilac
+      accent: 0xb39ddb, // Sweet lavender
+      glow: 0x70e3db,   // Pastel mint cyan
+      fog: 0xf1effc,    // Dreamy violet mist
+      sky: 0xe8eaf6,    // Periwinkle sky
+    },
   },
   science: {
     id: 'science',
     nameKey: 'zone.science',
-    palette: { ground: 0xb9d98f, accent: 0x3f8f5a, glow: 0xf2b35a, fog: 0xe8f5e0, sky: 0xd8f0e0 },
+    palette: {
+      ground: 0xe8f5e9, // Pastel matcha cream
+      accent: 0xa5d6a7, // Fresh mint leaf
+      glow: 0xffcc80,   // Pastel tangerine amber
+      fog: 0xedf7ee,    // Matcha morning dew
+      sky: 0xf1f8e9,    // Soft pastel clover
+    },
   },
 };
