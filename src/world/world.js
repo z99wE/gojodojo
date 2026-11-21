@@ -24,6 +24,12 @@ import {
   makeDistantSkyline,
   makeAsphaltBoulevard,
   makeTargetDrone,
+  makeArtDecoHotel,
+  makeLifeguardTower,
+  makeTrafficLightGantry,
+  makeViceCityStreetLamp,
+  makeViceCitySpeedboat,
+  makeBeachLoungers,
 } from './props.js';
 import {
   makePrismLab,
@@ -179,39 +185,114 @@ export function createWorld(scene) {
   hubFloor.position.y = 0.02;
   scene.add(hubFloor);
 
-  // Vice City Ocean Drive / Cyber Asphalt Boulevard in Hub
-  const boulevard = makeAsphaltBoulevard(22, 5.5);
-  boulevard.position.set(0, 0, 7.5);
-  scene.add(boulevard);
+  // -------------------------------------------------------------
+  // 1. GRAND GTA VICE CITY OCEAN DRIVE & ART DECO HOTEL ROW
+  // -------------------------------------------------------------
+  // Ocean Drive continuous dual-lane asphalt highway spanning the district
+  const oceanDrive = makeAsphaltBoulevard(96, 6.0);
+  oceanDrive.position.set(0, 0, 6.0);
+  scene.add(oceanDrive);
 
-  // Vice City Retro Pastel Sports Cars in Hub Plaza
-  const car1 = makeViceCityCar(0xff758c); // Strawberry pink
-  car1.position.set(-6, 0, 7.5);
-  car1.rotation.y = Math.PI / 4;
-  scene.add(car1);
-  cars.push({
-    id: 'car-pink',
-    name: 'Vice Cruiser (Pink)',
-    mesh: car1,
-    underglow: car1.userData.underglow,
-    position: car1.position,
-    flareTimer: 0,
-  });
-  colliders.push({ type: 'box', minX: -7.5, maxX: -4.5, minZ: 6.0, maxZ: 9.0 });
+  // Traffic Light Overhead Gantries spanning Ocean Drive
+  for (const gx of [-22, 22]) {
+    const gantry = makeTrafficLightGantry(6.0);
+    gantry.position.set(gx, 0, 6.0);
+    scene.add(gantry);
+  }
 
-  const car2 = makeViceCityCar(0x70e3db); // Pastel cyan
-  car2.position.set(6, 0, 7.5);
-  car2.rotation.y = -Math.PI / 4;
-  scene.add(car2);
-  cars.push({
-    id: 'car-cyan',
-    name: 'Vice Cruiser (Cyan)',
-    mesh: car2,
-    underglow: car2.userData.underglow,
-    position: car2.position,
-    flareTimer: 0,
+  // Cast Iron Street Lamps every 14 units along Ocean Drive
+  for (const lx of [-42, -28, -14, 0, 14, 28, 42]) {
+    const lamp = makeViceCityStreetLamp();
+    lamp.position.set(lx, 0, 2.6);
+    scene.add(lamp);
+  }
+
+  // Iconic Art Deco Hotel Row (North side of Ocean Drive)
+  const hotel1 = makeArtDecoHotel('OCEAN VIEW HOTEL', 0xffedf2, 0xff3b77);
+  hotel1.position.set(-16, 0, -14);
+  scene.add(hotel1);
+  colliders.push({ type: 'box', minX: -23, maxX: -9, minZ: -18, maxZ: -10 });
+
+  const hotel2 = makeArtDecoHotel('THE MALIBU CLUB', 0xedf7ff, 0x00f5d4);
+  hotel2.position.set(16, 0, -14);
+  scene.add(hotel2);
+  colliders.push({ type: 'box', minX: 9, maxX: 23, minZ: -18, maxZ: -10 });
+
+  const hotel3 = makeArtDecoHotel('DEACON HOTEL', 0xfffae0, 0xffa502);
+  hotel3.position.set(-34, 0, -14);
+  scene.add(hotel3);
+  colliders.push({ type: 'box', minX: -41, maxX: -27, minZ: -18, maxZ: -10 });
+
+  const hotel4 = makeArtDecoHotel('HOTEL COLON', 0xf0fff4, 0x2ed573);
+  hotel4.position.set(34, 0, -14);
+  scene.add(hotel4);
+  colliders.push({ type: 'box', minX: 27, maxX: 41, minZ: -18, maxZ: -10 });
+
+  // Ocean Beach Promenade (Golden Sand & Turquoise Sea)
+  const beachMat = new THREE.MeshStandardMaterial({ color: 0xfde047, roughness: 0.95 });
+  const beach = new THREE.Mesh(new THREE.PlaneGeometry(105, 18), beachMat);
+  beach.rotation.x = -Math.PI / 2;
+  beach.position.set(0, 0.01, 19);
+  scene.add(beach);
+
+  // Lifeguard Towers on Ocean Beach
+  const tower1 = makeLifeguardTower(0x00f5d4, 0xff3b77);
+  tower1.position.set(-20, 0, 18);
+  scene.add(tower1);
+  colliders.push({ type: 'circle', x: -20, z: 18, r: 1.5 });
+
+  const tower2 = makeLifeguardTower(0xffd166, 0x7d5fff);
+  tower2.position.set(0, 0, 18);
+  scene.add(tower2);
+  colliders.push({ type: 'circle', x: 0, z: 18, r: 1.5 });
+
+  const tower3 = makeLifeguardTower(0xff3b77, 0x00f5d4);
+  tower3.position.set(20, 0, 18);
+  scene.add(tower3);
+  colliders.push({ type: 'circle', x: 20, z: 18, r: 1.5 });
+
+  // Beach Loungers & Umbrellas
+  for (const bx of [-30, -10, 10, 30]) {
+    const lounger = makeBeachLoungers(bx % 20 === 0 ? 0xff3b77 : 0x00f5d4);
+    lounger.position.set(bx, 0, 15);
+    scene.add(lounger);
+  }
+
+  // Offshore Speedboats anchored in the ocean
+  const boat1 = makeViceCitySpeedboat(0xffffff, 0xff3b77);
+  boat1.position.set(-15, 0, 30);
+  scene.add(boat1);
+
+  const boat2 = makeViceCitySpeedboat(0x00f5d4, 0xffd166);
+  boat2.position.set(15, 0, 30);
+  scene.add(boat2);
+
+  // Active Cruising Vice City Sports Cars along Ocean Drive
+  const carColors = [
+    { name: 'Infernus (Hot Pink)', color: 0xff3b77, x: -18, z: 4.8, speed: 6.8, dir: 1 },
+    { name: 'Cheetah (Ocean Teal)', color: 0x00f5d4, x: 18, z: 7.2, speed: -6.8, dir: -1 },
+    { name: 'Banshee (Sunset Gold)', color: 0xffd166, x: -36, z: 4.8, speed: 6.0, dir: 1 },
+    { name: 'Oceanic (Vice Violet)', color: 0x7d5fff, x: 36, z: 7.2, speed: -6.0, dir: -1 },
+  ];
+
+  carColors.forEach((cfg, idx) => {
+    const carMesh = makeViceCityCar(cfg.color);
+    carMesh.position.set(cfg.x, 0, cfg.z);
+    if (cfg.dir === -1) carMesh.rotation.y = Math.PI;
+    scene.add(carMesh);
+    cars.push({
+      id: `car-${idx}`,
+      name: cfg.name,
+      mesh: carMesh,
+      underglow: carMesh.userData.underglow,
+      position: carMesh.position,
+      flareTimer: 0,
+      isCruising: true,
+      speed: cfg.speed,
+      minX: -48,
+      maxX: 48,
+    });
   });
-  colliders.push({ type: 'box', minX: 4.5, maxX: 7.5, minZ: 6.0, maxZ: 9.0 });
 
   // Korean Pastel Cyber Cafes & Buildings on Hub Edge
   const shop1 = makeKoreanStoreBuilding('수학 빵집 (Maths Cafe)', 0xffb7b2);
@@ -659,8 +740,16 @@ export function createWorld(scene) {
         }
       }
 
-      // 8. Animate Car Underglow Flares
+      // 8. Animate Cruising Vice City Traffic & Underglow Flares
       for (const car of cars) {
+        if (car.isCruising) {
+          car.position.x += car.speed * dt;
+          if (car.speed > 0 && car.position.x > car.maxX) {
+            car.position.x = car.minX;
+          } else if (car.speed < 0 && car.position.x < car.minX) {
+            car.position.x = car.maxX;
+          }
+        }
         if (car.flareTimer > 0) {
           car.flareTimer -= dt;
           if (car.underglow) {

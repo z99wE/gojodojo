@@ -876,3 +876,272 @@ export function makeTargetDrone(id, x, y, z) {
     respawnTimer: 0,
   };
 }
+
+// 25. Iconic GTA Vice City Ocean Drive Art Deco Hotel (Ocean View, Malibu, Colon, etc.)
+export function makeArtDecoHotel(name = 'OCEAN VIEW', baseColor = 0xfff0f5, neonColor = 0xff3b77) {
+  const g = new THREE.Group();
+
+  // Main 3-story Art Deco Building Body
+  const wallMat = new THREE.MeshStandardMaterial({
+    color: baseColor,
+    roughness: 0.55,
+    metalness: 0.1,
+  });
+  const body = new THREE.Mesh(new THREE.BoxGeometry(13.0, 9.5, 7.5), wallMat);
+  body.position.y = 4.75;
+  g.add(body);
+
+  // Stepped Geometric Deco Roofline Parapet
+  const roofStep1 = new THREE.Mesh(new THREE.BoxGeometry(11.5, 1.2, 7.0), wallMat);
+  roofStep1.position.y = 10.1;
+  const roofStep2 = new THREE.Mesh(new THREE.BoxGeometry(7.5, 1.0, 5.5), wallMat);
+  roofStep2.position.y = 11.2;
+
+  // Central Vertical Art Deco Fin / Pylon
+  const finMat = new THREE.MeshStandardMaterial({
+    color: neonColor,
+    roughness: 0.3,
+    metalness: 0.4,
+  });
+  const centralFin = new THREE.Mesh(new THREE.BoxGeometry(0.6, 13.5, 0.4), finMat);
+  centralFin.position.set(0, 6.8, 3.8);
+  g.add(roofStep1, roofStep2, centralFin);
+
+  // Ground Floor Portico Awning & Columns
+  const awningMat = new THREE.MeshStandardMaterial({ color: neonColor, roughness: 0.4 });
+  const awning = new THREE.Mesh(new THREE.BoxGeometry(7.0, 0.35, 2.4), awningMat);
+  awning.position.set(0, 3.2, 4.8);
+
+  const colMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.3 });
+  for (const cx of [-2.8, -0.9, 0.9, 2.8]) {
+    const col = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 3.2, 12), colMat);
+    col.position.set(cx, 1.6, 5.8);
+    g.add(col);
+  }
+  g.add(awning);
+
+  // Grand Entrance Steps & Double Glass Doors
+  const stepMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.6 });
+  const steps = new THREE.Mesh(new THREE.BoxGeometry(4.2, 0.4, 2.0), stepMat);
+  steps.position.set(0, 0.2, 4.5);
+  const doors = new THREE.Mesh(
+    new THREE.BoxGeometry(2.4, 2.4, 0.1),
+    new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.1, metalness: 0.8 })
+  );
+  doors.position.set(0, 1.4, 3.8);
+  g.add(steps, doors);
+
+  // Upper Windows and Rounded Balconies
+  const winMat = new THREE.MeshStandardMaterial({
+    color: 0x22d3ee,
+    emissive: 0x0891b2,
+    emissiveIntensity: 0.6,
+    roughness: 0.1,
+  });
+  const balcMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4 });
+
+  for (let floor = 0; floor < 2; floor++) {
+    const fy = 4.8 + floor * 2.8;
+    for (const wx of [-4.2, -2.1, 2.1, 4.2]) {
+      const win = new THREE.Mesh(new THREE.BoxGeometry(1.4, 1.6, 0.1), winMat);
+      win.position.set(wx, fy, 3.8);
+
+      const balc = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.6, 0.8), balcMat);
+      balc.position.set(wx, fy - 0.7, 4.1);
+      g.add(win, balc);
+    }
+  }
+
+  // Glowing Neon Signage Header Canvas
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 128;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#110324';
+  ctx.fillRect(0, 0, 512, 128);
+  ctx.strokeStyle = '#00f5d4';
+  ctx.lineWidth = 6;
+  ctx.strokeRect(6, 6, 500, 116);
+  ctx.fillStyle = '#ff3b77';
+  ctx.font = '900 44px "Fredoka", sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(name, 256, 64);
+
+  const signTex = new THREE.CanvasTexture(canvas);
+  const signMat = new THREE.MeshStandardMaterial({
+    map: signTex,
+    emissive: 0xffffff,
+    emissiveMap: signTex,
+    emissiveIntensity: 0.85,
+  });
+  const signMesh = new THREE.Mesh(new THREE.BoxGeometry(6.5, 1.4, 0.2), signMat);
+  signMesh.position.set(0, 11.2, 3.0);
+  g.add(signMesh);
+
+  return g;
+}
+
+// 26. Iconic Vice City Ocean Beach Wooden Lifeguard Tower
+export function makeLifeguardTower(color = 0x00f5d4, accent = 0xff3b77) {
+  const g = new THREE.Group();
+
+  const woodMat = new THREE.MeshStandardMaterial({ color, roughness: 0.65 });
+  const trimMat = new THREE.MeshStandardMaterial({ color: accent, roughness: 0.5 });
+
+  // 4 Stilt Legs
+  for (const [lx, lz] of [[-1.1, -1.1], [1.1, -1.1], [-1.1, 1.1], [1.1, 1.1]]) {
+    const stilt = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.12, 2.6, 8), trimMat);
+    stilt.position.set(lx, 1.3, lz);
+    g.add(stilt);
+  }
+
+  // Platform Deck
+  const deck = new THREE.Mesh(new THREE.BoxGeometry(2.8, 0.2, 2.8), woodMat);
+  deck.position.y = 2.6;
+  g.add(deck);
+
+  // Cabin Hut
+  const cabin = new THREE.Mesh(new THREE.BoxGeometry(2.0, 2.0, 2.0), woodMat);
+  cabin.position.y = 3.7;
+
+  // Angled Hip Roof
+  const roof = new THREE.Mesh(new THREE.ConeGeometry(2.1, 1.2, 4), trimMat);
+  roof.rotation.y = Math.PI / 4;
+  roof.position.y = 5.3;
+
+  // Access Ladder
+  const ladder = new THREE.Mesh(new THREE.BoxGeometry(0.5, 2.8, 0.1), trimMat);
+  ladder.position.set(0, 1.4, 1.45);
+  ladder.rotation.x = 0.2;
+
+  g.add(cabin, roof, ladder);
+  return g;
+}
+
+// 27. Vice City Overhead Traffic Light Gantry
+export function makeTrafficLightGantry(roadWidth = 12) {
+  const g = new THREE.Group();
+  const steelMat = new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.8, roughness: 0.3 });
+
+  // Vertical Post
+  const post = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.24, 6.0, 12), steelMat);
+  post.position.set(-roadWidth * 0.5, 3.0, 0);
+
+  // Horizontal Crossbar spanning road
+  const crossbar = new THREE.Mesh(new THREE.BoxGeometry(roadWidth + 1.0, 0.25, 0.25), steelMat);
+  crossbar.position.set(0, 5.8, 0);
+  g.add(post, crossbar);
+
+  // 2 Hanging Traffic Light Boxes
+  [-roadWidth * 0.25, roadWidth * 0.25].forEach((hx) => {
+    const box = new THREE.Mesh(new THREE.BoxGeometry(0.4, 1.1, 0.35), steelMat);
+    box.position.set(hx, 5.1, 0);
+
+    const redLens = new THREE.Mesh(
+      new THREE.SphereGeometry(0.12, 8, 8),
+      new THREE.MeshBasicMaterial({ color: 0xff0044 })
+    );
+    redLens.position.set(0, 0.32, 0.18);
+
+    const greenLens = new THREE.Mesh(
+      new THREE.SphereGeometry(0.12, 8, 8),
+      new THREE.MeshBasicMaterial({ color: 0x00f59b })
+    );
+    greenLens.position.set(0, -0.32, 0.18);
+
+    box.add(redLens, greenLens);
+    g.add(box);
+  });
+
+  return g;
+}
+
+// 28. Vice City Double-Lantern Cast Iron Street Lamp
+export function makeViceCityStreetLamp() {
+  const g = new THREE.Group();
+  const ironMat = new THREE.MeshStandardMaterial({ color: 0x1e1b29, metalness: 0.85, roughness: 0.3 });
+
+  const post = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.16, 4.2, 10), ironMat);
+  post.position.y = 2.1;
+
+  const crossArm = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.12, 0.12), ironMat);
+  crossArm.position.y = 4.0;
+  g.add(post, crossArm);
+
+  const bulbMat = new THREE.MeshStandardMaterial({
+    color: 0xfff2a3,
+    emissive: 0xfff2a3,
+    emissiveIntensity: 1.4,
+    roughness: 0.1,
+  });
+
+  [-0.7, 0.7].forEach((bx) => {
+    const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.24, 10, 10), bulbMat);
+    bulb.position.set(bx, 3.8, 0);
+    g.add(bulb);
+  });
+
+  return g;
+}
+
+// 29. Miami Vice / Vice City Offshore Speedboat
+export function makeViceCitySpeedboat(hullColor = 0xffffff, trimColor = 0xff3b77) {
+  const g = new THREE.Group();
+
+  // V-Hull
+  const hullMat = new THREE.MeshStandardMaterial({ color: hullColor, roughness: 0.3, metalness: 0.2 });
+  const hull = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.7, 5.2), hullMat);
+  hull.position.y = 0.35;
+
+  // Deck Trim
+  const trimMat = new THREE.MeshStandardMaterial({ color: trimColor, roughness: 0.4 });
+  const trim = new THREE.Mesh(new THREE.BoxGeometry(1.85, 0.15, 3.2), trimMat);
+  trim.position.set(0, 0.75, 0.4);
+
+  // Tinted Windshield
+  const glassMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.1, metalness: 0.8 });
+  const shield = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.45, 0.8), glassMat);
+  shield.position.set(0, 0.95, -0.6);
+
+  // Dual Outboard Motors
+  const motorMat = new THREE.MeshStandardMaterial({ color: 0x1f2937, metalness: 0.9 });
+  for (const mx of [-0.5, 0.5]) {
+    const motor = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.8, 0.4), motorMat);
+    motor.position.set(mx, 0.5, 2.7);
+    g.add(motor);
+  }
+
+  g.add(hull, trim, shield);
+  return g;
+}
+
+// 30. Beach Umbrella and Sun Loungers
+export function makeBeachLoungers(umbrellaColor = 0xff3b77) {
+  const g = new THREE.Group();
+
+  // Striped Beach Umbrella
+  const pole = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.04, 0.04, 2.4, 8),
+    new THREE.MeshStandardMaterial({ color: 0xffffff })
+  );
+  pole.position.set(0, 1.2, 0);
+  pole.rotation.z = 0.12;
+
+  const canopy = new THREE.Mesh(
+    new THREE.ConeGeometry(1.4, 0.7, 8),
+    new THREE.MeshStandardMaterial({ color: umbrellaColor, roughness: 0.6 })
+  );
+  canopy.position.set(0.15, 2.3, 0);
+  g.add(pole, canopy);
+
+  // 2 Sun Loungers
+  const lMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4 });
+  for (const lx of [-0.9, 0.9]) {
+    const lounger = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.2, 1.8), lMat);
+    lounger.position.set(lx, 0.1, 0.2);
+    g.add(lounger);
+  }
+
+  return g;
+}
