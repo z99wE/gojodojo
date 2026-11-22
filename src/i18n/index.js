@@ -3,7 +3,7 @@ import hi from './hi.js';
 import en from './en.js';
 
 const DICTS = { hi, en };
-const STORE_KEY = 'ss-lang';
+const STORE_KEY = 'gd-lang';
 
 // Read the saved language on load; default to Hindi.
 let current = 'hi';

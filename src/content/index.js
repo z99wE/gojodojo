@@ -13,7 +13,7 @@ export { BOARD };
 
 export const GRADES = [1, 2, 3, 4, 5, 6, 7, 8];
 
-const GRADE_KEY = 'ss-grade';
+const GRADE_KEY = 'gd-grade';
 const DEFAULT_GRADE = 8;
 
 const GRADE_FILES = {

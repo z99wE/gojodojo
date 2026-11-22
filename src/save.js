@@ -21,7 +21,7 @@ function makeDefault() {
  */
 export function loadProgress() {
   try {
-    const raw = localStorage.getItem(SAVE_KEY) || localStorage.getItem('ss-progress-v1');
+    const raw = localStorage.getItem(SAVE_KEY) || localStorage.getItem('gd-progress-v1');
     if (raw) {
       const p = JSON.parse(raw);
       if (p && p.version === 1 && p.stones && typeof p.stones === 'object') return p;
