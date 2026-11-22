@@ -126,11 +126,13 @@ test('STEM Quiz answer callback applies high-stakes boost or penalty', () => {
   assert.strictEqual(engine.player.score, 1000);
   assert.strictEqual(engine.player.shiftFeedback.type, 'perfect');
 
-  // 2. Incorrect Answer: -25% Shield, engine containment stall
+  // 2. Incorrect Answer: -25% Shield, engine containment stall, -1 life
   engine.player.shield = 100;
+  engine.player.lives = 5;
   engine.onQuizAnswer(false);
 
   assert.strictEqual(engine.player.shield, 75);
+  assert.strictEqual(engine.player.lives, 4);
   assert.ok(engine.player.stallTimer > 0, 'Engine must stall on incorrect answer');
   assert.strictEqual(engine.player.shiftFeedback.type, 'stall');
 });
@@ -289,6 +291,34 @@ test('Emergency pit repair prevents premature crash during 30+ min endurance GP'
 
   assert.ok(engine.player.shield >= 50, 'Emergency pit repair restores shield so session continues');
   assert.strictEqual(engine.player.stallTimer > 0, true);
+  assert.strictEqual(engine.player.lives, 4);
 });
+
+test('Depleting all 5 lives triggers Game Over', () => {
+  const engine = new RacingEngine();
+  engine.startRace();
+  engine.player.lives = 1;
+  engine.player.shield = 0;
+  engine.update(0.1);
+
+  assert.strictEqual(engine.player.lives, 0);
+  assert.strictEqual(engine.status, 'finished');
+  assert.strictEqual(engine.gameOverReason, 'lives');
+});
+
+test('Checkpoints enforce minimum 15 seconds of pure driving interval', () => {
+  const engine = new RacingEngine();
+  engine.startRace();
+  engine.player.distance = 500;
+  engine.timeSinceLastQuiz = 5.0; // Less than 15s
+
+  engine.update(0.1);
+  assert.strictEqual(engine.isPaused, false, 'Checkpoint must not trigger before 15 seconds have passed');
+
+  engine.timeSinceLastQuiz = 15.5; // Exceeds 15s
+  engine.update(0.1);
+  assert.strictEqual(engine.isPaused, true, 'Checkpoint must trigger once 15 seconds threshold is met');
+});
+
 
 

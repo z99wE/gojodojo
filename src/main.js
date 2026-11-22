@@ -10,7 +10,6 @@ import { PixelRenderer } from './game/pixel-renderer.js';
 import { ChiptuneAudio } from './game/chiptune-audio.js';
 import { QuizController } from './game/quiz-controller.js';
 import { VoiceInputController } from './voice/voice-input.js';
-import { ScreenReader } from './voice/screen-reader.js';
 import { AiTutor } from './ai/ai-tutor.js';
 import { loadProgress, saveProgress } from './save.js';
 import en from './i18n/en.js';
@@ -54,7 +53,6 @@ class GameApp {
     this.renderer = new PixelRenderer(this.canvas);
     this.audio = new ChiptuneAudio();
     this.aiTutor = new AiTutor();
-    this.screenReader = new ScreenReader({ lang: this.activeLang });
 
     this.quiz = new QuizController({
       grade: this.currentGrade,
@@ -88,7 +86,6 @@ class GameApp {
       audio: this.audio,
       quiz: this.quiz,
       voice: this.voiceInput,
-      screenReader: this.screenReader,
       aiTutor: this.aiTutor,
       app: this,
       handleQuizSubmit: (idx) => this.handleQuizSubmit(idx)
@@ -108,7 +105,6 @@ class GameApp {
         this.activeLang = btn.dataset.lang || 'hi';
         this.quiz.setLang(this.activeLang);
         this.voiceInput.updateLanguage(this.activeLang);
-        this.screenReader.setLang(this.activeLang);
         this.updateI18nLabels();
       });
     });
@@ -246,13 +242,25 @@ class GameApp {
       this.touchControls.classList.remove('hidden');
     }
 
-    if (this.playerNameInput && this.playerNameInput.value.trim()) {
-      this.playerName = this.playerNameInput.value.trim();
+    if (this.playerNameInput) {
+      if (this.playerNameInput.value.trim()) {
+        this.playerName = this.playerNameInput.value.trim();
+      }
+      this.playerNameInput.blur();
     }
+    if (this.customTopicInput) {
+      this.customTopicInput.blur();
+    }
+    if (document.activeElement && typeof document.activeElement.blur === 'function') {
+      document.activeElement.blur();
+    }
+    window.focus();
+    if (this.canvas) this.canvas.focus();
+
     this.engine.setPlayerProfile(this.playerName, this.selectedCharacter);
 
     this.engine.reset();
-    this.engine.trackLength = TRACK_CIRCUITS[this.currentCircuit]?.trackLength || 1200;
+    this.engine.trackLength = TRACK_CIRCUITS[this.currentCircuit]?.trackLength || 100000;
     this.engine.circuitId = this.currentCircuit;
     this.engine.startCountdown();
 
@@ -331,10 +339,22 @@ class GameApp {
 
   bindEvents() {
     window.addEventListener('keydown', (e) => {
+      // If typing in an input while start overlay or tutor drawer is open, don't capture game keys
+      const activeEl = document.activeElement;
+      const isInputFocused = activeEl === this.customTopicInput || activeEl === this.playerNameInput || activeEl?.id === 'tutor-query-input';
+      const isModalTyping = isInputFocused && (!this.startOverlay.classList.contains('hidden') || this.isTutorOpen);
+
+      if (isModalTyping) {
+        if (e.code === 'Enter' && !this.startOverlay.classList.contains('hidden')) {
+          e.preventDefault();
+          this.startGame();
+        }
+        return;
+      }
+
       // In Start overlay, Space or Enter starts
       if (!this.startOverlay.classList.contains('hidden')) {
         if (e.code === 'Space' || e.code === 'Enter') {
-          if (document.activeElement === this.customTopicInput || document.activeElement === this.playerNameInput) return; // Allow typing
           e.preventDefault();
           this.startGame();
           return;
@@ -353,10 +373,10 @@ class GameApp {
       // If Quiz is active, keys 1-4 submit option
       if (this.quiz.isActive) {
         let optIndex = -1;
-        if (e.code === 'Digit1' || e.code === 'Numpad1') optIndex = 0;
-        else if (e.code === 'Digit2' || e.code === 'Numpad2') optIndex = 1;
-        else if (e.code === 'Digit3' || e.code === 'Numpad3') optIndex = 2;
-        else if (e.code === 'Digit4' || e.code === 'Numpad4') optIndex = 3;
+        if (e.code === 'Digit1' || e.code === 'Numpad1' || e.key === '1') optIndex = 0;
+        else if (e.code === 'Digit2' || e.code === 'Numpad2' || e.key === '2') optIndex = 1;
+        else if (e.code === 'Digit3' || e.code === 'Numpad3' || e.key === '3') optIndex = 2;
+        else if (e.code === 'Digit4' || e.code === 'Numpad4' || e.key === '4') optIndex = 3;
 
         if (optIndex >= 0) {
           e.preventDefault();
@@ -366,14 +386,14 @@ class GameApp {
       }
 
       // AI Tutor Hotkey (T key)
-      if (e.code === 'KeyT') {
+      if (e.code === 'KeyT' || e.key?.toLowerCase() === 't') {
         e.preventDefault();
         this.toggleAiTutor();
         return;
       }
 
       // Pranayama / Zen Breath Hotkey (B key)
-      if (e.code === 'KeyB') {
+      if (e.code === 'KeyB' || e.key?.toLowerCase() === 'b') {
         e.preventDefault();
         if (this.engine.activateFocus()) {
           this.audio.playZenBreath();
@@ -381,32 +401,36 @@ class GameApp {
         return;
       }
 
+      const keyLower = e.key ? e.key.toLowerCase() : '';
+
       // 1. Lane UP: W, ArrowUp, L
-      if (e.code === 'ArrowUp' || e.code === 'KeyW' || e.code === 'KeyL') {
+      if (e.code === 'ArrowUp' || e.code === 'KeyW' || e.code === 'KeyL' || e.key === 'ArrowUp' || keyLower === 'w' || keyLower === 'l') {
         e.preventDefault();
         this.engine.steerLaneUp();
+        this.engine.setSteerUp(true);
       }
 
       // 2. Lane DOWN: S, ArrowDown, R
-      if (e.code === 'ArrowDown' || e.code === 'KeyS' || e.code === 'KeyR') {
+      if (e.code === 'ArrowDown' || e.code === 'KeyS' || e.code === 'KeyR' || e.key === 'ArrowDown' || keyLower === 's' || keyLower === 'r') {
         e.preventDefault();
         this.engine.steerLaneDown();
+        this.engine.setSteerDown(true);
       }
 
       // 3. Accelerate / Gas: D, ArrowRight
-      if (e.code === 'ArrowRight' || e.code === 'KeyD') {
+      if (e.code === 'ArrowRight' || e.code === 'KeyD' || e.key === 'ArrowRight' || keyLower === 'd') {
         e.preventDefault();
         this.engine.setThrottle(true);
       }
 
       // 4. Active Brake: A, ArrowLeft
-      if (e.code === 'ArrowLeft' || e.code === 'KeyA') {
+      if (e.code === 'ArrowLeft' || e.code === 'KeyA' || e.key === 'ArrowLeft' || keyLower === 'a') {
         e.preventDefault();
         this.engine.setBrake(true);
       }
 
       // Shift Up (SPACEBAR)
-      if (e.code === 'Space') {
+      if (e.code === 'Space' || e.key === ' ') {
         e.preventDefault();
         const prevGear = this.engine.player.gear;
         this.engine.shiftUp();
@@ -416,14 +440,14 @@ class GameApp {
       }
 
       // Shift Down (X or Shift)
-      if (e.code === 'KeyX' || e.code === 'ShiftLeft' || e.code === 'ShiftRight') {
+      if (e.code === 'KeyX' || e.code === 'ShiftLeft' || e.code === 'ShiftRight' || keyLower === 'x') {
         e.preventDefault();
         this.engine.shiftDown();
         this.audio.playShift('down');
       }
 
       // Nitro (N key)
-      if (e.code === 'KeyN') {
+      if (e.code === 'KeyN' || keyLower === 'n') {
         e.preventDefault();
         if (this.engine.activateNitro()) {
           this.audio.playNitro();
@@ -432,13 +456,26 @@ class GameApp {
     });
 
     window.addEventListener('keyup', (e) => {
-      if (e.code === 'ArrowRight' || e.code === 'KeyD') {
+      const keyLower = e.key ? e.key.toLowerCase() : '';
+      if (e.code === 'ArrowUp' || e.code === 'KeyW' || e.code === 'KeyL' || e.key === 'ArrowUp' || keyLower === 'w' || keyLower === 'l') {
+        this.engine.setSteerUp(false);
+      }
+      if (e.code === 'ArrowDown' || e.code === 'KeyS' || e.code === 'KeyR' || e.key === 'ArrowDown' || keyLower === 's' || keyLower === 'r') {
+        this.engine.setSteerDown(false);
+      }
+      if (e.code === 'ArrowRight' || e.code === 'KeyD' || e.key === 'ArrowRight' || keyLower === 'd') {
         this.engine.setThrottle(false);
       }
-      if (e.code === 'ArrowLeft' || e.code === 'KeyA') {
+      if (e.code === 'ArrowLeft' || e.code === 'KeyA' || e.key === 'ArrowLeft' || keyLower === 'a') {
         this.engine.setBrake(false);
       }
     });
+
+    if (this.canvas) {
+      this.canvas.addEventListener('click', () => {
+        window.focus();
+      });
+    }
 
     // Touch Buttons
     const bindTouchAction = (id, onStart, onEnd) => {
@@ -531,25 +568,32 @@ class GameApp {
     });
   }
 
-  // --- High-Legibility In-Game STEM Quiz Modal ---
+  // --- High-Legibility In-Game STEM Quiz & Science Scramble Modal ---
 
   showQuizModal(q) {
     if (!this.uiContainer) return;
 
     this.engine.pauseForPitstop();
-    this.screenReader.stop();
 
     const isHi = this.activeLang === 'hi';
-    const badgeText = isHi ? `[ पिटस्टॉप चेकपॉइंट: ${q.topicTitle} ]` : `[ PITSTOP CHECKPOINT: ${q.topicTitle} ]`;
+    const isScramble = q.type === 'scramble';
+    const badgeText = isScramble
+      ? (isHi ? `[ विज्ञान पहेली: ${q.topicTitle} ]` : `[ SCIENCE PUZZLE: ${q.topicTitle} ]`)
+      : (isHi ? `[ पिटस्टॉप चेकपॉइंट: ${q.topicTitle} ]` : `[ PITSTOP CHECKPOINT: ${q.topicTitle} ]`);
+
+    const tilesHtml = isScramble && q.scrambledTiles
+      ? `
+        <div class="scramble-tiles-rack">
+          ${q.scrambledTiles.map((letter) => `<span class="scramble-tile">${letter}</span>`).join('')}
+        </div>
+      `
+      : '';
 
     this.uiContainer.innerHTML = `
       <div id="stem-quiz-modal">
         <div class="quiz-modal-header">
           <div class="quiz-badge">${badgeText}</div>
           <div class="quiz-audio-bar">
-            <button id="quiz-btn-speak" class="quiz-helper-btn" type="button">
-              ${isHi ? 'प्रश्न सुनें (TTS)' : 'LISTEN QUESTION'}
-            </button>
             <button id="quiz-btn-voice" class="quiz-helper-btn" type="button">
               ${isHi ? 'बोलकर उत्तर दें (MIC)' : 'VOICE ANSWER (MIC)'}
             </button>
@@ -558,7 +602,9 @@ class GameApp {
 
         <div id="quiz-voice-status" class="transcription-live-bubble"></div>
 
-        <div class="quiz-question-text">${q.text}</div>
+        <div class="quiz-question-text" style="white-space: pre-line;">${q.text}</div>
+
+        ${tilesHtml}
 
         <div class="quiz-options-grid">
           ${q.options
@@ -586,15 +632,6 @@ class GameApp {
       });
     });
 
-    // Bind Screen Reader TTS
-    const btnSpeak = document.getElementById('quiz-btn-speak');
-    if (btnSpeak) {
-      btnSpeak.addEventListener('click', () => {
-        const fullReadText = `${q.text}. ${isHi ? 'विकल्प हैं:' : 'Options are:'} 1: ${q.options[0]}, 2: ${q.options[1]}, 3: ${q.options[2]}, 4: ${q.options[3]}`;
-        this.screenReader.speak(fullReadText);
-      });
-    }
-
     // Bind Voice Microphone Answer
     const btnVoice = document.getElementById('quiz-btn-voice');
     if (btnVoice) {
@@ -603,10 +640,6 @@ class GameApp {
         this.voiceInput.start();
       });
     }
-
-    // Auto-read question with screen reader if enabled
-    const autoReadText = `${q.text}`;
-    this.screenReader.speak(autoReadText);
   }
 
   handleQuizSubmit(optionIndex) {
@@ -621,9 +654,8 @@ class GameApp {
     this.audio.playQuizResult(result.isCorrect);
     this.engine.onQuizAnswer(result.isCorrect, { correctText, explain: result.explain });
 
-    // Stop active listening and speaking
+    // Stop active listening
     this.voiceInput.stop();
-    this.screenReader.stop();
 
     // Show feedback in modal with explicit mistake identification and correct answer
     const fbContainer = document.getElementById('quiz-feedback-container');
@@ -631,7 +663,7 @@ class GameApp {
       const isHi = this.activeLang === 'hi';
       const statusTitle = result.isCorrect
         ? (isHi ? '[ सही उत्तर! / CORRECT! ] +1000 अंक & सुपर टर्बो ओवरड्राइव!' : '[ CORRECT! ] +1000 PTS & SUPER TURBO OVERDRIVE!')
-        : (isHi ? `[ गलत उत्तर! / INCORRECT! ] सही उत्तर: ${correctText}` : `[ INCORRECT! ] CORRECT ANSWER: ${correctText}`);
+        : (isHi ? `[ गलत उत्तर! / INCORRECT! ] -1 जीवन (शेष: ${this.engine.player.lives}/5) | सही: ${correctText}` : `[ INCORRECT! ] -1 LIFE (REMAINING: ${this.engine.player.lives}/5) | CORRECT: ${correctText}`);
 
       fbContainer.innerHTML = `
         <div class="quiz-feedback-box ${result.isCorrect ? 'correct' : 'incorrect'}">
@@ -639,9 +671,6 @@ class GameApp {
           <span>${result.explain}</span>
         </div>
       `;
-
-      // Read out explanation with TTS
-      this.screenReader.speak(`${statusTitle}. ${result.explain}`);
     }
 
     // Record progress
@@ -652,14 +681,16 @@ class GameApp {
     };
     saveProgress(this.progress);
 
-    // Auto dismiss after 2.6s so student can absorb the explanation and mistake analysis
+    // Auto dismiss after 2.0s so student can absorb the explanation
     setTimeout(() => {
       this.quiz.dismiss();
-      this.engine.resumeFromPitstop();
+      if (this.engine.status !== 'finished') {
+        this.engine.resumeFromPitstop();
+      }
       if (this.uiContainer) {
         this.uiContainer.innerHTML = '';
       }
-    }, 2600);
+    }, 2000);
   }
 
   // --- Interactive In-Game AI STEM Tutor Drawer ---

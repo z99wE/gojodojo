@@ -84,3 +84,15 @@ test('VoiceInputController parses spoken Hindi and English numbers to option ind
   assert.strictEqual(voice.parseOptionCommand('चार'), 3);
   assert.strictEqual(voice.parseOptionCommand('what is gravity'), null);
 });
+
+test('QuizController generates Science Word Scramble puzzles with scrambled letter tiles', () => {
+  const quiz = new QuizController({ grade: 6, circuitId: 'physics', lang: 'en' });
+  quiz.nextQuestion(); // Turn 1 (curriculum question)
+  const q2 = quiz.nextQuestion(); // Turn 2 (scramble puzzle)
+
+  assert.strictEqual(q2.type, 'scramble');
+  assert.ok(Array.isArray(q2.scrambledTiles) && q2.scrambledTiles.length > 2);
+  assert.ok(typeof q2.targetWord === 'string' && q2.targetWord.length > 2);
+  assert.strictEqual(q2.options.length, 4);
+  assert.ok(q2.options.includes(q2.targetWord));
+});

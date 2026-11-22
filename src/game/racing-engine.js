@@ -70,6 +70,8 @@ export class RacingEngine {
     this.inputs = {
       throttle: false,
       brake: false,
+      steerUp: false,
+      steerDown: false,
       steerLeft: false,
       steerRight: false
     };
@@ -119,6 +121,7 @@ export class RacingEngine {
   resumeFromPitstop() {
     this.isPaused = false;
     this.status = 'racing';
+    this.timeSinceLastQuiz = 0; // Strict 15s driving interval before next quiz/puzzle
   }
 
   reset() {
@@ -132,9 +135,14 @@ export class RacingEngine {
     this.jaywalkers = [];
     this.spawnTrafficTimer = 0;
     this.spawnJaywalkerTimer = 0;
+    this.championshipDuration = 3600; // 60 minutes endurance gameplay
+    this.timeSinceLastQuiz = 0; // At least 15s before first quiz
+    this.gameOverReason = null;
 
     // Player State
     this.player = {
+      lives: 5, // 5 lives per game
+      maxLives: 5,
       gear: 1,
       rpm: REV_ZONES.IDLE,
       speed: 0, // km/h
@@ -253,6 +261,14 @@ export class RacingEngine {
 
   setSteerRight(pressed) {
     this.inputs.steerRight = Boolean(pressed);
+  }
+
+  setSteerUp(pressed) {
+    this.inputs.steerUp = Boolean(pressed);
+  }
+
+  setSteerDown(pressed) {
+    this.inputs.steerDown = Boolean(pressed);
   }
 
   steerLane(direction) {
@@ -394,12 +410,27 @@ export class RacingEngine {
 
       // Check collision
       if (Math.abs(relDist) < 4.8 && Math.abs(v.x - this.player.x) < 0.38) {
-        this.player.shield = Math.max(0, this.player.shield - 15);
-        this.player.speed = Math.max(25, this.player.speed - 30);
-        this.player.bpm = Math.min(170, this.player.bpm + 20);
-        this.triggerCrash('traffic', 0.9);
-        this.player.shiftFeedback = { text: 'TRAFFIC IMPACT! -15% SHIELD', type: 'stall', timer: 1.5 };
+        this.player.shield = Math.max(0, this.player.shield - 25);
+        this.player.score = Math.max(0, this.player.score - 150); // Score deteriorates on crash
+        this.player.speed = Math.max(20, this.player.speed - 35);
+        this.player.bpm = Math.min(170, this.player.bpm + 22);
+        this.triggerCrash('traffic', 0.95);
         this.traffic.splice(i, 1);
+
+        if (this.player.shield <= 0) {
+          this.player.lives -= 1;
+          if (this.player.lives <= 0) {
+            this.status = 'finished';
+            this.gameOverReason = 'lives';
+            this.player.hasFinished = true;
+            this.player.shiftFeedback = { text: 'GAME OVER! 5 LIVES DEPLETED', type: 'stall', timer: 5.0 };
+          } else {
+            this.player.shield = 60;
+            this.player.shiftFeedback = { text: `TRAFFIC CRASH! -1 LIFE (${this.player.lives}/5 LIVES)`, type: 'stall', timer: 2.5 };
+          }
+        } else {
+          this.player.shiftFeedback = { text: 'TRAFFIC IMPACT! -25% SHIELD & -150 PTS', type: 'stall', timer: 1.5 };
+        }
         continue;
       }
 
@@ -424,12 +455,27 @@ export class RacingEngine {
 
       // Check collision
       if (Math.abs(relDist) < 4.0 && Math.abs(w.x - this.player.x) < 0.34) {
-        this.player.shield = Math.max(0, this.player.shield - 15);
-        this.player.speed = Math.max(25, this.player.speed - 30);
+        this.player.shield = Math.max(0, this.player.shield - 20);
+        this.player.score = Math.max(0, this.player.score - 200); // Score deteriorates on pedestrian hit
+        this.player.speed = Math.max(20, this.player.speed - 30);
         this.player.bpm = Math.min(170, this.player.bpm + 22);
         this.triggerCrash('jaywalker', 0.85);
-        this.player.shiftFeedback = { text: 'PEDESTRIAN ACCIDENT! -15% SHIELD', type: 'stall', timer: 1.5 };
         this.jaywalkers.splice(i, 1);
+
+        if (this.player.shield <= 0) {
+          this.player.lives -= 1;
+          if (this.player.lives <= 0) {
+            this.status = 'finished';
+            this.gameOverReason = 'lives';
+            this.player.hasFinished = true;
+            this.player.shiftFeedback = { text: 'GAME OVER! 5 LIVES DEPLETED', type: 'stall', timer: 5.0 };
+          } else {
+            this.player.shield = 60;
+            this.player.shiftFeedback = { text: `PEDESTRIAN ACCIDENT! -1 LIFE (${this.player.lives}/5 LIVES)`, type: 'stall', timer: 2.5 };
+          }
+        } else {
+          this.player.shiftFeedback = { text: 'PEDESTRIAN IMPACT! -20% SHIELD & -200 PTS', type: 'stall', timer: 1.5 };
+        }
         continue;
       }
 
@@ -484,19 +530,33 @@ export class RacingEngine {
         timer: 2.5
       };
     } else {
-      // WRONG ANSWER: Clearly identify mistake, drop speed, cause containment stall
-      const explainSummary = answerData ? `CORRECT ANSWER: ${answerData.correctText}` : 'ENGINE STALL';
+      // WRONG ANSWER: Loses 1 Life, points deteriorate, speed drops
+      this.player.lives = Math.max(0, this.player.lives - 1);
+      this.player.score = Math.max(0, this.player.score - 300);
       this.player.shield = Math.max(0, this.player.shield - 25);
       this.player.nitro = Math.max(0, this.player.nitro - 40);
-      this.player.stallTimer = 1.8;
-      this.player.speed = Math.max(25, this.player.speed - 35);
+      this.player.stallTimer = 2.0;
+      this.player.speed = Math.max(20, this.player.speed - 40);
       this.player.bpm = Math.min(170, this.player.bpm + 25);
-      this.triggerCrash('hazard', 0.8);
-      this.player.shiftFeedback = {
-        text: `INCORRECT! ${explainSummary}`,
-        type: 'stall',
-        timer: 2.8
-      };
+      this.triggerCrash('hazard', 0.85);
+
+      const explainSummary = answerData ? `CORRECT: ${answerData.correctText}` : 'MISTAKE';
+      if (this.player.lives <= 0) {
+        this.status = 'finished';
+        this.gameOverReason = 'lives';
+        this.player.hasFinished = true;
+        this.player.shiftFeedback = {
+          text: `WRONG! ${explainSummary} | GAME OVER (0/5 LIVES)`,
+          type: 'stall',
+          timer: 5.0
+        };
+      } else {
+        this.player.shiftFeedback = {
+          text: `WRONG! -1 LIFE! (${this.player.lives}/5 REMAINING) | ${explainSummary}`,
+          type: 'stall',
+          timer: 3.5
+        };
+      }
     }
   }
 
@@ -728,11 +788,21 @@ export class RacingEngine {
     }
 
     // 5. Responsive Lateral Steering & Lane Following
+    if (this.inputs.steerUp) {
+      this.player.targetX = Math.max(-0.75, this.player.targetX - 4.5 * dt);
+      if (this.player.targetX < -0.3) this.player.lane = 0;
+      else if (this.player.targetX < 0.3) this.player.lane = 1;
+    }
+    if (this.inputs.steerDown) {
+      this.player.targetX = Math.min(0.75, this.player.targetX + 4.5 * dt);
+      if (this.player.targetX > 0.3) this.player.lane = 2;
+      else if (this.player.targetX > -0.3) this.player.lane = 1;
+    }
     if (this.inputs.steerLeft) {
-      this.player.targetX = Math.max(-1.0, this.player.targetX - 2.6 * dt);
+      this.player.targetX = Math.max(-1.0, this.player.targetX - 2.8 * dt);
     }
     if (this.inputs.steerRight) {
-      this.player.targetX = Math.min(1.0, this.player.targetX + 2.6 * dt);
+      this.player.targetX = Math.min(1.0, this.player.targetX + 2.8 * dt);
     }
 
     if (Math.abs(this.player.spinVelocity) > 0.05) {
@@ -776,22 +846,25 @@ export class RacingEngine {
       this.player.bpm += (targetBpm - this.player.bpm) * dt * 0.5;
     }
 
-    // 9. Checkpoint Triggers & Pitstop Pause
-    for (const cp of this.checkpoints) {
-      if (!cp.triggered && this.player.distance >= cp.distance) {
-        cp.triggered = true;
-        this.activeQuizCheckpoint = cp;
-        this.pauseForPitstop(); // FREEZES CAR BEHIND QUIZ MODAL
-        this.player.bpm = Math.min(165, this.player.bpm + 18);
-        break;
+    // 9. Checkpoint Triggers & Pitstop Pause (Enforcing minimum 15s driving interval)
+    this.timeSinceLastQuiz += dt;
+    if (this.timeSinceLastQuiz >= 15.0) {
+      for (const cp of this.checkpoints) {
+        if (!cp.triggered && this.player.distance >= cp.distance) {
+          cp.triggered = true;
+          this.activeQuizCheckpoint = cp;
+          this.pauseForPitstop(); // FREEZES CAR BEHIND QUIZ MODAL
+          this.player.bpm = Math.min(165, this.player.bpm + 18);
+          break;
+        }
       }
     }
 
-    // Continuous Checkpoint Generation for 30+ min gameplay
+    // Continuous Checkpoint Generation for 60-min gameplay
     const lastCp = this.checkpoints[this.checkpoints.length - 1];
     if (lastCp && this.player.distance > lastCp.distance - 200) {
       this.checkpoints.push({
-        distance: lastCp.distance + 220 + Math.floor(Math.random() * 80),
+        distance: lastCp.distance + 250 + Math.floor(Math.random() * 80),
         triggered: false
       });
     }
@@ -804,21 +877,33 @@ export class RacingEngine {
     this.updateRivalAi(dt);
     this.checkRivalCollision(dt);
 
-    // 12. Emergency Shield Pitstop Repair (Prevents premature crash, sustains 30+ min run)
+    // 12. Emergency Pit Repair & 5 Lives System
     if (this.player.shield <= 0) {
-      this.player.shield = 60;
-      this.player.speed = Math.max(30, this.player.speed * 0.5);
-      this.player.stallTimer = 1.2;
-      this.player.bpm = 85;
-      this.triggerCrash('hazard', 0.85);
-      this.player.shiftFeedback = {
-        text: 'EMERGENCY PIT REPAIR: +60% SHIELD RESTORED',
-        type: 'stall',
-        timer: 2.2
-      };
+      this.player.lives -= 1;
+      if (this.player.lives <= 0) {
+        this.status = 'finished';
+        this.gameOverReason = 'lives';
+        this.player.hasFinished = true;
+        this.player.shiftFeedback = {
+          text: 'GAME OVER! 5 LIVES DEPLETED',
+          type: 'stall',
+          timer: 5.0
+        };
+      } else {
+        this.player.shield = 60;
+        this.player.speed = Math.max(30, this.player.speed * 0.5);
+        this.player.stallTimer = 1.2;
+        this.player.bpm = 85;
+        this.triggerCrash('hazard', 0.85);
+        this.player.shiftFeedback = {
+          text: `EMERGENCY PIT REPAIR! -1 LIFE (${this.player.lives}/5 REMAINING)`,
+          type: 'stall',
+          timer: 2.5
+        };
+      }
     }
 
-    // 13. Multi-Stage Championship Progression (No abrupt finish)
+    // 13. Multi-Stage Championship Progression (No abrupt finish, 60 minutes)
     if (this.player.distance >= this.stage * 1200) {
       this.stage++;
       this.player.score += 2000;
@@ -830,20 +915,17 @@ export class RacingEngine {
       };
     }
 
-    // 14. Finish Line
-    if (!this.player.hasFinished && this.player.distance >= this.trackLength) {
+    // 14. 60-Minute Grand Prix Championship Finish
+    if (this.elapsedTime >= this.championshipDuration) {
       this.player.hasFinished = true;
-      this.player.finishTime = this.elapsedTime;
-      this.player.score += Math.max(0, Math.floor(10000 - this.elapsedTime * 70));
-    }
-
-    if (!this.rival.hasFinished && this.rival.distance >= this.trackLength) {
-      this.rival.hasFinished = true;
-      this.rival.finishTime = this.elapsedTime;
-    }
-
-    if (this.player.hasFinished && this.rival.hasFinished) {
       this.status = 'finished';
+      this.gameOverReason = 'victory_60m';
+      this.player.score += 50000;
+      this.player.shiftFeedback = {
+        text: '60-MINUTE GRAND PRIX CHAMPION! ALL STAGES CONQUERED!',
+        type: 'perfect',
+        timer: 10.0
+      };
     }
   }
 
@@ -957,6 +1039,10 @@ export class RacingEngine {
   getTelemetry() {
     const scene = this.getScene();
     return {
+      lives: this.player.lives,
+      maxLives: this.player.maxLives,
+      championshipRemaining: Math.max(0, this.championshipDuration - this.elapsedTime),
+      championshipDuration: this.championshipDuration,
       gear: this.player.gear,
       rpm: Math.round(this.player.rpm),
       speed: Math.round(this.player.speed),

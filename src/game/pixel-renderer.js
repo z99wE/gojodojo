@@ -726,74 +726,107 @@ export class PixelRenderer {
 
     // Top Status Bar
     ctx.fillStyle = '#080812';
-    ctx.fillRect(0, 0, this.width, 32);
+    ctx.fillRect(0, 0, this.width, 34);
     ctx.fillStyle = '#2a2a3e';
-    ctx.fillRect(0, 31, this.width, 1);
+    ctx.fillRect(0, 33, this.width, 1);
 
-    ctx.font = 'bold 13px "Mukta", "Share Tech Mono", sans-serif';
+    ctx.font = 'bold 12px "Mukta", "Share Tech Mono", sans-serif';
 
-    // 1. Character Name & Live Score (Prominently displayed)
+    // 1. Character Name & Live Score
     ctx.fillStyle = '#ffd166';
-    ctx.fillText(`PILOT: ${t.playerName} (${t.score} PTS)`, 12, 14);
+    ctx.fillText(`${t.playerName} (${t.score} PTS)`, 10, 14);
 
     // 2. Speedometer & RPM
     ctx.fillStyle = '#00f0ff';
-    ctx.fillText(`${t.speed} KM/H | G${t.gear}`, 12, 27);
+    ctx.fillText(`${t.speed} KM/H | G${t.gear}`, 10, 28);
 
-    // 3. Mini Track Progress Bar (Center)
-    const trackBarW = 160;
-    const trackBarX = this.width / 2 - trackBarW / 2;
+    // 3. 5 Lives System (Pure 8-Bit Pixel Blocks, 0 Emojis)
+    const currentLives = t.lives !== undefined ? t.lives : 5;
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '10px "Share Tech Mono", monospace';
+    ctx.fillText('LIVES:', 168, 14);
+    for (let i = 0; i < 5; i++) {
+      const lx = 208 + i * 11;
+      const ly = 6;
+      if (i < currentLives) {
+        ctx.fillStyle = currentLives <= 2 ? '#ff2a55' : '#00ff66';
+        ctx.fillRect(lx, ly, 8, 8);
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(lx, ly, 8, 8);
+      } else {
+        ctx.fillStyle = '#22111a';
+        ctx.fillRect(lx, ly, 8, 8);
+        ctx.strokeStyle = '#442233';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(lx, ly, 8, 8);
+      }
+    }
+
+    // 4. 60-Min Grand Prix Endurance Clock
+    const elapsedSecs = Math.floor(parseFloat(t.time) || 0);
+    const m = Math.floor(elapsedSecs / 60);
+    const s = elapsedSecs % 60;
+    const timeStr = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')} / 60:00`;
+    ctx.fillStyle = '#a8dadc';
+    ctx.font = '10px "Share Tech Mono", monospace';
+    ctx.fillText(`GP 60M: ${timeStr}`, 168, 28);
+
+    // 5. Mini Track Progress Bar (Center)
+    const trackBarW = 110;
+    const trackBarX = 310;
     ctx.fillStyle = '#1c1c28';
     ctx.fillRect(trackBarX, 10, trackBarW, 12);
     ctx.strokeStyle = '#444455';
     ctx.strokeRect(trackBarX, 10, trackBarW, 12);
 
-    const pFrac = Math.min(1.0, engine.player.distance / engine.trackLength);
+    const pFrac = Math.min(1.0, (engine.player.distance % 2400) / 2400);
     ctx.fillStyle = '#06d6a0';
     ctx.fillRect(trackBarX + pFrac * (trackBarW - 6), 11, 6, 10);
 
-    const rFrac = Math.min(1.0, engine.rival.distance / engine.trackLength);
+    const rFrac = Math.min(1.0, (engine.rival.distance % 2400) / 2400);
     ctx.fillStyle = '#e71d36';
     ctx.fillRect(trackBarX + rFrac * (trackBarW - 4), 13, 4, 6);
 
-    // 4. Scene Name
-    const sName = activeLanguage === 'hi' ? t.sceneName.hi : t.sceneName.en;
-    ctx.fillStyle = '#8899aa';
-    ctx.font = '11px "Mukta", sans-serif';
-    ctx.fillText(`SCENE: ${sName}`, 240, 27);
-
-    // 5. Anxiety Pulse BPM
-    ctx.font = 'bold 12px "Share Tech Mono", monospace';
+    // 6. Anxiety Pulse BPM
+    ctx.font = 'bold 11px "Share Tech Mono", monospace';
     const bpmColor = t.bpm > 130 ? '#ff3366' : t.bpm > 95 ? '#ffd166' : '#06d6a0';
     ctx.fillStyle = bpmColor;
-    ctx.fillText(`PULSE: ${t.bpm} BPM`, 390, 14);
+    ctx.fillText(`PULSE: ${t.bpm}`, 430, 14);
 
-    // 6. Nitro & Shield Bars
+    // 7. Scene Name
+    const sName = activeLanguage === 'hi' ? t.sceneName.hi : t.sceneName.en;
+    ctx.fillStyle = '#8899aa';
+    ctx.font = '10px "Mukta", sans-serif';
+    ctx.fillText(`${sName.slice(0, 15)}`, 430, 28);
+
+    // 8. Nitro & Shield Bars
     ctx.fillStyle = '#ffffff';
-    ctx.fillText('NITRO', 485, 14);
+    ctx.font = '10px "Share Tech Mono", monospace';
+    ctx.fillText('NITRO', 525, 14);
     ctx.fillStyle = '#222';
-    ctx.fillRect(525, 6, 45, 9);
+    ctx.fillRect(562, 6, 45, 9);
     ctx.fillStyle = '#0df';
-    ctx.fillRect(526, 7, Math.floor((t.nitro / 100) * 43), 7);
+    ctx.fillRect(563, 7, Math.floor((t.nitro / 100) * 43), 7);
 
     ctx.fillStyle = '#ffffff';
-    ctx.fillText('SHIELD', 485, 26);
+    ctx.fillText('SHIELD', 525, 27);
     ctx.fillStyle = '#222';
-    ctx.fillRect(525, 18, 45, 9);
+    ctx.fillRect(562, 19, 45, 9);
     ctx.fillStyle = t.shield > 25 ? '#06d6a0' : '#e71d36';
-    ctx.fillRect(526, 19, Math.floor((t.shield / 100) * 43), 7);
+    ctx.fillRect(563, 20, Math.floor((t.shield / 100) * 43), 7);
 
-    // 7. Distance Telemetry
+    // Bottom Telemetry Bar
     ctx.fillStyle = '#0a0a14';
-    ctx.fillRect(8, this.height - 22, 170, 18);
+    ctx.fillRect(8, this.height - 22, 180, 18);
     ctx.strokeStyle = '#00f0ff';
-    ctx.strokeRect(8, this.height - 22, 170, 18);
+    ctx.strokeRect(8, this.height - 22, 180, 18);
 
     ctx.fillStyle = '#00f0ff';
     ctx.font = '11px "Share Tech Mono", monospace';
-    ctx.fillText(`DIST: ${t.distance}m / ${engine.trackLength}m`, 14, this.height - 9);
+    ctx.fillText(`STAGE ${engine.stage || 1} | DIST: ${t.distance}m`, 14, this.height - 9);
 
-    // 8. Rival Delta
+    // Rival Delta
     ctx.fillStyle = '#0a0a14';
     ctx.fillRect(this.width - 150, this.height - 22, 142, 18);
     ctx.strokeStyle = t.leadDelta >= 0 ? '#06d6a0' : '#e71d36';
@@ -853,31 +886,48 @@ export class PixelRenderer {
 
   drawFinishBanner(engine, activeLanguage) {
     const ctx = this.ctx;
-    const isWinner = engine.player.distance >= engine.rival.distance;
+    const isLivesDepleted = engine.gameOverReason === 'lives' || engine.player.lives <= 0;
+    const is60mVictory = engine.gameOverReason === 'victory_60m';
+    const isWinner = is60mVictory || (!isLivesDepleted && engine.player.distance >= engine.rival.distance);
 
     ctx.fillStyle = 'rgba(8, 8, 16, 0.94)';
-    ctx.fillRect(80, 65, 480, 210);
+    ctx.fillRect(70, 55, 500, 230);
     ctx.strokeStyle = isWinner ? '#06d6a0' : '#e71d36';
     ctx.lineWidth = 3;
-    ctx.strokeRect(80, 65, 480, 210);
+    ctx.strokeRect(70, 55, 500, 230);
 
     ctx.fillStyle = isWinner ? '#06d6a0' : '#e71d36';
-    ctx.font = 'bold 24px "Mukta", sans-serif';
+    ctx.font = 'bold 22px "Mukta", sans-serif';
     ctx.textAlign = 'center';
 
-    const title = isWinner
-      ? (activeLanguage === 'hi' ? `विजयी! ${engine.playerName} ग्रैंड प्रिक्स चैंपियन!` : `VICTORY! ${engine.playerName} GP CHAMPION!`)
-      : (activeLanguage === 'hi' ? 'दौड़ समाप्त! शानदार प्रयास!' : 'RACE FINISHED! GREAT EFFORT!');
-    ctx.fillText(title, this.width / 2, 110);
+    let title = '';
+    if (isLivesDepleted) {
+      title = activeLanguage === 'hi'
+        ? `खेल समाप्त! सभी 5 जीवन समाप्त`
+        : `GAME OVER! 5 LIVES DEPLETED`;
+    } else if (is60mVictory) {
+      title = activeLanguage === 'hi'
+        ? `विजयी! ${engine.playerName} 60-मिनट विज्ञान चैंपियन!`
+        : `VICTORY! ${engine.playerName} 60-MIN SCIENCE CHAMPION!`;
+    } else {
+      title = isWinner
+        ? (activeLanguage === 'hi' ? `शानदार रेस! ${engine.playerName} विजेता!` : `GREAT RACE! ${engine.playerName} WINS!`)
+        : (activeLanguage === 'hi' ? 'दौड़ समाप्त! शानदार प्रयास!' : 'RACE FINISHED! GREAT EFFORT!');
+    }
+    ctx.fillText(title, this.width / 2, 98);
 
     ctx.fillStyle = '#ffffff';
-    ctx.font = '15px "Mukta", sans-serif';
-    ctx.fillText(`TIME: ${engine.elapsedTime.toFixed(2)}s | SCORE: ${engine.player.score} PTS`, this.width / 2, 145);
-    ctx.fillText(`PERFECT SHIFTS: ${engine.player.perfectShifts} | AVG PULSE: ${Math.round(engine.player.bpm)} BPM`, this.width / 2, 175);
+    ctx.font = '14px "Share Tech Mono", monospace';
+    const mins = Math.floor(engine.elapsedTime / 60);
+    const secs = Math.floor(engine.elapsedTime % 60);
+    const timeFmt = `${mins}m ${secs}s`;
+    ctx.fillText(`SURVIVED: ${timeFmt} | FINAL SCORE: ${engine.player.score} PTS`, this.width / 2, 135);
+    ctx.fillText(`LIVES: ${engine.player.lives}/5 | STAGE: ${engine.stage} | DISTANCE: ${Math.round(engine.player.distance)}m`, this.width / 2, 165);
+    ctx.fillText(`PERFECT SHIFTS: ${engine.player.perfectShifts} | AVG PULSE: ${Math.round(engine.player.bpm)} BPM`, this.width / 2, 195);
 
     ctx.fillStyle = '#ffd166';
-    ctx.font = 'bold 16px "Mukta", sans-serif';
-    ctx.fillText(activeLanguage === 'hi' ? 'फिर से खेलने के लिए SPACE दबाएं' : 'PRESS SPACEBAR TO RACE AGAIN', this.width / 2, 235);
+    ctx.font = 'bold 15px "Mukta", sans-serif';
+    ctx.fillText(activeLanguage === 'hi' ? 'फिर से खेलने के लिए SPACE दबाएं' : 'PRESS SPACEBAR TO RACE AGAIN', this.width / 2, 245);
     ctx.textAlign = 'left';
   }
 }

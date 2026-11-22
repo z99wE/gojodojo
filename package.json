@@ -8,7 +8,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "node --check src/main.js src/save.js src/flags.js src/ui/sanitize.js src/game/racing-engine.js src/game/pixel-renderer.js src/game/chiptune-audio.js src/game/quiz-controller.js src/ai/ai-tutor.js src/voice/voice-input.js src/voice/screen-reader.js",
+    "lint": "node --check src/main.js src/save.js src/flags.js src/ui/sanitize.js src/game/racing-engine.js src/game/pixel-renderer.js src/game/chiptune-audio.js src/game/quiz-controller.js src/ai/ai-tutor.js src/voice/voice-input.js",
     "test": "node --test test/*.test.js",
     "test:e2e": "vite build && node test/browser-verification.js",
     "deploy": "wrangler pages deploy dist --project-name sankhya-strike --branch main"
