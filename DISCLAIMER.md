@@ -1,6 +1,6 @@
 # Educational Disclaimer
 
-Sankhya Strike is an open-source educational game built to democratize quality STEM learning for underprivileged students across India and regional language communities.
+GojoDojo is an open-source educational game built by Codebenders to democratize quality STEM learning for underprivileged students across India and regional language communities.
 
 All learning questions, explanations, and hints are created independently for foundational conceptual mastery and do not reproduce proprietary textbook questions.
 

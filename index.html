@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#0a0520" />
-    <title>संख्या टर्बो: 8-बिट ग्रैंड प्रिक्स | Sankhya Turbo: 8-Bit GP</title>
+    <title>GojoDojo: 8-Bit STEM Grand Prix | गोजो डोजो</title>
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -12,6 +12,20 @@
     <link rel="stylesheet" href="/src/ui/styles.css" />
   </head>
   <body class="arcade-body">
+    <!-- Initial Loading Screen: GojoDojo by Codebenders -->
+    <div id="splash-loading" class="splash-screen">
+      <div class="splash-content">
+        <div class="splash-badge">[ CODEBENDERS PRESENTS ]</div>
+        <h1 class="splash-title">GojoDojo</h1>
+        <div class="splash-tagline">गोजो डोजो • 8-BIT STEM GRAND PRIX</div>
+        <div class="splash-loader-bar">
+          <div id="splash-progress" class="splash-progress-fill"></div>
+        </div>
+        <div id="splash-status" class="splash-status-text">INITIALIZING RACING ENGINE &amp; STEM CIRCUITS...</div>
+        <button id="btn-enter-dojo" class="splash-enter-btn" type="button">ENTER DOJO [SPACE / ENTER]</button>
+      </div>
+    </div>
+
     <div id="arcade-container">
       <!-- CRT Screen Bezel & Canvas -->
       <div id="crt-screen">
@@ -60,8 +74,8 @@
 
           <!-- Main Title Header -->
           <div class="garage-hero-header">
-            <h1 class="arcade-title">संख्या टर्बो: 8-बिट ग्रैंड प्रिक्स</h1>
-            <div class="arcade-sub">SANKHYA TURBO: RETRO STEM RACER • SPEED, FORMULAS & REFLEXES</div>
+            <h1 class="arcade-title">GojoDojo: 8-बिट ग्रैंड प्रिक्स</h1>
+            <div class="arcade-sub">GOJODOJO: RETRO STEM RACER • SPEED, FORMULAS &amp; REFLEXES</div>
           </div>
 
           <!-- Fast Onboarding 1-Click Launch Plinth -->

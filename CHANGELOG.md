@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to Sankhya Turbo are documented in this file.
+All notable changes to GojoDojo by Codebenders are documented in this file.
 
 ## [2.1.0] - 2026-11-21
 

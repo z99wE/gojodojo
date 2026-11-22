@@ -3,7 +3,7 @@
  * Ensures offline resilience on basic, shared mobile devices.
  */
 
-export const SAVE_KEY = 'ss-progress-v1';
+export const SAVE_KEY = 'gojodojo-progress-v1';
 const SAVE_DELAY_MS = 400;
 
 /**
@@ -21,7 +21,7 @@ function makeDefault() {
  */
 export function loadProgress() {
   try {
-    const raw = localStorage.getItem(SAVE_KEY);
+    const raw = localStorage.getItem(SAVE_KEY) || localStorage.getItem('ss-progress-v1');
     if (raw) {
       const p = JSON.parse(raw);
       if (p && p.version === 1 && p.stones && typeof p.stones === 'object') return p;

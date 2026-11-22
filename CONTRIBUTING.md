@@ -1,6 +1,6 @@
 # Contributing Guidelines
 
-Thank you for your interest in contributing to Sankhya Strike. We welcome contributions that expand educational access for students learning in regional languages.
+Thank you for your interest in contributing to GojoDojo by Codebenders. We welcome contributions that expand educational access for students learning in regional languages.
 
 ## Development Workflow
 1. Clone this repository locally.

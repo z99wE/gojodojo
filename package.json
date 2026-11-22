@@ -1,7 +1,8 @@
 {
-  "name": "sankhya-strike",
+  "name": "gojodojo",
   "version": "2.0.0",
-  "description": "8-Bit Arcade Drag & Grand Prix STEM Racer for Grades 1-8 in Hindi & English",
+  "description": "GojoDojo: 8-Bit Arcade STEM Grand Prix for Grades 1-8 in Hindi & English by Codebenders",
+  "author": "Codebenders",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,7 +12,7 @@
     "lint": "node --check src/main.js src/save.js src/flags.js src/ui/sanitize.js src/game/racing-engine.js src/game/pixel-renderer.js src/game/chiptune-audio.js src/game/quiz-controller.js src/ai/ai-tutor.js src/voice/voice-input.js",
     "test": "node --test test/*.test.js",
     "test:e2e": "vite build && node test/browser-verification.js",
-    "deploy": "wrangler pages deploy dist --project-name sankhya-strike --branch main"
+    "deploy": "wrangler pages deploy dist --project-name gojodojo --branch main"
   },
   "devDependencies": {
     "vite": "5.4.0"

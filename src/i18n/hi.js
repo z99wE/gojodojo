@@ -1,6 +1,6 @@
 // Hindi 8-Bit Racing Arcade Localization Strings (Zero Emojis)
 export default {
-  'app.title': 'संख्या टर्बो: 8-बिट ग्रैंड प्रिक्स',
+  'app.title': 'गोजो डोजो: 8-बिट ग्रैंड प्रिक्स',
   'app.start': 'दौड़ प्रारंभ करें',
   'app.clickToContinue': 'आगे बढ़ने के लिए स्क्रीन पर क्लिक करें या स्पेस दबाएँ',
   'app.lang': 'English',

@@ -241,6 +241,14 @@ export class QuizController {
       const promptHi = `अक्षरों को सुलझाकर सही वैज्ञानिक शब्द चुनें:\nसंकेत: ${puzzle.hint.hi || puzzle.hint.en}`;
       const promptEn = `Unscramble the tiles to identify the science term:\nHint: ${puzzle.hint.en}`;
 
+      this.rawSource = {
+        type: 'scramble',
+        puzzle,
+        scrambledTiles,
+        shuffled,
+        correctIdx
+      };
+
       this.currentQuestion = {
         type: 'scramble',
         topicTitle: this.lang === 'hi' ? titleHi : titleEn,
@@ -277,6 +285,12 @@ export class QuizController {
 
     const q = fullTopic.questions[Math.floor(Math.random() * fullTopic.questions.length)];
 
+    this.rawSource = {
+      type: 'quiz',
+      fullTopic,
+      q
+    };
+
     this.currentQuestion = {
       type: 'quiz',
       topicTitle: fullTopic.title[this.lang] || fullTopic.title.en,
@@ -290,6 +304,43 @@ export class QuizController {
 
     this.isActive = true;
     this.answered = false;
+    return this.currentQuestion;
+  }
+
+  /**
+   * Seamlessly switches the language of the currently active question.
+   * @param {string} targetLang 'hi' | 'en'
+   * @returns {object|null}
+   */
+  switchLanguage(targetLang) {
+    this.lang = targetLang === 'en' ? 'en' : 'hi';
+    if (!this.currentQuestion || !this.rawSource) return this.currentQuestion;
+
+    if (this.rawSource.type === 'scramble') {
+      const p = this.rawSource.puzzle;
+      const titleHi = `विज्ञान शब्द पहेली (SCIENCE SCRAMBLE): ${p.word.length} अक्षर`;
+      const titleEn = `SCIENCE WORD SCRAMBLE: ${p.word.length} LETTERS`;
+      const promptHi = `अक्षरों को सुलझाकर सही वैज्ञानिक शब्द चुनें:\nसंकेत: ${p.hint.hi || p.hint.en}`;
+      const promptEn = `Unscramble the tiles to identify the science term:\nHint: ${p.hint.en}`;
+
+      this.currentQuestion.topicTitle = this.lang === 'hi' ? titleHi : titleEn;
+      this.currentQuestion.text = this.lang === 'hi' ? promptHi : promptEn;
+      this.currentQuestion.hint = p.hint[this.lang] || p.hint.en;
+      this.currentQuestion.explain = p.explain[this.lang] || p.explain.en;
+      return this.currentQuestion;
+    }
+
+    if (this.rawSource.type === 'quiz') {
+      const ft = this.rawSource.fullTopic;
+      const q = this.rawSource.q;
+      this.currentQuestion.topicTitle = ft.title[this.lang] || ft.title.en;
+      this.currentQuestion.text = q.text[this.lang] || q.text.en;
+      this.currentQuestion.options = q.options.map((opt) => opt[this.lang] || opt.en);
+      this.currentQuestion.hint = q.hint[this.lang] || q.hint.en;
+      this.currentQuestion.explain = q.explain[this.lang] || q.explain.en;
+      return this.currentQuestion;
+    }
+
     return this.currentQuestion;
   }
 

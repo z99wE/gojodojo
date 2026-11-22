@@ -1,6 +1,6 @@
 # Feature Flag Rollout Strategy
 
-This document describes the rollout lifecycle and progressive activation gates for features in Sankhya Turbo 8-Bit Grand Prix.
+This document describes the rollout lifecycle and progressive activation gates for features in GojoDojo 8-Bit Grand Prix by Codebenders.
 
 ## Active Flags
 1. `retro8BitMode`: Enables the 8-bit retro arcade drag racing engine, custom canvas pixel renderer, and CRT scanlines.

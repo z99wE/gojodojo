@@ -740,7 +740,7 @@ export class RacingEngine {
 
       const gearCfg = GEAR_CONFIG[this.player.gear - 1];
       let maxSpeedForGear = gearCfg.maxSpeed;
-      let accelFactor = gearCfg.ratio * 22.0;
+      let accelFactor = gearCfg.ratio * 26.0;
 
       if (this.player.isNitroActive) {
         maxSpeedForGear += 70;
@@ -754,10 +754,10 @@ export class RacingEngine {
         this.player.bpm = Math.min(160, this.player.bpm + 12 * dt);
       }
 
-      // Auto-Shift Transmission Assist
+      // Auto-Shift Transmission Assist (Ensures intuitive acceleration if player forgets to shift)
       if (this.inputs.throttle && this.player.rpm >= REV_ZONES.GREEN_MAX && this.player.gear < GEAR_CONFIG.length) {
         this.player.overrevTimer += dt;
-        if (this.player.overrevTimer > 0.4) {
+        if (this.player.overrevTimer > 0.35) {
           this.player.overrevTimer = 0;
           this.player.gear++;
           this.player.rpm = Math.max(GEAR_CONFIG[this.player.gear - 1].minRpm, Math.floor(this.player.rpm * 0.68));
@@ -773,7 +773,7 @@ export class RacingEngine {
         this.player.speed = Math.max(0, this.player.speed - 95 * dt);
         this.player.rpm = Math.max(REV_ZONES.IDLE, this.player.rpm - 4000 * dt);
       } else if (isThrottling) {
-        const rpmGain = (REV_ZONES.REDLINE - this.player.rpm) * dt * (this.player.isNitroActive ? 3.0 : 2.0);
+        const rpmGain = (REV_ZONES.REDLINE - this.player.rpm) * dt * (this.player.isNitroActive ? 3.2 : 2.2);
         this.player.rpm = Math.min(REV_ZONES.REDLINE, this.player.rpm + rpmGain);
 
         if (this.player.speed < maxSpeedForGear) {
@@ -789,20 +789,20 @@ export class RacingEngine {
 
     // 5. Responsive Lateral Steering & Lane Following
     if (this.inputs.steerUp) {
-      this.player.targetX = Math.max(-0.75, this.player.targetX - 4.5 * dt);
+      this.player.targetX = Math.max(-0.75, this.player.targetX - 6.5 * dt);
       if (this.player.targetX < -0.3) this.player.lane = 0;
       else if (this.player.targetX < 0.3) this.player.lane = 1;
     }
     if (this.inputs.steerDown) {
-      this.player.targetX = Math.min(0.75, this.player.targetX + 4.5 * dt);
+      this.player.targetX = Math.min(0.75, this.player.targetX + 6.5 * dt);
       if (this.player.targetX > 0.3) this.player.lane = 2;
       else if (this.player.targetX > -0.3) this.player.lane = 1;
     }
     if (this.inputs.steerLeft) {
-      this.player.targetX = Math.max(-1.0, this.player.targetX - 2.8 * dt);
+      this.player.targetX = Math.max(-1.0, this.player.targetX - 3.5 * dt);
     }
     if (this.inputs.steerRight) {
-      this.player.targetX = Math.min(1.0, this.player.targetX + 2.8 * dt);
+      this.player.targetX = Math.min(1.0, this.player.targetX + 3.5 * dt);
     }
 
     if (Math.abs(this.player.spinVelocity) > 0.05) {
@@ -811,7 +811,7 @@ export class RacingEngine {
     }
 
     const laneDiff = this.player.targetX - this.player.x;
-    this.player.x += laneDiff * Math.min(1.0, 16.0 * dt);
+    this.player.x += laneDiff * Math.min(1.0, 22.0 * dt);
     this.player.x = Math.max(-1.85, Math.min(1.85, this.player.x));
 
     // Roadside Guardrail Hit

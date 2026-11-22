@@ -1,11 +1,11 @@
 # Security Policy
 
 ## Supported Versions
-Only the latest release branch of Sankhya Strike receives active security patches.
+Only the latest release branch of GojoDojo receives active security patches.
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 1.0.x   | :white_check_mark: |
+| Version | Supported |
+| ------- | --------- |
+| 2.0.x   | YES       |
 
 ## Reporting Vulnerabilities
 If you discover a security issue or unexpected data exposure, please open a private report or contact the maintainers directly. Do not file public issue tickets for sensitive disclosures.

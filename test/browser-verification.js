@@ -104,6 +104,8 @@ async function run() {
   const clickStart = await send('Runtime.evaluate', {
     expression: `
       (() => {
+        const splash = document.getElementById('splash-loading');
+        if (splash) splash.classList.add('hidden');
         const btn = document.getElementById('start-btn');
         if (!btn) return { error: 'start-btn not found' };
         btn.click();
@@ -122,7 +124,7 @@ async function run() {
       (() => {
         const canvas = document.getElementById('game-canvas');
         const startModal = document.getElementById('start');
-        const app = window.__SANKHYA__;
+        const app = window.__GOJODOJO__;
         const engine = app?.engine;
         const quiz = app?.quiz;
         return {
@@ -155,7 +157,7 @@ async function run() {
   const shiftCheck = await send('Runtime.evaluate', {
     expression: `
       (() => {
-        const engine = window.__SANKHYA__?.engine;
+        const engine = window.__GOJODOJO__?.engine;
         engine.status = 'racing';
         engine.player.rpm = 6400; // Inside green sweet spot (5800-7000)
         engine.shiftUp();
@@ -181,7 +183,7 @@ async function run() {
   const steerCheck = await send('Runtime.evaluate', {
     expression: `
       (() => {
-        const engine = window.__SANKHYA__?.engine;
+        const engine = window.__GOJODOJO__?.engine;
         engine.steerLane(1);
         return { lane: engine.player.lane };
       })()
@@ -198,7 +200,7 @@ async function run() {
   const nitroCheck = await send('Runtime.evaluate', {
     expression: `
       (() => {
-        const engine = window.__SANKHYA__?.engine;
+        const engine = window.__GOJODOJO__?.engine;
         engine.player.nitro = 60;
         const activated = engine.activateNitro();
         return {
@@ -220,7 +222,7 @@ async function run() {
   const quizCheck = await send('Runtime.evaluate', {
     expression: `
       (() => {
-        const app = window.__SANKHYA__;
+        const app = window.__GOJODOJO__;
         const q = app.quiz.nextQuestion();
         const correctIndex = q.correctIndex;
         // Submit correct answer
@@ -248,7 +250,7 @@ async function run() {
   const distanceCheck = await send('Runtime.evaluate', {
     expression: `
       (() => {
-        const engine = window.__SANKHYA__?.engine;
+        const engine = window.__GOJODOJO__?.engine;
         return {
           playerDist: engine.player.distance,
           rivalDist: engine.rival.distance,

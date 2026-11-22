@@ -1,5 +1,5 @@
 /**
- * Sankhya Turbo - Feature Flag Engine
+ * GojoDojo - Feature Flag Engine by Codebenders
  * Controls gradual rollouts for 8-bit racing mechanics, chiptune audio, and STEM quizzes.
  */
 

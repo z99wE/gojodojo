@@ -1,6 +1,6 @@
 // English 8-Bit Racing Arcade Localization Strings (Zero Emojis)
 export default {
-  'app.title': 'Sankhya Turbo: 8-Bit Grand Prix',
+  'app.title': 'GojoDojo: 8-Bit Grand Prix',
   'app.start': 'START RACE',
   'app.clickToContinue': 'Click or press Spacebar to proceed',
   'app.lang': 'हिंदी',

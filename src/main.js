@@ -1,7 +1,8 @@
 /**
- * @fileoverview Main Game Coordinator for Sankhya Turbo 8-Bit Grand Prix.
+ * @fileoverview Main Game Coordinator for GojoDojo 8-Bit Grand Prix.
+ * Built by Codebenders for Ace Builders Hackathon 2026.
  * Orchestrates vehicle physics, free lateral steering, off-road collisions,
- * procedural chiptune audio, speech-to-text voice input, screen reader TTS,
+ * procedural chiptune audio, speech-to-text voice input,
  * in-browser AI STEM Pit Crew doubt solver, and exam anxiety management.
  */
 
@@ -79,8 +80,8 @@ class GameApp {
     this.bindEvents();
     this.updateI18nLabels();
 
-    // Global testing hook
-    window.__SANKHYA__ = {
+    // Global testing hooks
+    window.__GOJODOJO__ = {
       engine: this.engine,
       renderer: this.renderer,
       audio: this.audio,
@@ -228,9 +229,59 @@ class GameApp {
       });
     }
 
-    // Initialize Interactive Garage Preview
+    // Initialize Interactive Garage Preview & GojoDojo Splash Screen
     this.initGaragePreview();
     this.updateGarageBadge();
+    this.initSplash();
+  }
+
+  initSplash() {
+    const splash = document.getElementById('splash-loading');
+    if (!splash) return;
+    const progress = document.getElementById('splash-progress');
+    const status = document.getElementById('splash-status');
+    const enterBtn = document.getElementById('btn-enter-dojo');
+
+    const steps = [
+      { pct: '25%', text: 'LOADING 8-BIT RACING ENGINE...' },
+      { pct: '60%', text: 'SYNTHESIZING CHIPTUNE AUDIO...' },
+      { pct: '85%', text: 'PREPARING STEM CIRCUITS & PUZZLES...' },
+      { pct: '100%', text: 'GOJODOJO READY!' }
+    ];
+
+    let stepIdx = 0;
+    const interval = setInterval(() => {
+      stepIdx++;
+      if (stepIdx < steps.length) {
+        if (progress) progress.style.width = steps[stepIdx].pct;
+        if (status) status.textContent = steps[stepIdx].text;
+      } else {
+        clearInterval(interval);
+      }
+    }, 250);
+
+    const dismissSplash = () => {
+      clearInterval(interval);
+      if (splash && !splash.classList.contains('hidden')) {
+        splash.classList.add('hidden');
+      }
+    };
+
+    if (enterBtn) {
+      enterBtn.addEventListener('click', dismissSplash);
+    }
+
+    // Auto-dismiss after 1.2s to smoothly reveal garage
+    setTimeout(dismissSplash, 1200);
+
+    window.addEventListener('keydown', (e) => {
+      if (splash && !splash.classList.contains('hidden')) {
+        if (e.code === 'Space' || e.code === 'Enter') {
+          e.preventDefault();
+          dismissSplash();
+        }
+      }
+    });
   }
 
   toggleAudioMute() {
@@ -534,8 +585,14 @@ class GameApp {
         }
       }
 
-      // If Quiz is active, keys 1-4 submit option
+      // If Quiz is active, keys 1-4 submit option, L key toggles Hindi/English
       if (this.quiz.isActive) {
+        if (e.code === 'KeyL' || keyLower === 'l') {
+          e.preventDefault();
+          this.toggleQuizLanguage();
+          return;
+        }
+
         let optIndex = -1;
         if (e.code === 'Digit1' || e.code === 'Numpad1' || e.key === '1') optIndex = 0;
         else if (e.code === 'Digit2' || e.code === 'Numpad2' || e.key === '2') optIndex = 1;
@@ -765,6 +822,9 @@ class GameApp {
         <div class="quiz-modal-header">
           <div class="quiz-badge">${badgeText}</div>
           <div class="quiz-audio-bar">
+            <button id="quiz-btn-lang" class="quiz-helper-btn lang-toggle" type="button">
+              ${isHi ? 'ENGLISH [EN / L]' : 'हिंदी [HI / L]'}
+            </button>
             <button id="quiz-btn-voice" class="quiz-helper-btn" type="button">
               ${isHi ? 'बोलकर उत्तर दें (MIC)' : 'VOICE ANSWER (MIC)'}
             </button>
@@ -810,6 +870,25 @@ class GameApp {
         this.activeVoiceTarget = 'quiz';
         this.voiceInput.start();
       });
+    }
+
+    // Bind Quick Language Switch in Quiz
+    const btnQuizLang = document.getElementById('quiz-btn-lang');
+    if (btnQuizLang) {
+      btnQuizLang.addEventListener('click', () => {
+        this.toggleQuizLanguage();
+      });
+    }
+  }
+
+  toggleQuizLanguage() {
+    const nextLang = this.activeLang === 'hi' ? 'en' : 'hi';
+    this.activeLang = nextLang;
+    this.quiz.switchLanguage(nextLang);
+    this.voiceInput.updateLanguage(nextLang);
+    this.updateI18nLabels();
+    if (this.quiz.currentQuestion) {
+      this.showQuizModal(this.quiz.currentQuestion);
     }
   }
 
