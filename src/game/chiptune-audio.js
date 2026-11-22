@@ -43,6 +43,11 @@ export class ChiptuneAudio {
       }
       this.stopBgm();
     } else {
+      if (this.engineGain) {
+        this.engineGain.gain.setValueAtTime(0.05, this.ctx ? this.ctx.currentTime : 0);
+      } else {
+        this.startEngine();
+      }
       this.startBgm();
     }
     return this.muted;

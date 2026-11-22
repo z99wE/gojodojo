@@ -192,11 +192,24 @@ class GameApp {
       });
     }
 
-    // Audio Toggle Button
+    // Audio Toggle Buttons (Garage, In-Game HUD, and Mobile Touch)
     if (this.audioBtn) {
       this.audioBtn.addEventListener('click', () => {
-        const isMuted = this.audio.toggleMute();
-        this.audioBtn.textContent = isMuted ? 'AUDIO: OFF' : 'AUDIO: ON';
+        this.toggleAudioMute();
+      });
+    }
+
+    const inGameAudioBtn = document.getElementById('btn-in-game-audio');
+    if (inGameAudioBtn) {
+      inGameAudioBtn.addEventListener('click', () => {
+        this.toggleAudioMute();
+      });
+    }
+
+    const touchMuteBtn = document.getElementById('btn-touch-mute');
+    if (touchMuteBtn) {
+      touchMuteBtn.addEventListener('click', () => {
+        this.toggleAudioMute();
       });
     }
 
@@ -218,6 +231,29 @@ class GameApp {
     // Initialize Interactive Garage Preview
     this.initGaragePreview();
     this.updateGarageBadge();
+  }
+
+  toggleAudioMute() {
+    const isMuted = this.audio.toggleMute();
+    if (this.audioBtn) {
+      this.audioBtn.textContent = isMuted ? 'AUDIO: OFF' : 'AUDIO: ON';
+    }
+    const inGameAudioBtn = document.getElementById('btn-in-game-audio');
+    if (inGameAudioBtn) {
+      inGameAudioBtn.textContent = isMuted ? 'AUDIO: OFF [M]' : 'AUDIO: ON [M]';
+      inGameAudioBtn.classList.toggle('muted', isMuted);
+    }
+    const touchMuteBtn = document.getElementById('btn-touch-mute');
+    if (touchMuteBtn) {
+      touchMuteBtn.textContent = isMuted ? 'AUDIO: OFF [M]' : 'AUDIO: ON [M]';
+      touchMuteBtn.classList.toggle('muted', isMuted);
+    }
+    if (this.engine) {
+      this.engine.shiftFeedback = isMuted ? 'AUDIO MUTED [M]' : 'AUDIO ACTIVE [M]';
+      this.engine.shiftFeedbackType = isMuted ? 'bogged' : 'perfect';
+      this.engine.shiftFeedbackTimer = 1.2;
+    }
+    return isMuted;
   }
 
   updateGarageBadge() {
@@ -526,6 +562,13 @@ class GameApp {
         if (this.engine.activateFocus()) {
           this.audio.playZenBreath();
         }
+        return;
+      }
+
+      // Audio Mute Toggle Hotkey (M key)
+      if (e.code === 'KeyM' || e.key?.toLowerCase() === 'm') {
+        e.preventDefault();
+        this.toggleAudioMute();
         return;
       }
 

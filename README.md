@@ -213,6 +213,7 @@ Students in high-stakes testing environments frequently freeze under pressure. S
 | **Super Nitro** | `N` | `NITRO [N]` | Consume 25% nitro for a $350+$ KM/H hyper-speed surge |
 | **Zen Breath** | `B` | `ZEN [B]` | Activate bullet-time slow motion and vagus nerve pulse reset |
 | **AI Pit Tutor** | `T` | `TUTOR [T]` | Open on-device AI STEM doubt solver |
+| **Audio Mute** | `M` | `AUDIO [M]` / `[AUDIO: ON]` | Toggle sound effects & engine synth mute on/off |
 | **Answer Quiz** | `1`, `2`, `3`, `4` | Click Option | Select answer in pitstop radio checkpoint |
 | **Voice Microphone** | Click `[MIC]` | Tap `[MIC]` | Speak custom learning topic or say answer option |
 
