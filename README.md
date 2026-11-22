@@ -374,4 +374,4 @@ All 33 unit tests pass cleanly:
 
 ## 11. License & Ethics Commitment
 
-Open-source under the MIT License. Created by team **Codebenders** for Ace Builders Hackathon 2026, dedicated to providing free, high-performance, culturally grounded STEM learning for underprivileged students in regional-language schools across India.
+Open-source under the MIT License. Created by S Chakraborty, dedicated to providing free, high-performance, culturally grounded STEM learning for underprivileged students in regional-language schools across India.
