@@ -1,3 +1,16 @@
+```text
+  ██████╗   ██████╗      ██╗  ██████╗  ██████╗    ██████╗      ██╗  ██████╗ 
+ ██╔════╝  ██╔═══██╗     ██║ ██╔═══██╗ ██╔══██╗  ██╔═══██╗     ██║ ██╔═══██╗
+ ██║  ███╗ ██║   ██║     ██║ ██║   ██║ ██║  ██║  ██║   ██║     ██║ ██║   ██║
+ ██║   ██║ ██║   ██║██   ██║ ██║   ██║ ██║  ██║  ██║   ██║██   ██║ ██║   ██║
+ ╚██████╔╝ ╚██████╔╝╚█████╔╝ ╚██████╔╝ ██████╔╝  ╚██████╔╝╚█████╔╝ ╚██████╔╝
+  ╚═════╝   ╚═════╝  ╚════╝   ╚═════╝  ╚═════╝    ╚═════╝  ╚════╝   ╚═════╝ 
++-----------------------------------------------------------------------------+
+|                CODEBENDERS PRESENTS : 8-BIT STEM GRAND PRIX                 |
+|          NCERT & STATE BOARD CLASSES 1-8 • HINDI & ENGLISH OFF-LINE         |
++-----------------------------------------------------------------------------+
+```
+
 # GojoDojo: 8-Bit Grand Prix (गोजो डोजो: 8-बिट ग्रैंड प्रिक्स)
 
 ### The Last-Mile STEM Tutor for Regional-Language Schools
@@ -321,39 +334,40 @@ npx wrangler pages deploy dist --project-name gojodojo --branch main
 
 All 33 unit tests pass cleanly:
 ```
-✔ Sanitize HTML prevents script injection and dangerous attributes
-✔ Feature flag engine correctly checks configured flags
-✔ Progress state initializes with safe defaults and zero personal data
-✔ Progress persistence saves and flushes properly to localStorage
-✔ Curriculum index covers grades 1 to 8 with comprehensive STEM topics
-✔ Topic lookup by stoneId resolves correctly
-✔ i18n catalogs have 1:1 matching keys between English and Hindi
-✔ i18n catalogs contain strictly 0 emoji characters
-✔ RacingEngine initializes with default player and rival state
-✔ Shift Up in Green Zone triggers Perfect Shift and awards Nitro
-✔ Shift Up in Yellow Zone bogs down the engine
-✔ Shift Up beyond Redline triggers Late Shift feedback
-✔ Downshifting rev-matches up and updates gear
-✔ Nitro activation consumes 25% nitro and triggers overdrive
-✔ Steering lane adjusts lane within 0 to 2 bounds
-✔ STEM Quiz answer callback applies high-stakes boost or penalty
-✔ Physics simulation advances player and rival distances over time
-✔ Manual throttle accelerates and active brake decelerates the vehicle
-✔ Rival vehicle collision causes shield damage and screen impact crunch
-✔ Anxiety BPM model increases under stress and calms with Zen breath
-✔ Player profile and dynamic day-to-night scene transitions
-✔ Pitstop pause freezes racing engine and resumes cleanly
-✔ Steering lane up and down responds immediately and smoothly
-✔ Car color customization updates primary and secondary hues
-✔ Emergency pit repair prevents premature crash during 30+ min endurance GP
-✔ Depleting all 5 lives triggers Game Over
-✔ Checkpoints enforce minimum 15 seconds of pure driving interval
-✔ QuizController generates grade-appropriate STEM questions for all classes
-✔ QuizController handles answer submission, streak, and history
-✔ AiTutor explains STEM concepts and provides anxiety advice in Hindi and English
-✔ QuizController dynamically synthesizes customized quiz questions for user-selected topics
-✔ VoiceInputController parses spoken Hindi and English numbers to option indices
-✔ QuizController generates Science Word Scramble puzzles with scrambled letter tiles
+[PASS] Sanitize HTML prevents script injection and dangerous attributes
+[PASS] Feature flag engine correctly checks configured flags
+[PASS] Progress state initializes with safe defaults and zero personal data
+[PASS] Progress persistence saves and flushes properly to localStorage
+[PASS] Curriculum index covers grades 1 to 8 with comprehensive STEM topics
+[PASS] Topic lookup by stoneId resolves correctly
+[PASS] i18n catalogs have 1:1 matching keys between English and Hindi
+[PASS] i18n catalogs contain strictly 0 emoji characters
+[PASS] RacingEngine initializes with default player and rival state
+[PASS] Shift Up in Green Zone triggers Perfect Shift and awards Nitro
+[PASS] Shift Up in Yellow Zone bogs down the engine
+[PASS] Shift Up beyond Redline triggers Late Shift feedback
+[PASS] Downshifting rev-matches up and updates gear
+[PASS] Nitro activation consumes 25% nitro and triggers overdrive
+[PASS] Steering lane adjusts lane within 0 to 2 bounds
+[PASS] STEM Quiz answer callback applies high-stakes boost or penalty
+[PASS] Physics simulation advances player and rival distances over time
+[PASS] Manual throttle accelerates and active brake decelerates the vehicle
+[PASS] Rival vehicle collision causes shield damage and screen impact crunch
+[PASS] Anxiety BPM model increases under stress and calms with Zen breath
+[PASS] Player profile and dynamic day-to-night scene transitions
+[PASS] Pitstop pause freezes racing engine and resumes cleanly
+[PASS] Steering lane up and down responds immediately and smoothly
+[PASS] Car color customization updates primary and secondary hues
+[PASS] Emergency pit repair prevents premature crash during 30+ min endurance GP
+[PASS] Depleting all 5 lives triggers Game Over
+[PASS] Checkpoints enforce minimum 15 seconds of pure driving interval
+[PASS] QuizController generates grade-appropriate STEM questions for all classes
+[PASS] QuizController handles answer submission, streak, and history
+[PASS] AiTutor explains STEM concepts and provides anxiety advice in Hindi and English
+[PASS] QuizController dynamically synthesizes customized quiz questions for user-selected topics
+[PASS] VoiceInputController parses spoken Hindi and English numbers to option indices
+[PASS] QuizController generates Science Word Scramble puzzles with scrambled letter tiles
+[PASS] QuizController guarantees unique questions across session with zero duplicates
 ```
 
 ---
