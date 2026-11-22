@@ -149,6 +149,7 @@ class GameApp {
       this.playerNameInput.addEventListener('input', (e) => {
         this.playerName = e.target.value.trim() || 'ARYABHATA';
         this.engine.setPlayerProfile(this.playerName, this.selectedCharacter);
+        this.updateGarageBadge();
       });
     }
 
@@ -160,6 +161,7 @@ class GameApp {
         btn.classList.add('active');
         this.selectedCharacter = btn.dataset.char || 'Velocity Ace';
         this.engine.setPlayerProfile(this.playerName, this.selectedCharacter);
+        this.updateGarageBadge();
       });
     });
 
@@ -198,12 +200,129 @@ class GameApp {
       });
     }
 
-    // Start Race Button
+    // Start Race Button (Primary)
     if (this.startBtn) {
       this.startBtn.addEventListener('click', () => {
         this.startGame();
       });
     }
+
+    // Start Race Button (Secondary Bottom Plinth)
+    const secondaryStartBtn = document.getElementById('start-btn-secondary');
+    if (secondaryStartBtn) {
+      secondaryStartBtn.addEventListener('click', () => {
+        this.startGame();
+      });
+    }
+
+    // Initialize Interactive Garage Preview
+    this.initGaragePreview();
+    this.updateGarageBadge();
+  }
+
+  updateGarageBadge() {
+    const badge = document.getElementById('garage-pilot-badge');
+    if (badge) {
+      const name = this.playerName || 'ARYABHATA';
+      const char = this.selectedCharacter || 'Velocity Ace';
+      badge.textContent = `PILOT: ${name.toUpperCase()} • ${char.toUpperCase()}`;
+    }
+  }
+
+  initGaragePreview() {
+    const canvas = document.getElementById('garage-car-preview');
+    if (!canvas || !canvas.getContext) return;
+    const ctx = canvas.getContext('2d');
+    let wheelAngle = 0;
+
+    const render = () => {
+      if (this.startOverlay && this.startOverlay.classList.contains('hidden')) {
+        return;
+      }
+      ctx.imageSmoothingEnabled = false;
+      ctx.fillStyle = '#060410';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Road background strip
+      ctx.fillStyle = '#171329';
+      ctx.fillRect(0, 48, canvas.width, 26);
+      ctx.fillStyle = '#262040';
+      ctx.fillRect(0, 47, canvas.width, 2);
+
+      // Dashed lane marker
+      wheelAngle = (wheelAngle + 0.12) % (Math.PI * 2);
+      const dashOffset = (performance.now() * 0.08) % 36;
+      ctx.fillStyle = '#ffe600';
+      for (let rx = -dashOffset; rx < canvas.width; rx += 36) {
+        ctx.fillRect(rx, 58, 18, 3);
+      }
+
+      // Draw 8-Bit Pixel Car
+      const primaryColor = this.engine.player?.carColor || '#00f0ff';
+      const secondaryColor = this.engine.player?.carSecondaryColor || '#005577';
+      const x = 55;
+      const y = 36;
+      const bob = Math.sin(wheelAngle * 2) > 0.6 ? 1 : 0;
+      const cy = y - 10 + bob;
+
+      // Drop Shadow
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+      ctx.fillRect(x + 4, y + 10, 88, 8);
+
+      // Nitro exhaust glow
+      const flameLen = 12 + Math.floor(Math.sin(performance.now() * 0.02) * 6 + 6);
+      ctx.fillStyle = '#00f0ff';
+      ctx.fillRect(x - flameLen, cy + 9, flameLen, 5);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(x - flameLen + 4, cy + 10, flameLen - 6, 2);
+
+      // Chassis
+      ctx.fillStyle = primaryColor;
+      ctx.fillRect(x + 8, cy + 6, 76, 14);
+
+      // Cockpit / Roof
+      ctx.fillStyle = secondaryColor;
+      ctx.fillRect(x + 24, cy - 2, 40, 9);
+
+      // Windshield
+      ctx.fillStyle = '#a8dadc';
+      ctx.fillRect(x + 36, cy, 20, 6);
+
+      // Front Wedge
+      ctx.fillStyle = primaryColor;
+      ctx.fillRect(x + 84, cy + 10, 8, 10);
+
+      // Rear Spoiler
+      ctx.fillStyle = secondaryColor;
+      ctx.fillRect(x + 4, cy - 4, 8, 11);
+      ctx.fillRect(x + 2, cy - 6, 12, 4);
+
+      // Wheels
+      ctx.fillStyle = '#111116';
+      ctx.fillRect(x + 16, cy + 16, 16, 9);
+      ctx.fillRect(x + 64, cy + 16, 16, 9);
+
+      // Rims
+      ctx.fillStyle = '#e5e5e5';
+      const rimOff = Math.sin(wheelAngle) > 0 ? 4 : 2;
+      ctx.fillRect(x + 20 + rimOff, cy + 18, 4, 5);
+      ctx.fillRect(x + 68 + rimOff, cy + 18, 4, 5);
+
+      // Headlight
+      ctx.fillStyle = '#ffe600';
+      ctx.fillRect(x + 90, cy + 11, 4, 4);
+
+      // Tail light
+      ctx.fillStyle = '#ff0055';
+      ctx.fillRect(x + 4, cy + 7, 4, 4);
+
+      this.garageAnimId = requestAnimationFrame(render);
+    };
+
+    if (this.garageAnimId) {
+      cancelAnimationFrame(this.garageAnimId);
+    }
+    this.garageAnimId = requestAnimationFrame(render);
   }
 
   updateI18nLabels() {
@@ -223,7 +342,11 @@ class GameApp {
       }
     }
     if (this.startBtn) {
-      this.startBtn.textContent = t['app.start'];
+      this.startBtn.textContent = this.activeLang === 'hi' ? 'रेस शुरू करें [ENTER / SPACE]' : 'START RACE [ENTER / SPACE]';
+    }
+    const secondaryStartBtn = document.getElementById('start-btn-secondary');
+    if (secondaryStartBtn) {
+      secondaryStartBtn.textContent = this.activeLang === 'hi' ? 'रेस शुरू करें [ENTER / SPACE]' : 'START RACE [ENTER / SPACE]';
     }
     if (this.btnVoiceTopic) {
       this.btnVoiceTopic.textContent = this.activeLang === 'hi' ? 'बोलकर चुनें (MIC)' : 'SPEAK TOPIC (MIC)';
@@ -231,6 +354,11 @@ class GameApp {
   }
 
   startGame() {
+    if (this.garageAnimId) {
+      cancelAnimationFrame(this.garageAnimId);
+      this.garageAnimId = null;
+    }
+
     this.audio.resume();
     this.audio.startEngine();
 

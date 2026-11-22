@@ -93,6 +93,12 @@ async function run() {
   // Wait 1.5s for page script execution
   await new Promise((resolve) => setTimeout(resolve, 1500));
 
+  // 0. Capture Garage Home Screen
+  console.log('Capturing Garage Home Onboarding Screen...');
+  const garageShot = await send('Page.captureScreenshot', { format: 'png' });
+  fs.writeFileSync(path.join(process.cwd(), 'screenshot-garage-home.png'), Buffer.from(garageShot.data, 'base64'));
+  console.log('Saved garage screenshot to screenshot-garage-home.png');
+
   // 1. Click Start Race Button
   console.log('Testing Start Race Button Click...');
   const clickStart = await send('Runtime.evaluate', {

@@ -39,122 +39,168 @@
       <!-- Start / Garage Menu Overlay -->
       <div id="start" class="overlay">
         <div class="arcade-card">
-          <div class="arcade-header-tag">[ 60-MIN STEM GP | 5 LIVES CHAMPIONSHIP ]</div>
-          <h1 class="arcade-title">संख्या टर्बो: 8-बिट ग्रैंड प्रिक्स</h1>
-          <div class="arcade-sub">SANKHYA TURBO: RETRO STEM RACER</div>
-
-          <!-- Language Selector at the beginning -->
-          <div class="topic-study-section">
-            <label class="selector-label">भाषा का चयन करें / CHOOSE LANGUAGE:</label>
-            <div id="lang-selector-top" class="chip-group" style="margin-top: 4px;">
-              <button id="top-lang-hi" class="chip-btn active" type="button" data-lang="hi">हिंदी (HINDI)</button>
-              <button id="top-lang-en" class="chip-btn" type="button" data-lang="en">ENGLISH</button>
+          <!-- Top Utility & Mode Bar -->
+          <div class="garage-top-bar">
+            <div class="garage-tag-group">
+              <span class="arcade-header-tag">[ 60-MIN STEM GP ]</span>
+              <span class="arcade-tag-sub">[ 5 LIVES ]</span>
+              <span class="arcade-tag-sub">[ 8-BIT RETRO ]</span>
+            </div>
+            <div class="garage-top-controls">
+              <div id="lang-selector-top" class="chip-group lang-chip-group">
+                <button id="top-lang-hi" class="chip-btn active" type="button" data-lang="hi">हिंदी (HI)</button>
+                <button id="top-lang-en" class="chip-btn" type="button" data-lang="en">ENGLISH (EN)</button>
+              </div>
+              <button id="audio-btn" class="arcade-quick-btn" type="button">AUDIO: ON</button>
+              <button id="lang-btn" class="arcade-quick-btn" style="display:none;" type="button">LANG: EN/HI</button>
             </div>
           </div>
 
-          <!-- Character & Pilot Selection -->
-          <div class="topic-study-section">
-            <label class="selector-label" for="player-name-input">खिलाड़ी का नाम / PILOT NAME:</label>
-            <div class="topic-input-row">
-              <input type="text" id="player-name-input" class="arcade-text-input" placeholder="अपना नाम लिखें (उदा: Aryabhata, Kalpana, Raman...)" value="ARYABHATA" />
-            </div>
-            <div id="character-selector" class="chip-group" style="margin-top: 6px;">
-              <button class="chip-btn active" data-char="Velocity Ace">Velocity Ace (गति नायक)</button>
-              <button class="chip-btn" data-char="Quantum Racer">Quantum Racer (क्वांटम चालक)</button>
-              <button class="chip-btn" data-char="Cosmo Pilot">Cosmo Pilot (ब्रह्मांडीय)</button>
-              <button class="chip-btn" data-char="Aero Striker">Aero Striker (वायु योद्धा)</button>
+          <!-- Main Title Header -->
+          <div class="garage-hero-header">
+            <h1 class="arcade-title">संख्या टर्बो: 8-बिट ग्रैंड प्रिक्स</h1>
+            <div class="arcade-sub">SANKHYA TURBO: RETRO STEM RACER • SPEED, FORMULAS & REFLEXES</div>
+          </div>
+
+          <!-- Fast Onboarding 1-Click Launch Plinth -->
+          <div class="hero-launch-plinth">
+            <button id="start-btn" class="arcade-start-btn hero-pulse" type="button">
+              START RACE [ENTER / SPACE]
+            </button>
+            <div class="quick-play-status">
+              [ त्वरित शुरुआत / FAST PLAY: CLASS 5 • PHYSICS • VELOCITY ACE • 5 LIVES • 60-MIN GP ]
             </div>
           </div>
 
-          <!-- Car Color Selection -->
-          <div class="topic-study-section">
-            <label class="selector-label">कार का रंग / CAR COLOR:</label>
-            <div id="car-color-selector" class="chip-group" style="margin-top: 6px;">
-              <button class="chip-btn active" data-color="#00f0ff">CYBER CYAN</button>
-              <button class="chip-btn" data-color="#00ff66">NEO LIME</button>
-              <button class="chip-btn" data-color="#ffe600">TURBO GOLD</button>
-              <button class="chip-btn" data-color="#ff2a55">CRIMSON RED</button>
-              <button class="chip-btn" data-color="#ff007f">SYNTH MAGENTA</button>
+          <!-- Fast 3-Step Micro Action Rules -->
+          <div class="fast-rules-strip">
+            <div class="fast-rule-card">
+              <div class="rule-badge">[1. STEER & DODGE]</div>
+              <div class="rule-keys">W (UP) / S (DOWN)</div>
+              <div class="rule-desc">Dodge oncoming traffic & road pedestrians (-1 life on hit)</div>
+            </div>
+            <div class="fast-rule-card">
+              <div class="rule-badge">[2. TACHOMETER BOOST]</div>
+              <div class="rule-keys">SPACEBAR [SHIFT]</div>
+              <div class="rule-desc">Shift up in green RPM zone to unleash Super Nitro</div>
+            </div>
+            <div class="fast-rule-card">
+              <div class="rule-badge">[3. SOLVE & SURVIVE]</div>
+              <div class="rule-keys">5 LIVES • 60-MIN GP</div>
+              <div class="rule-desc">Answer STEM radio checkpoints & word scrambles</div>
             </div>
           </div>
 
-          <!-- Study Angle: What do you want to learn today? -->
-          <div class="topic-study-section">
-            <label class="selector-label" for="custom-topic-input">आज आप क्या सीखना चाहते हैं? / WHAT DO YOU WANT TO STUDY?</label>
-            <div class="topic-input-row">
-              <input type="text" id="custom-topic-input" class="arcade-text-input" placeholder="उदा: घर्षण, प्रकाश संश्लेषण, Fractions, Newton's Laws..." />
-              <button id="btn-voice-topic" class="arcade-mic-btn" type="button">बोलकर चुनें (MIC)</button>
+          <!-- Garage Customizer: 2-Column Responsive Split -->
+          <div class="garage-customizer-grid">
+            <!-- Left Column: Pilot & 8-Bit Machine -->
+            <div class="garage-col topic-study-section">
+              <div class="garage-col-title">[ PILOT & MACHINE / चालक और वाहन ]</div>
+              
+              <!-- 8-Bit Pixel Car Live Preview Stage -->
+              <div class="garage-car-stage">
+                <canvas id="garage-car-preview" width="240" height="74" class="garage-preview-canvas"></canvas>
+                <div id="garage-pilot-badge" class="garage-preview-badge">PILOT: ARYABHATA • VELOCITY ACE</div>
+              </div>
+
+              <label class="selector-label" for="player-name-input">PILOT NAME (चालक का नाम):</label>
+              <div class="topic-input-row">
+                <input type="text" id="player-name-input" class="arcade-text-input" placeholder="Type Pilot Name (उदा: Aryabhata, Raman...)" value="ARYABHATA" />
+              </div>
+
+              <label class="selector-label" style="margin-top: 4px;">ARCHETYPE (चालक शैली):</label>
+              <div id="character-selector" class="chip-group">
+                <button class="chip-btn active" data-char="Velocity Ace">Velocity Ace (गति नायक)</button>
+                <button class="chip-btn" data-char="Quantum Racer">Quantum Racer (क्वांटम)</button>
+                <button class="chip-btn" data-char="Cosmo Pilot">Cosmo Pilot (ब्रह्मांडीय)</button>
+                <button class="chip-btn" data-char="Aero Striker">Aero Striker (वायु योद्धा)</button>
+              </div>
+
+              <label class="selector-label" style="margin-top: 4px;">CAR PAINT (कार का रंग):</label>
+              <div id="car-color-selector" class="chip-group">
+                <button class="chip-btn color-chip active" data-color="#00f0ff">CYBER CYAN</button>
+                <button class="chip-btn color-chip" data-color="#00ff66">NEO LIME</button>
+                <button class="chip-btn color-chip" data-color="#ffe600">TURBO GOLD</button>
+                <button class="chip-btn color-chip" data-color="#ff2a55">CRIMSON RED</button>
+                <button class="chip-btn color-chip" data-color="#ff007f">SYNTH MAGENTA</button>
+              </div>
             </div>
-            <div id="topic-voice-feedback" class="transcription-live-bubble"></div>
+
+            <!-- Right Column: Mission, Class & Circuit -->
+            <div class="garage-col topic-study-section">
+              <div class="garage-col-title">[ MISSION & CIRCUIT / कक्षा और ट्रैक ]</div>
+
+              <!-- Grade Selector (Class 1 - 8) -->
+              <label class="selector-label">CLASS STANDARD (कक्षा मानक):</label>
+              <div id="grade-selector" class="chip-group">
+                <button class="chip-btn" data-grade="1">G1</button>
+                <button class="chip-btn" data-grade="2">G2</button>
+                <button class="chip-btn" data-grade="3">G3</button>
+                <button class="chip-btn" data-grade="4">G4</button>
+                <button class="chip-btn active" data-grade="5">G5</button>
+                <button class="chip-btn" data-grade="6">G6</button>
+                <button class="chip-btn" data-grade="7">G7</button>
+                <button class="chip-btn" data-grade="8">G8</button>
+              </div>
+
+              <!-- Subject Circuit Selector -->
+              <label class="selector-label" style="margin-top: 4px;">CIRCUIT (सर्किट विषय):</label>
+              <div id="circuit-selector" class="chip-group circuit-group">
+                <button class="chip-btn circuit-btn active" data-circuit="physics">PHYSICS VELOCITY</button>
+                <button class="chip-btn circuit-btn" data-circuit="chemistry">CHEMISTRY REACTOR</button>
+                <button class="chip-btn circuit-btn" data-circuit="biology">BIOLOGY BIO-SPRINT</button>
+                <button class="chip-btn circuit-btn" data-circuit="maths">MATHS MATRIX 500</button>
+              </div>
+
+              <!-- Study Angle / Custom Topic with Voice Mic -->
+              <label class="selector-label" style="margin-top: 4px;" for="custom-topic-input">WHAT DO YOU WANT TO STUDY? / आज क्या सीखना है? (OPTIONAL):</label>
+              <div class="topic-input-row">
+                <input type="text" id="custom-topic-input" class="arcade-text-input" placeholder="उदा: घर्षण, प्रकाश संश्लेषण, Fractions, Newton's Laws..." />
+                <button id="btn-voice-topic" class="arcade-mic-btn" type="button">बोलकर चुनें (MIC)</button>
+              </div>
+              <div id="topic-voice-feedback" class="transcription-live-bubble"></div>
+            </div>
           </div>
 
-          <!-- Grade Selector (Class 1 - 8) -->
-          <div class="selector-section">
-            <label class="selector-label">कक्षा मानक / CLASS STANDARD:</label>
-            <div id="grade-selector" class="chip-group">
-              <button class="chip-btn" data-grade="1">G1</button>
-              <button class="chip-btn" data-grade="2">G2</button>
-              <button class="chip-btn" data-grade="3">G3</button>
-              <button class="chip-btn" data-grade="4">G4</button>
-              <button class="chip-btn active" data-grade="5">G5</button>
-              <button class="chip-btn" data-grade="6">G6</button>
-              <button class="chip-btn" data-grade="7">G7</button>
-              <button class="chip-btn" data-grade="8">G8</button>
-            </div>
-          </div>
-
-          <!-- Grand Prix Track Circuit Selector -->
-          <div class="selector-section">
-            <label class="selector-label">सर्किट विषय / SUBJECT CIRCUIT:</label>
-            <div id="circuit-selector" class="chip-group circuit-group">
-              <button class="chip-btn circuit-btn active" data-circuit="physics">PHYSICS VELOCITY</button>
-              <button class="chip-btn circuit-btn" data-circuit="chemistry">CHEMISTRY REACTOR</button>
-              <button class="chip-btn circuit-btn" data-circuit="biology">BIOLOGY BIO-SPRINT</button>
-              <button class="chip-btn circuit-btn" data-circuit="maths">MATHS MATRIX 500</button>
-            </div>
-          </div>
-
-          <!-- Controls Quick Reference -->
+          <!-- Controls Quick Reference Bar (Compact Monospace Legend) -->
           <div class="controls-guide">
             <div class="guide-item">
-              <span class="guide-key">UP / W / L</span>
-              <span class="guide-desc">Switch Lane UP (Dodge Oncoming Traffic & Jaywalkers!)</span>
+              <span class="guide-key">W / UP</span>
+              <span class="guide-desc">Lane Up (Dodge Traffic)</span>
             </div>
             <div class="guide-item">
-              <span class="guide-key">DOWN / S / R</span>
-              <span class="guide-desc">Switch Lane DOWN (Dodge Hazards & Pedestrians!)</span>
+              <span class="guide-key">S / DOWN</span>
+              <span class="guide-desc">Lane Down (Dodge Hazards)</span>
             </div>
             <div class="guide-item">
-              <span class="guide-key">RIGHT / D</span>
-              <span class="guide-desc">Accelerate (Gas) - Hold to surge forward</span>
+              <span class="guide-key">D / RIGHT</span>
+              <span class="guide-desc">Gas Accelerate</span>
             </div>
             <div class="guide-item">
-              <span class="guide-key">LEFT / A</span>
-              <span class="guide-desc">Active Brake - Slow down, illuminate brake lights</span>
+              <span class="guide-key">A / LEFT</span>
+              <span class="guide-desc">Active Brake</span>
             </div>
             <div class="guide-item">
               <span class="guide-key">SPACEBAR</span>
-              <span class="guide-desc">Shift Up (Green sweet spot on Tachometer for Boost!)</span>
+              <span class="guide-desc">Shift Up (Green RPM)</span>
             </div>
             <div class="guide-item">
               <span class="guide-key">N KEY</span>
-              <span class="guide-desc">Super Nitro Overdrive (350+ KM/H Speed Surge)</span>
+              <span class="guide-desc">Super Nitro (350+ KM/H)</span>
             </div>
             <div class="guide-item">
               <span class="guide-key">B KEY</span>
-              <span class="guide-desc">Pranayama Zen Breath (Bullet-Time Calm Focus & Vagus Reset)</span>
+              <span class="guide-desc">Zen Breath (Calm Focus)</span>
             </div>
             <div class="guide-item">
               <span class="guide-key">T KEY</span>
-              <span class="guide-desc">AI Pit Crew Tutor (Ask Doubts & Concept Explanations)</span>
+              <span class="guide-desc">AI Pit Crew Tutor</span>
             </div>
           </div>
 
-          <!-- Controls Buttons -->
+          <!-- Secondary Bottom Action Bar -->
           <div class="arcade-action-bar">
-            <button id="lang-btn" class="arcade-secondary-btn" type="button">LANG: EN/HI</button>
-            <button id="audio-btn" class="arcade-secondary-btn" type="button">AUDIO: ON</button>
-            <button id="start-btn" class="arcade-start-btn" type="button">START RACE</button>
+            <button id="start-btn-secondary" class="arcade-start-btn" type="button">START RACE [SPACE / ENTER]</button>
           </div>
         </div>
       </div>
