@@ -826,14 +826,128 @@ export class PixelRenderer {
     ctx.font = '11px "Share Tech Mono", monospace';
     ctx.fillText(`STAGE ${engine.stage || 1} | DIST: ${t.distance}m`, 14, this.height - 9);
 
-    // Rival Delta
-    ctx.fillStyle = '#0a0a14';
-    ctx.fillRect(this.width - 150, this.height - 22, 142, 18);
-    ctx.strokeStyle = t.leadDelta >= 0 ? '#06d6a0' : '#e71d36';
-    ctx.strokeRect(this.width - 150, this.height - 22, 142, 18);
+    // Bottom-Right GPS Radar Navigation Minimap
+    this.drawBottomRightNavRadar(ctx, engine, t, activeLanguage);
+  }
 
+  drawBottomRightNavRadar(ctx, engine, t, activeLanguage) {
+    const rx = this.width - 165;
+    const ry = this.height - 78;
+    const rw = 157;
+    const rh = 70;
+
+    // Dark cyber radar background
+    ctx.fillStyle = 'rgba(6, 4, 18, 0.94)';
+    ctx.fillRect(rx, ry, rw, rh);
+    ctx.strokeStyle = '#00f0ff';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(rx, ry, rw, rh);
+
+    // Decorative corner brackets
+    ctx.fillStyle = '#ffe600';
+    ctx.fillRect(rx, ry, 4, 2);
+    ctx.fillRect(rx, ry, 2, 4);
+    ctx.fillRect(rx + rw - 4, ry, 4, 2);
+    ctx.fillRect(rx + rw - 2, ry, 2, 4);
+    ctx.fillRect(rx, ry + rh - 2, 4, 2);
+    ctx.fillRect(rx, ry + rh - 4, 2, 4);
+    ctx.fillRect(rx + rw - 4, ry + rh - 2, 4, 2);
+    ctx.fillRect(rx + rw - 2, ry + rh - 4, 2, 4);
+
+    // Header Title
+    ctx.fillStyle = '#00f0ff';
+    ctx.font = 'bold 9px "Share Tech Mono", monospace';
+    ctx.fillText('GPS NAV RADAR', rx + 6, ry + 11);
+
+    // Circuit progress tag
+    const circPct = Math.min(100, Math.floor(((engine.player.distance % 2400) / 2400) * 100));
+    ctx.fillStyle = '#ffd166';
+    ctx.textAlign = 'right';
+    ctx.fillText(`${circPct}%`, rx + rw - 6, ry + 11);
+    ctx.textAlign = 'left';
+
+    // Radar Track Area (3 lanes)
+    const trackX = rx + 6;
+    const trackY = ry + 15;
+    const trackW = rw - 12;
+    const trackH = 34;
+
+    ctx.fillStyle = '#110d24';
+    ctx.fillRect(trackX, trackY, trackW, trackH);
+    ctx.strokeStyle = '#29204a';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(trackX, trackY, trackW, trackH);
+
+    // Draw 3 lane divider lines
+    ctx.strokeStyle = '#3d3066';
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath();
+    ctx.moveTo(trackX, trackY + 11);
+    ctx.lineTo(trackX + trackW, trackY + 11);
+    ctx.moveTo(trackX, trackY + 23);
+    ctx.lineTo(trackX + trackW, trackY + 23);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Lane Y coordinates in radar
+    const laneYMap = [trackY + 6, trackY + 17, trackY + 28];
+
+    // Pulsing Radar scanline effect
+    const scanX = trackX + ((performance.now() * 0.06) % trackW);
+    ctx.fillStyle = 'rgba(0, 240, 255, 0.15)';
+    ctx.fillRect(scanX, trackY, 2, trackH);
+
+    // Player Pip: Cyan Blip
+    const playerRadarX = trackX + 35;
+    const playerLane = Math.max(0, Math.min(2, engine.player.lane));
+    const playerY = laneYMap[playerLane];
+
+    // Draw Player marker
+    ctx.fillStyle = '#00f0ff';
+    ctx.fillRect(playerRadarX, playerY - 3, 7, 6);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(playerRadarX + 2, playerY - 1, 3, 2);
+
+    // Rival Pip: Red Blip relative to player
+    const relRivalDist = engine.rival.distance - engine.player.distance; // meters
+    const rivalRadarX = playerRadarX + (relRivalDist / 3.0);
+    const rivalLane = Math.max(0, Math.min(2, engine.rival.lane || 1));
+    if (rivalRadarX >= trackX && rivalRadarX <= trackX + trackW - 6) {
+      ctx.fillStyle = '#ff2a55';
+      ctx.fillRect(rivalRadarX, laneYMap[rivalLane] - 3, 6, 6);
+    }
+
+    // Traffic Obstacles Pips
+    if (engine.traffic && engine.traffic.length > 0) {
+      ctx.fillStyle = '#ff9900';
+      for (const v of engine.traffic) {
+        const relV = v.distance - engine.player.distance;
+        const vRadarX = playerRadarX + (relV / 3.0);
+        if (vRadarX >= trackX && vRadarX <= trackX + trackW - 4) {
+          const vLane = Math.max(0, Math.min(2, v.lane || 0));
+          ctx.fillRect(vRadarX, laneYMap[vLane] - 2, 4, 4);
+        }
+      }
+    }
+
+    // Upcoming Pitstop Checkpoint Pip (Yellow Indicator)
+    const distToPit = t.distToPit || 120;
+    const pitRadarX = playerRadarX + (distToPit / 3.0);
+    if (pitRadarX >= trackX && pitRadarX <= trackX + trackW - 4) {
+      ctx.fillStyle = '#ffe600';
+      ctx.fillRect(pitRadarX, trackY + 2, 3, trackH - 4);
+    }
+
+    // Bottom Telemetry Stats inside Radar
     ctx.fillStyle = t.leadDelta >= 0 ? '#06d6a0' : '#e71d36';
-    ctx.fillText(t.leadDelta >= 0 ? `LEAD: +${t.leadDelta}m` : `BEHIND: ${t.leadDelta}m`, this.width - 142, this.height - 9);
+    ctx.font = '9px "Share Tech Mono", monospace';
+    const leadStr = t.leadDelta >= 0 ? `+${t.leadDelta}m` : `${t.leadDelta}m`;
+    ctx.fillText(`RIV:${leadStr}`, rx + 6, ry + rh - 6);
+
+    ctx.fillStyle = '#a8dadc';
+    ctx.textAlign = 'right';
+    ctx.fillText(`PIT:~${distToPit}m`, rx + rw - 6, ry + rh - 6);
+    ctx.textAlign = 'left';
   }
 
   drawAnxietyAndFocusEffects(engine) {

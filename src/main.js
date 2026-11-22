@@ -645,14 +645,23 @@ class GameApp {
         this.engine.setSteerDown(true);
       }
 
-      // 3. Accelerate / Gas: D, ArrowRight
-      if (e.code === 'ArrowRight' || e.code === 'KeyD' || e.key === 'ArrowRight' || keyLower === 'd') {
+      // 3. Accelerate / Gas: Key A (Shift + A for Super Fast Overdrive!), D, ArrowRight
+      if (e.code === 'KeyA' || keyLower === 'a') {
+        e.preventDefault();
+        this.engine.setThrottle(true);
+        if (e.shiftKey) {
+          this.engine.setSuperFast(true);
+          if (!this.engine.player.isNitroActive) {
+            this.audio.playNitro();
+          }
+        }
+      } else if (e.code === 'ArrowRight' || e.code === 'KeyD' || e.key === 'ArrowRight' || keyLower === 'd') {
         e.preventDefault();
         this.engine.setThrottle(true);
       }
 
-      // 4. Active Brake: A, ArrowLeft
-      if (e.code === 'ArrowLeft' || e.code === 'KeyA' || e.key === 'ArrowLeft' || keyLower === 'a') {
+      // 4. Active Brake: Z key, ArrowLeft
+      if (e.code === 'ArrowLeft' || e.code === 'KeyZ' || e.key === 'ArrowLeft' || keyLower === 'z') {
         e.preventDefault();
         this.engine.setBrake(true);
       }
@@ -691,10 +700,14 @@ class GameApp {
       if (e.code === 'ArrowDown' || e.code === 'KeyS' || e.code === 'KeyR' || e.key === 'ArrowDown' || keyLower === 's' || keyLower === 'r') {
         this.engine.setSteerDown(false);
       }
+      if (e.code === 'KeyA' || keyLower === 'a') {
+        this.engine.setThrottle(false);
+        this.engine.setSuperFast(false);
+      }
       if (e.code === 'ArrowRight' || e.code === 'KeyD' || e.key === 'ArrowRight' || keyLower === 'd') {
         this.engine.setThrottle(false);
       }
-      if (e.code === 'ArrowLeft' || e.code === 'KeyA' || e.key === 'ArrowLeft' || keyLower === 'a') {
+      if (e.code === 'ArrowLeft' || e.code === 'KeyZ' || e.key === 'ArrowLeft' || keyLower === 'z') {
         this.engine.setBrake(false);
       }
     });
@@ -732,6 +745,17 @@ class GameApp {
 
     bindTouchAction('btn-gas', () => this.engine.setThrottle(true), () => this.engine.setThrottle(false));
     bindTouchAction('btn-brake', () => this.engine.setBrake(true), () => this.engine.setBrake(false));
+
+    const btnShiftA = document.getElementById('btn-shift-a');
+    if (btnShiftA) {
+      bindTouchAction('btn-shift-a', () => {
+        this.engine.setSuperFast(true);
+        this.engine.setThrottle(true);
+      }, () => {
+        this.engine.setSuperFast(false);
+        this.engine.setThrottle(false);
+      });
+    }
 
     const btnShiftUp = document.getElementById('btn-shift-up');
     if (btnShiftUp) {
@@ -801,7 +825,13 @@ class GameApp {
   showQuizModal(q) {
     if (!this.uiContainer) return;
 
+    if (this.quizTimerInterval) {
+      clearInterval(this.quizTimerInterval);
+      this.quizTimerInterval = null;
+    }
+
     this.engine.pauseForPitstop();
+    this.quizTimeRemaining = 10.0;
 
     const isHi = this.activeLang === 'hi';
     const isScramble = q.type === 'scramble';
@@ -828,6 +858,20 @@ class GameApp {
             <button id="quiz-btn-voice" class="quiz-helper-btn" type="button">
               ${isHi ? 'बोलकर उत्तर दें (MIC)' : 'VOICE ANSWER (MIC)'}
             </button>
+            <button id="btn-quiz-close" class="quiz-helper-btn quiz-close-btn" type="button" title="Close / Skip Quiz (-300 PTS)">
+              ${isHi ? '[X] छोड़ें (-300 अंक)' : '[X] CLOSE (-300 PTS)'}
+            </button>
+          </div>
+        </div>
+
+        <!-- 10-Second Countdown Timer Bar -->
+        <div class="quiz-timer-container">
+          <div class="quiz-timer-meta">
+            <span class="quiz-timer-label">${isHi ? 'समय सीमा (10s में उत्तर दें - अंक बोनस):' : 'SPEED TIMER (ANSWER IN 10s FOR BONUS):'}</span>
+            <span id="quiz-timer-val" class="quiz-timer-digits">10.0s</span>
+          </div>
+          <div class="quiz-timer-track">
+            <div id="quiz-timer-bar" class="quiz-timer-fill" style="width: 100%;"></div>
           </div>
         </div>
 
@@ -854,6 +898,34 @@ class GameApp {
       </div>
     `;
 
+    // 10-Second Countdown Timer Loop
+    const timerVal = document.getElementById('quiz-timer-val');
+    const timerBar = document.getElementById('quiz-timer-bar');
+
+    this.quizTimerInterval = setInterval(() => {
+      this.quizTimeRemaining = Math.max(0, this.quizTimeRemaining - 0.1);
+      if (timerVal) {
+        timerVal.textContent = `${this.quizTimeRemaining.toFixed(1)}s`;
+      }
+      if (timerBar) {
+        const pct = (this.quizTimeRemaining / 10.0) * 100;
+        timerBar.style.width = `${pct}%`;
+        if (pct < 30) {
+          timerBar.style.backgroundColor = '#ff2a55';
+        } else if (pct < 60) {
+          timerBar.style.backgroundColor = '#ffd166';
+        } else {
+          timerBar.style.backgroundColor = '#00ff66';
+        }
+      }
+
+      if (this.quizTimeRemaining <= 0) {
+        clearInterval(this.quizTimerInterval);
+        this.quizTimerInterval = null;
+        this.handleQuizCloseOrTimeout(true);
+      }
+    }, 100);
+
     // Bind option clicks
     const optBtns = this.uiContainer.querySelectorAll('.quiz-option-btn');
     optBtns.forEach((btn) => {
@@ -862,6 +934,14 @@ class GameApp {
         this.handleQuizSubmit(idx);
       });
     });
+
+    // Bind Close / Skip Button with Penalty
+    const btnClose = document.getElementById('btn-quiz-close');
+    if (btnClose) {
+      btnClose.addEventListener('click', () => {
+        this.handleQuizCloseOrTimeout(false);
+      });
+    }
 
     // Bind Voice Microphone Answer
     const btnVoice = document.getElementById('quiz-btn-voice');
@@ -881,6 +961,41 @@ class GameApp {
     }
   }
 
+  handleQuizCloseOrTimeout(isTimeout = false) {
+    if (this.quizTimerInterval) {
+      clearInterval(this.quizTimerInterval);
+      this.quizTimerInterval = null;
+    }
+
+    this.voiceInput.stop();
+    this.engine.onQuizClosedOrTimeout();
+    this.audio.playShift('early');
+
+    const isHi = this.activeLang === 'hi';
+    const fbContainer = document.getElementById('quiz-feedback-container');
+    if (fbContainer) {
+      const msg = isTimeout
+        ? (isHi ? '[ समय समाप्त! ] 10 सेकंड पूरे - 300 अंक कटे व इंजन धीमा हुआ!' : '[ TIME EXPIRED! ] 10 SECONDS UP: -300 PTS PENALTY & ENGINE STALL!')
+        : (isHi ? '[ प्रश्न बंद किया गया! ] -300 अंक कटे व गति धीमी हुई!' : '[ QUIZ CLOSED / SKIPPED! ] -300 PTS PENALTY & ENGINE STALL!');
+
+      fbContainer.innerHTML = `
+        <div class="quiz-feedback-box incorrect">
+          <strong>${msg}</strong>
+        </div>
+      `;
+    }
+
+    setTimeout(() => {
+      this.quiz.dismiss();
+      if (this.engine.status !== 'finished') {
+        this.engine.resumeFromPitstop();
+      }
+      if (this.uiContainer) {
+        this.uiContainer.innerHTML = '';
+      }
+    }, 800);
+  }
+
   toggleQuizLanguage() {
     const nextLang = this.activeLang === 'hi' ? 'en' : 'hi';
     this.activeLang = nextLang;
@@ -893,6 +1008,12 @@ class GameApp {
   }
 
   handleQuizSubmit(optionIndex) {
+    if (this.quizTimerInterval) {
+      clearInterval(this.quizTimerInterval);
+      this.quizTimerInterval = null;
+    }
+
+    const timeRemaining = this.quizTimeRemaining || 0;
     const currentQ = this.quiz.currentQuestion;
     const result = this.quiz.submitAnswer(optionIndex);
     if (!result) return;
@@ -902,18 +1023,20 @@ class GameApp {
       : '';
 
     this.audio.playQuizResult(result.isCorrect);
-    this.engine.onQuizAnswer(result.isCorrect, { correctText, explain: result.explain });
+    this.engine.onQuizAnswer(result.isCorrect, { correctText, explain: result.explain }, timeRemaining);
 
     // Stop active listening
     this.voiceInput.stop();
 
-    // Show feedback in modal with explicit mistake identification and correct answer
+    // Show feedback in modal with explicit mistake identification and speed bonus
     const fbContainer = document.getElementById('quiz-feedback-container');
     if (fbContainer) {
       const isHi = this.activeLang === 'hi';
+      const speedBonus = Math.max(0, Math.floor(timeRemaining * 50));
+      const totalEarned = 1000 + speedBonus;
       const statusTitle = result.isCorrect
-        ? (isHi ? '[ सही उत्तर! / CORRECT! ] +1000 अंक & सुपर टर्बो ओवरड्राइव!' : '[ CORRECT! ] +1000 PTS & SUPER TURBO OVERDRIVE!')
-        : (isHi ? `[ गलत उत्तर! / INCORRECT! ] -1 जीवन (शेष: ${this.engine.player.lives}/5) | सही: ${correctText}` : `[ INCORRECT! ] -1 LIFE (REMAINING: ${this.engine.player.lives}/5) | CORRECT: ${correctText}`);
+        ? (isHi ? `[ सही उत्तर! ] +${totalEarned} अंक (+${speedBonus} गति बोनस) & सुपर टर्बो!` : `[ CORRECT! ] +${totalEarned} PTS (+${speedBonus} SPEED BONUS) & HYPER TURBO!`)
+        : (isHi ? `[ गलत उत्तर! ] -1 जीवन (शेष: ${this.engine.player.lives}/5) | सही: ${correctText}` : `[ INCORRECT! ] -1 LIFE (REMAINING: ${this.engine.player.lives}/5) | CORRECT: ${correctText}`);
 
       fbContainer.innerHTML = `
         <div class="quiz-feedback-box ${result.isCorrect ? 'correct' : 'incorrect'}">

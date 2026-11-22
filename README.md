@@ -201,7 +201,7 @@ Students in high-stakes testing environments frequently freeze under pressure. G
 |  [LANE 1]  [PLAYER CAR] >>>                   [RIVAL RACER] >>>          |
 |  [LANE 2]  ==  ==  ==  [ONCOMING TRUCK] <<<        [JAYWALKER] ^         |
 |==========================================================================|
-|  CONTROLS: [W] LANE UP | [S] LANE DOWN | [D] GAS | [A] BRAKE | [SPACE]    |
+|  CONTROLS: [A] GAS | [SHIFT+A] SUPER | [W] UP | [S] DOWN | [Z] BRAKE | [SPACE] |
 +--------------------------------------------------------------------------+
 ```
 
@@ -209,19 +209,22 @@ Students in high-stakes testing environments frequently freeze under pressure. G
 
 | Action | Desktop Keyboard | Mobile Touch Bar | Function |
 | :--- | :--- | :--- | :--- |
+| **Accelerate (Gas)** | `A` / `D` / `Arrow Right` | `[A] GAS` | Hold `A` to accelerate vehicle smoothly forward |
+| **Super Fast Overdrive** | `Shift + A` / `N` | `[SHIFT+A] SUPER` | Instant nitro boost & hyper-speed acceleration surge (400+ KM/H) |
 | **Lane UP** | `W` / `Arrow Up` / `L` | `[W] LANE UP` | Switch lane upward quickly to dodge oncoming vehicles |
 | **Lane DOWN** | `S` / `Arrow Down` / `R` | `[S] LANE DOWN` | Switch lane downward to avoid road hazards and pedestrians |
-| **Accelerate (Gas)** | `D` / `Arrow Right` | `[D] GAS` | Hold to accelerate forward quickly |
-| **Active Brake** | `A` / `Arrow Left` | `[A] BRAKE` | Decelerate rapidly with red tail brake lights |
+| **Active Brake** | `Z` / `Arrow Left` / `S` | `[Z] BRAKE` | Decelerate rapidly with red tail brake lights |
 | **Shift Gear Up** | `SPACEBAR` | `SHIFT [SPACE]` | Shift up inside green tachometer zone (5800-7000 RPM) for turbo surge |
 | **Shift Gear Down** | `X` / `Left Shift` | `GEAR -` | Downshift for rapid engine braking and traffic navigation |
-| **Super Nitro** | `N` | `NITRO [N]` | Consume 25% nitro for a $350+$ KM/H hyper-speed surge |
+| **Bottom-Right Radar** | Always Active | On-Canvas HUD | Live 3-lane GPS Radar displaying player, rival, traffic & next checkpoint |
+| **10s Quiz Speed Bonus** | `1`, `2`, `3`, `4` | Click Option | Answer within 10s for +1000 PTS + up to +500 speed bonus! |
+| **Close Quiz Penalty** | `[X] CLOSE` | Tap `[X]` | Closing/skipping a quiz deducts 300 points and causes an engine stall |
+| **Unique Questions** | Guaranteed | Automatic | Zero duplicate questions across the 59+ minute race |
+| **Offline PWA Play** | Full Support | Service Worker | 100% playable offline without any active network connection |
 | **Zen Breath** | `B` | `ZEN [B]` | Activate bullet-time slow motion and vagus nerve pulse reset |
 | **AI Pit Tutor** | `T` | `TUTOR [T]` | Open on-device AI STEM doubt solver |
 | **Audio Mute** | `M` | `AUDIO [M]` / `[AUDIO: ON]` | Toggle sound effects & engine synth mute on/off |
 | **Toggle Quiz Lang** | `L` | `[EN / HI]` | Switch question language between English and Hindi on the fly |
-| **Answer Quiz** | `1`, `2`, `3`, `4` | Click Option | Select answer in pitstop radio checkpoint |
-| **Voice Microphone** | Click `[MIC]` | Tap `[MIC]` | Speak custom learning topic or say answer option |
 
 ### 5 Lives System & 60-Minute Championship Endurance
 - **5 Lives per Session**: Collisions with oncoming traffic or jaywalkers deduct 1 life (-150 score). Incorrect answers in pitstops also deduct 1 life.

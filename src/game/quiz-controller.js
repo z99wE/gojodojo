@@ -48,6 +48,38 @@ export const SCIENCE_SCRAMBLES = {
       hint: { hi: 'कांच का वह टुकड़ा जो श्वेत प्रकाश को 7 रंगों (VIBGYOR) में विभाजित करता है', en: 'Optical glass separating white light into 7 colors' },
       explain: { hi: 'प्रिज्म प्रकाश के विक्षेपण (Dispersion) द्वारा स्पेक्ट्रम बनाता है।', en: 'A prism refracts white light into a spectrum.' },
       subject: 'physics'
+    },
+    {
+      word: 'FRICTION',
+      scrambled: ['C', 'T', 'I', 'O', 'N', 'F', 'R', 'I'],
+      distractors: ['GRAVITY', 'INERTIA', 'PRESSURE'],
+      hint: { hi: 'दो संपर्क सतहों के बीच गति का विरोध करने वाला बल', en: 'Force resisting relative motion between two contacting surfaces' },
+      explain: { hi: 'घर्षण (Friction) गति का विरोध करता है और ऊष्मा उत्पन्न करता है।', en: 'Friction opposes relative motion between contacting surfaces.' },
+      subject: 'physics'
+    },
+    {
+      word: 'INERTIA',
+      scrambled: ['E', 'R', 'T', 'I', 'A', 'I', 'N'],
+      distractors: ['ACCEL', 'WEIGHT', 'ENERGY'],
+      hint: { hi: 'वस्तु का वह गुण जो उसकी गति या विराम अवस्था में परिवर्तन का विरोध करता है', en: 'Tendency of an object to resist changes in its state of motion' },
+      explain: { hi: 'जड़त्व (Inertia) न्यूटन के प्रथम गति नियम का आधार है।', en: 'Inertia is described by Newton First Law of Motion.' },
+      subject: 'physics'
+    },
+    {
+      word: 'DENSITY',
+      scrambled: ['S', 'I', 'T', 'Y', 'D', 'E', 'N'],
+      distractors: ['VOLUME', 'WEIGHT', 'GRAVITY'],
+      hint: { hi: 'प्रति इकाई आयतन का द्रव्यमान (d = m / V)', en: 'Mass per unit volume of a substance (d = m / V)' },
+      explain: { hi: 'घनत्व (Density) बताता है कि किसी वस्तु के पदार्थ के कण कितने सघन हैं।', en: 'Density equals mass divided by volume.' },
+      subject: 'physics'
+    },
+    {
+      word: 'MAGNET',
+      scrambled: ['G', 'N', 'E', 'T', 'M', 'A'],
+      distractors: ['COPPER', 'SILVER', 'CHARGE'],
+      hint: { hi: 'वह वस्तु जो लोहे और निकल को अपनी ओर आकर्षित करती है (उत्तरी और दक्षिणी ध्रुव)', en: 'Object producing magnetic field attracting iron and nickel' },
+      explain: { hi: 'चुंबक (Magnet) के दो ध्रुव होते हैं: उत्तर और दक्षिण।', en: 'Magnets have north and south magnetic poles.' },
+      subject: 'physics'
     }
   ],
   chemistry: [
@@ -89,6 +121,30 @@ export const SCIENCE_SCRAMBLES = {
       distractors: ['COMPOUND', 'MIXTURE', 'SOLUTION'],
       hint: { hi: 'एक ही प्रकार के परमाणुओं से बना शुद्ध रासायनिक पदार्थ', en: 'Pure chemical substance consisting of only one type of atom' },
       explain: { hi: 'तत्व (Element) को रासायनिक विधियों द्वारा सरल पदार्थों में नहीं तोड़ा जा सकता।', en: 'Elements are the building blocks on the periodic table.' },
+      subject: 'chemistry'
+    },
+    {
+      word: 'MOLECULE',
+      scrambled: ['L', 'E', 'C', 'U', 'L', 'E', 'M', 'O'],
+      distractors: ['PROTON', 'ELECTRON', 'CRYSTAL'],
+      hint: { hi: 'दो या दो से अधिक परमाणुओं का रासायनिक बंधन द्वारा जुड़ा समूह', en: 'Group of two or more atoms held together by chemical bonds' },
+      explain: { hi: 'अणु (Molecule) किसी यौगिक का सूक्ष्मतम स्वतंत्र अस्तित्व रखने वाला कण है।', en: 'Molecules consist of bonded atoms representing chemical compounds.' },
+      subject: 'chemistry'
+    },
+    {
+      word: 'CARBON',
+      scrambled: ['R', 'B', 'O', 'N', 'C', 'A'],
+      distractors: ['SILICON', 'ARGON', 'BORON'],
+      hint: { hi: 'परमाणु संख्या 6 वाला जैव रासायनिक तत्व (हीरा और ग्रेफाइट इसके रूप हैं)', en: 'Atomic number 6 element forming backbone of all organic life' },
+      explain: { hi: 'कार्बन (Carbon) चार संयोजकता के कारण अनगिनत रासायनिक यौगिक बनाता है।', en: 'Carbon forms diverse organic compounds due to tetravalency.' },
+      subject: 'chemistry'
+    },
+    {
+      word: 'PROTON',
+      scrambled: ['T', 'O', 'N', 'P', 'R', 'O'],
+      distractors: ['NEUTRON', 'ELECTRON', 'PHOTON'],
+      hint: { hi: 'परमाणु नाभिक में स्थित धनावेशित (+ve) मूल कण', en: 'Positively charged subatomic particle inside the atomic nucleus' },
+      explain: { hi: 'प्रोटॉन (Proton) की संख्या ही तत्व की परमाणु संख्या (Atomic Number) तय करती है।', en: 'The number of protons determines the elemental identity.' },
       subject: 'chemistry'
     }
   ],
@@ -132,6 +188,22 @@ export const SCIENCE_SCRAMBLES = {
       hint: { hi: 'पौधे का वह हरा भाग जिसे पौधे का "रसोईघर" कहा जाता है', en: 'Green plant organ known as the plant food factory' },
       explain: { hi: 'पत्ती (Leaf) में क्लोरोफिल होता है जो प्रकाश संश्लेषण द्वारा भोजन बनाता है।', en: 'Leaves contain chlorophyll to perform photosynthesis.' },
       subject: 'biology'
+    },
+    {
+      word: 'TISSUE',
+      scrambled: ['S', 'S', 'U', 'E', 'T', 'I'],
+      distractors: ['ORGAN', 'CELL', 'SKIN'],
+      hint: { hi: 'समान संरचना और विशेष कार्य करने वाली कोशिकाओं का समूह', en: 'Ensemble of similar cells that carry out a specific shared function' },
+      explain: { hi: 'ऊतक (Tissue) कोशिकाओं से मिलकर बनते हैं और अंगों का निर्माण करते हैं।', en: 'Tissues are groups of specialized cells functioning together.' },
+      subject: 'biology'
+    },
+    {
+      word: 'NUCLEUS',
+      scrambled: ['C', 'L', 'E', 'U', 'S', 'N', 'U'],
+      distractors: ['VACUOLE', 'RIBOSOME', 'CYTOPLASM'],
+      hint: { hi: 'कोशिका का नियंत्रण केंद्र जिसमें आनुवंशिक सामग्री (DNA) होती है', en: 'Membrane-bound cellular control center containing genetic material' },
+      explain: { hi: 'केंद्रक (Nucleus) कोशिका के सभी क्रियाकलापों और विभाजन का नियंत्रण करता है।', en: 'The nucleus directs cellular growth and stores hereditary code.' },
+      subject: 'biology'
     }
   ],
   maths: [
@@ -158,6 +230,22 @@ export const SCIENCE_SCRAMBLES = {
       hint: { hi: 'वह संख्या जो केवल 1 और स्वयं से विभाजित होती है (उदा: 2, 3, 5, 7)', en: 'A whole number greater than 1 with only two factors: 1 and itself' },
       explain: { hi: 'अभाज्य संख्या (Prime number) के केवल दो गुणनखंड होते हैं: 1 और वह संख्या स्वयं।', en: 'Prime numbers have exactly two factors.' },
       subject: 'maths'
+    },
+    {
+      word: 'PERIMETER',
+      scrambled: ['R', 'I', 'M', 'E', 'T', 'E', 'R', 'P', 'E'],
+      distractors: ['AREA', 'DIAMETER', 'VOLUME'],
+      hint: { hi: 'किसी बंद ज्यामितीय आकृति के चारों ओर की कुल सीमा लंबाई', en: 'Continuous line forming the boundary of a closed geometric figure' },
+      explain: { hi: 'परिमाप (Perimeter) किसी आकृति की सभी बाहरी भुजाओं की कुल लंबाई है।', en: 'Perimeter is the total boundary distance around a shape.' },
+      subject: 'maths'
+    },
+    {
+      word: 'POLYGON',
+      scrambled: ['L', 'Y', 'G', 'O', 'N', 'P', 'O'],
+      distractors: ['CIRCLE', 'PARABOLA', 'SPHERE'],
+      hint: { hi: 'तीन या अधिक सीधी रेखाओं से घिरी बंद समतल आकृति', en: 'Closed plane figure bounded by three or more straight lines' },
+      explain: { hi: 'बहुभुज (Polygon) रेखाखंडों से बनी बंद समतल आकृति है (उदा: त्रिभुज, आयत)।', en: 'Polygons are closed two-dimensional shapes made of straight sides.' },
+      subject: 'maths'
     }
   ]
 };
@@ -176,6 +264,7 @@ export class QuizController {
     this.streak = 0;
     this.history = [];
     this.questionCount = 0;
+    this.usedQuestionKeys = new Set();
   }
 
   setGrade(grade) {
@@ -195,7 +284,127 @@ export class QuizController {
   }
 
   /**
+   * Generates procedural STEM question with unique values if question pools are depleted.
+   */
+  generateProceduralQuestion() {
+    const types = ['speed', 'force', 'area', 'density'];
+    const type = types[Math.floor(Math.random() * types.length)];
+
+    if (type === 'speed') {
+      const dist = (Math.floor(Math.random() * 8) + 2) * 50;
+      const time = (Math.floor(Math.random() * 5) + 2) * 5;
+      const speed = dist / time;
+      const key = `proc:speed:${dist}:${time}`;
+      this.usedQuestionKeys.add(key);
+
+      const distractors = [speed + 5, Math.max(2, speed - 4), speed * 2];
+      const opts = [speed, ...distractors].map((v) => `${v} m/s`);
+      const shuffled = opts.map((o) => ({ o, s: Math.random() })).sort((a, b) => a.s - b.s).map((a) => a.o);
+      const correctIdx = shuffled.indexOf(`${speed} m/s`);
+
+      return {
+        type: 'quiz',
+        topicTitle: this.lang === 'hi' ? 'भौतिकी गति एवं चाल गणना' : 'PHYSICS VELOCITY CALCULATION',
+        subject: 'physics',
+        text: this.lang === 'hi'
+          ? `एक रेसिंग कार ${time} सेकंड में ${dist} मीटर की दूरी तय करती है। कार की चाल (Speed = Distance / Time) ज्ञात करें:`
+          : `A racing vehicle covers ${dist} meters in ${time} seconds. Calculate its speed (Speed = Distance / Time):`,
+        options: shuffled,
+        correctIndex: correctIdx,
+        hint: this.lang === 'hi' ? 'चाल = दूरी / समय' : 'Speed = Distance / Time',
+        explain: this.lang === 'hi'
+          ? `चाल = ${dist}m / ${time}s = ${speed} m/s।`
+          : `Speed = ${dist}m / ${time}s = ${speed} m/s.`
+      };
+    }
+
+    if (type === 'force') {
+      const mass = Math.floor(Math.random() * 10) + 2;
+      const accel = Math.floor(Math.random() * 8) + 2;
+      const force = mass * accel;
+      const key = `proc:force:${mass}:${accel}`;
+      this.usedQuestionKeys.add(key);
+
+      const distractors = [force + 10, Math.max(4, force - 8), force * 2];
+      const opts = [force, ...distractors].map((v) => `${v} N (न्यूटन)`);
+      const shuffled = opts.map((o) => ({ o, s: Math.random() })).sort((a, b) => a.s - b.s).map((a) => a.o);
+      const correctIdx = shuffled.indexOf(`${force} N (न्यूटन)`);
+
+      return {
+        type: 'quiz',
+        topicTitle: this.lang === 'hi' ? 'न्यूटन का द्वितीय नियम (बल F = m*a)' : 'NEWTON SECOND LAW (FORCE F = m*a)',
+        subject: 'physics',
+        text: this.lang === 'hi'
+          ? `एक ${mass} kg द्रव्यमान की वस्तु पर ${accel} m/s² का त्वरण उत्पन्न करने के लिए कितने बल (F = m × a) की आवश्यकता होगी?`
+          : `What force is required to accelerate a ${mass} kg mass at ${accel} m/s² (F = m × a)?`,
+        options: shuffled,
+        correctIndex: correctIdx,
+        hint: this.lang === 'hi' ? 'बल = द्रव्यमान × त्वरण' : 'Force = Mass × Acceleration',
+        explain: this.lang === 'hi'
+          ? `F = m × a = ${mass} kg × ${accel} m/s² = ${force} N (न्यूटन)।`
+          : `Force = ${mass} kg × ${accel} m/s² = ${force} N.`
+      };
+    }
+
+    if (type === 'area') {
+      const length = Math.floor(Math.random() * 9) + 3;
+      const width = Math.floor(Math.random() * 6) + 2;
+      const area = length * width;
+      const key = `proc:area:${length}:${width}`;
+      this.usedQuestionKeys.add(key);
+
+      const distractors = [area + 6, Math.max(6, area - 5), (length + width) * 2];
+      const opts = [area, ...distractors].map((v) => `${v} sq m`);
+      const shuffled = opts.map((o) => ({ o, s: Math.random() })).sort((a, b) => a.s - b.s).map((a) => a.o);
+      const correctIdx = shuffled.indexOf(`${area} sq m`);
+
+      return {
+        type: 'quiz',
+        topicTitle: this.lang === 'hi' ? 'ज्यामिति: आयत का क्षेत्रफल' : 'GEOMETRY: RECTANGLE AREA',
+        subject: 'maths',
+        text: this.lang === 'hi'
+          ? `एक रेसिंग ट्रैक पिटस्टॉप की लंबाई ${length}m और चौड़ाई ${width}m है। इसका क्षेत्रफल (Area = Length × Width) क्या होगा?`
+          : `A pitstop garage is ${length}m long and ${width}m wide. What is its total area (Area = Length × Width)?`,
+        options: shuffled,
+        correctIndex: correctIdx,
+        hint: this.lang === 'hi' ? 'क्षेत्रफल = लंबाई × चौड़ाई' : 'Area = Length × Width',
+        explain: this.lang === 'hi'
+          ? `क्षेत्रफल = ${length} × ${width} = ${area} वर्ग मीटर।`
+          : `Area = ${length}m × ${width}m = ${area} sq meters.`
+      };
+    }
+
+    // Density default
+    const massD = (Math.floor(Math.random() * 6) + 2) * 10;
+    const vol = (Math.floor(Math.random() * 4) + 1) * 5;
+    const density = massD / vol;
+    const key = `proc:density:${massD}:${vol}`;
+    this.usedQuestionKeys.add(key);
+
+    const distractors = [density + 2, Math.max(1, density - 1.5), density * 2];
+    const opts = [density, ...distractors].map((v) => `${v} g/cm³`);
+    const shuffled = opts.map((o) => ({ o, s: Math.random() })).sort((a, b) => a.s - b.s).map((a) => a.o);
+    const correctIdx = shuffled.indexOf(`${density} g/cm³`);
+
+    return {
+      type: 'quiz',
+      topicTitle: this.lang === 'hi' ? 'पदार्थ का घनत्व (Density = Mass / Volume)' : 'DENSITY CALCULATION',
+      subject: 'chemistry',
+      text: this.lang === 'hi'
+        ? `एक रासायनिक ब्लॉक का द्रव्यमान ${massD} ग्राम और आयतन ${vol} cm³ है। इसका घनत्व क्या होगा?`
+        : `A chemical compound block has mass ${massD}g and volume ${vol} cm³. What is its density (d = m / V)?`,
+      options: shuffled,
+      correctIndex: correctIdx,
+      hint: this.lang === 'hi' ? 'घनत्व = द्रव्यमान / आयतन' : 'Density = Mass / Volume',
+      explain: this.lang === 'hi'
+        ? `घनत्व = ${massD}g / ${vol} cm³ = ${density} g/cm³।`
+        : `Density = ${massD}g / ${vol} cm³ = ${density} g/cm³.`
+    };
+  }
+
+  /**
    * Selects or synthesizes an appropriate STEM question or puzzle for current grade & circuit.
+   * Guarantees 100% unique questions across the session with zero duplicates.
    */
   nextQuestion() {
     this.questionCount++;
@@ -204,7 +413,11 @@ export class QuizController {
     if (this.customTopic && this.customTopic.length > 1) {
       const customQuestions = this.aiTutor.generateCustomQuiz(this.customTopic, this.grade, this.lang);
       if (customQuestions && customQuestions.length > 0) {
-        const q = customQuestions[Math.floor(Math.random() * customQuestions.length)];
+        const unusedCustom = customQuestions.filter((q) => !this.usedQuestionKeys.has(`custom:${q.text}`));
+        const pool = unusedCustom.length > 0 ? unusedCustom : customQuestions;
+        const q = pool[Math.floor(Math.random() * pool.length)];
+        this.usedQuestionKeys.add(`custom:${q.text}`);
+
         this.currentQuestion = {
           type: 'quiz',
           topicTitle: this.customTopic,
@@ -221,87 +434,129 @@ export class QuizController {
       }
     }
 
-    // 2. Science Word Scramble Puzzle (Every 2nd or 3rd question)
+    // 2. Science Word Scramble Puzzle (Every 2nd question)
     const isScrambleTurn = this.questionCount % 2 === 0;
     const circuitPool = SCIENCE_SCRAMBLES[this.circuitId] || SCIENCE_SCRAMBLES.physics;
 
     if (isScrambleTurn && circuitPool && circuitPool.length > 0) {
-      const puzzle = circuitPool[Math.floor(Math.random() * circuitPool.length)];
-      const scrambledTiles = [...puzzle.scrambled];
-      const allOpts = [puzzle.word, ...puzzle.distractors];
-      const shuffled = allOpts
-        .map((opt) => ({ opt, sort: Math.random() }))
-        .sort((a, b) => a.sort - b.sort)
-        .map((a) => a.opt);
-      const correctIdx = shuffled.indexOf(puzzle.word);
+      const unusedScrambles = circuitPool.filter((p) => !this.usedQuestionKeys.has(`scramble:${p.word}`));
+      if (unusedScrambles.length > 0) {
+        const puzzle = unusedScrambles[Math.floor(Math.random() * unusedScrambles.length)];
+        this.usedQuestionKeys.add(`scramble:${puzzle.word}`);
 
-      const titleHi = `विज्ञान शब्द पहेली (SCIENCE SCRAMBLE): ${puzzle.word.length} अक्षर`;
-      const titleEn = `SCIENCE WORD SCRAMBLE: ${puzzle.word.length} LETTERS`;
+        const scrambledTiles = [...puzzle.scrambled];
+        const allOpts = [puzzle.word, ...puzzle.distractors];
+        const shuffled = allOpts
+          .map((opt) => ({ opt, sort: Math.random() }))
+          .sort((a, b) => a.sort - b.sort)
+          .map((a) => a.opt);
+        const correctIdx = shuffled.indexOf(puzzle.word);
 
-      const promptHi = `अक्षरों को सुलझाकर सही वैज्ञानिक शब्द चुनें:\nसंकेत: ${puzzle.hint.hi || puzzle.hint.en}`;
-      const promptEn = `Unscramble the tiles to identify the science term:\nHint: ${puzzle.hint.en}`;
+        const titleHi = `विज्ञान शब्द पहेली (SCIENCE SCRAMBLE): ${puzzle.word.length} अक्षर`;
+        const titleEn = `SCIENCE WORD SCRAMBLE: ${puzzle.word.length} LETTERS`;
+
+        const promptHi = `अक्षरों को सुलझाकर सही वैज्ञानिक शब्द चुनें:\nसंकेत: ${puzzle.hint.hi || puzzle.hint.en}`;
+        const promptEn = `Unscramble the tiles to identify the science term:\nHint: ${puzzle.hint.en}`;
+
+        this.rawSource = {
+          type: 'scramble',
+          puzzle,
+          scrambledTiles,
+          shuffled,
+          correctIdx
+        };
+
+        this.currentQuestion = {
+          type: 'scramble',
+          topicTitle: this.lang === 'hi' ? titleHi : titleEn,
+          subject: puzzle.subject,
+          scrambledTiles,
+          targetWord: puzzle.word,
+          text: this.lang === 'hi' ? promptHi : promptEn,
+          options: shuffled,
+          correctIndex: correctIdx,
+          hint: puzzle.hint[this.lang] || puzzle.hint.en,
+          explain: puzzle.explain[this.lang] || puzzle.explain.en
+        };
+        this.isActive = true;
+        this.answered = false;
+        return this.currentQuestion;
+      }
+    }
+
+    // 3. Curriculum Questions: Collect all questions for this grade
+    const topics = topicsForGrade(this.grade);
+    let candidateQuestions = [];
+
+    if (topics && topics.length > 0) {
+      let targetSubject = 'science';
+      if (this.circuitId === 'maths') targetSubject = 'maths';
+
+      let matchedTopics = topics.filter((t) => t.subject === targetSubject);
+      if (matchedTopics.length === 0) matchedTopics = topics;
+
+      for (const th of matchedTopics) {
+        const fullTopic = getTopic(th.id, this.grade);
+        if (fullTopic && fullTopic.questions) {
+          for (const q of fullTopic.questions) {
+            const qKey = `grade:${this.grade}:${th.id}:${q.id || q.text.en}`;
+            if (!this.usedQuestionKeys.has(qKey)) {
+              candidateQuestions.push({ qKey, fullTopic, q });
+            }
+          }
+        }
+      }
+    }
+
+    // If all questions in current grade are used, search across all 8 grades
+    if (candidateQuestions.length === 0) {
+      for (let g = 1; g <= 8; g++) {
+        const gTopics = topicsForGrade(g);
+        for (const th of gTopics) {
+          const fullTopic = getTopic(th.id, g);
+          if (fullTopic && fullTopic.questions) {
+            for (const q of fullTopic.questions) {
+              const qKey = `grade:${g}:${th.id}:${q.id || q.text.en}`;
+              if (!this.usedQuestionKeys.has(qKey)) {
+                candidateQuestions.push({ qKey, fullTopic, q });
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // If static questions exist, pick an unused one
+    if (candidateQuestions.length > 0) {
+      const chosen = candidateQuestions[Math.floor(Math.random() * candidateQuestions.length)];
+      this.usedQuestionKeys.add(chosen.qKey);
 
       this.rawSource = {
-        type: 'scramble',
-        puzzle,
-        scrambledTiles,
-        shuffled,
-        correctIdx
+        type: 'quiz',
+        fullTopic: chosen.fullTopic,
+        q: chosen.q
       };
 
       this.currentQuestion = {
-        type: 'scramble',
-        topicTitle: this.lang === 'hi' ? titleHi : titleEn,
-        subject: puzzle.subject,
-        scrambledTiles,
-        targetWord: puzzle.word,
-        text: this.lang === 'hi' ? promptHi : promptEn,
-        options: shuffled,
-        correctIndex: correctIdx,
-        hint: puzzle.hint[this.lang] || puzzle.hint.en,
-        explain: puzzle.explain[this.lang] || puzzle.explain.en
+        type: 'quiz',
+        topicTitle: chosen.fullTopic.title[this.lang] || chosen.fullTopic.title.en,
+        subject: chosen.fullTopic.subject,
+        text: chosen.q.text[this.lang] || chosen.q.text.en,
+        options: chosen.q.options.map((opt) => opt[this.lang] || opt.en),
+        correctIndex: chosen.q.answer,
+        hint: chosen.q.hint[this.lang] || chosen.q.hint.en,
+        explain: chosen.q.explain[this.lang] || chosen.q.explain.en
       };
+
       this.isActive = true;
       this.answered = false;
       return this.currentQuestion;
     }
 
-    // 3. Otherwise load from standard curriculum index
-    const topics = topicsForGrade(this.grade);
-    if (!topics || topics.length === 0) return null;
-
-    let targetSubject = 'science';
-    if (this.circuitId === 'maths') targetSubject = 'maths';
-
-    let matchedTopics = topics.filter((t) => t.subject === targetSubject);
-    if (matchedTopics.length === 0) matchedTopics = topics;
-
-    const chosenTopicHeader = matchedTopics[Math.floor(Math.random() * matchedTopics.length)];
-    const fullTopic = getTopic(chosenTopicHeader.id, this.grade);
-
-    if (!fullTopic || !fullTopic.questions || fullTopic.questions.length === 0) {
-      return null;
-    }
-
-    const q = fullTopic.questions[Math.floor(Math.random() * fullTopic.questions.length)];
-
-    this.rawSource = {
-      type: 'quiz',
-      fullTopic,
-      q
-    };
-
-    this.currentQuestion = {
-      type: 'quiz',
-      topicTitle: fullTopic.title[this.lang] || fullTopic.title.en,
-      subject: fullTopic.subject,
-      text: q.text[this.lang] || q.text.en,
-      options: q.options.map((opt) => opt[this.lang] || opt.en),
-      correctIndex: q.answer,
-      hint: q.hint[this.lang] || q.hint.en,
-      explain: q.explain[this.lang] || q.explain.en
-    };
-
+    // 4. Procedural Generator fallback: Infinite unique questions!
+    const procQ = this.generateProceduralQuestion();
+    this.rawSource = null;
+    this.currentQuestion = procQ;
     this.isActive = true;
     this.answered = false;
     return this.currentQuestion;

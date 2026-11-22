@@ -158,6 +158,7 @@ export class RacingEngine {
       isBraking: false,
       nitro: 100, // Starts with 100% full nitro!
       isNitroActive: false,
+      isSuperFast: false,
       nitroTimeRemaining: 0,
       shield: 100, // 0-100%
       stallTimer: 0,
@@ -347,6 +348,24 @@ export class RacingEngine {
     return true;
   }
 
+  setSuperFast(active) {
+    this.player.isSuperFast = Boolean(active);
+    if (active && (this.status === 'racing' || this.status === 'countdown')) {
+      if (!this.player.isNitroActive && this.player.nitro >= 10) {
+        this.activateNitro();
+      } else {
+        this.player.speed = Math.min(450, this.player.speed + 35);
+        this.player.isNitroActive = true;
+        this.player.nitroTimeRemaining = Math.max(this.player.nitroTimeRemaining, 3.5);
+        this.player.shiftFeedback = {
+          text: 'SUPER FAST OVERDRIVE ENGAGED [SHIFT + A]!',
+          type: 'perfect',
+          timer: 1.5
+        };
+      }
+    }
+  }
+
   // --- Oncoming Traffic & Jaywalker Simulation ---
 
   spawnTrafficVehicle() {
@@ -512,10 +531,25 @@ export class RacingEngine {
 
   // --- STEM Quiz Callbacks: High-Stakes Speed Surges & Identification ---
 
-  onQuizAnswer(isCorrect, answerData = null) {
+  onQuizClosedOrTimeout() {
+    this.player.score = Math.max(0, this.player.score - 300);
+    this.player.shield = Math.max(0, this.player.shield - 15);
+    this.player.stallTimer = 1.0;
+    this.player.speed = Math.max(25, this.player.speed - 35);
+    this.player.bpm = Math.min(160, this.player.bpm + 15);
+    this.player.shiftFeedback = {
+      text: 'QUIZ CLOSED / EXPIRED! -300 PTS PENALTY & STALL',
+      type: 'stall',
+      timer: 2.5
+    };
+  }
+
+  onQuizAnswer(isCorrect, answerData = null, timeRemaining = 0) {
     if (isCorrect) {
-      // RIGHT ANSWER: Mega Turbo Overdrive, speed surge, shield repair
-      this.player.score += 1000;
+      // RIGHT ANSWER: Mega Turbo Overdrive, speed surge, shield repair, and speed bonus
+      const speedBonus = Math.max(0, Math.floor(timeRemaining * 50));
+      const totalPoints = 1000 + speedBonus;
+      this.player.score += totalPoints;
       this.player.nitro = 100;
       this.player.isNitroActive = true;
       this.player.nitroTimeRemaining = 5.5;
@@ -524,8 +558,9 @@ export class RacingEngine {
       // Surge speed by +65 km/h!
       this.player.speed = Math.min(420, this.player.speed + 65);
       this.player.bpm = Math.max(72, this.player.bpm - 20);
+      const timeBonusMsg = speedBonus > 0 ? ` (+${speedBonus} SPEED BONUS)` : '';
       this.player.shiftFeedback = {
-        text: 'CORRECT! HYPER TURBO BOOST ENGAGED (+1000 PTS)',
+        text: `CORRECT! HYPER TURBO BOOST ENGAGED (+${totalPoints} PTS${timeBonusMsg})`,
         type: 'perfect',
         timer: 2.5
       };
@@ -742,9 +777,9 @@ export class RacingEngine {
       let maxSpeedForGear = gearCfg.maxSpeed;
       let accelFactor = gearCfg.ratio * 26.0;
 
-      if (this.player.isNitroActive) {
-        maxSpeedForGear += 70;
-        accelFactor *= 2.4;
+      if (this.player.isNitroActive || this.player.isSuperFast) {
+        maxSpeedForGear += 80;
+        accelFactor *= 2.8;
       }
 
       this.player.isOffRoad = Math.abs(this.player.x) > 1.0;
@@ -1053,6 +1088,7 @@ export class RacingEngine {
       focusActive: this.player.focusActive,
       isOffRoad: this.player.isOffRoad,
       isBraking: this.player.isBraking,
+      isSuperFast: this.player.isSuperFast,
       score: this.player.score,
       playerName: this.playerName,
       character: this.character,
@@ -1061,7 +1097,8 @@ export class RacingEngine {
       time: this.elapsedTime.toFixed(2),
       rivalDist: Math.round(this.rival.distance),
       rivalSpeed: Math.round(this.rival.speed),
-      leadDelta: Math.round(this.player.distance - this.rival.distance)
+      leadDelta: Math.round(this.player.distance - this.rival.distance),
+      distToPit: Math.max(0, Math.round((15 - this.timeSinceLastQuiz) * (Math.max(30, this.player.speed) / 3.6)))
     };
   }
 }

@@ -135,6 +135,18 @@ test('STEM Quiz answer callback applies high-stakes boost or penalty', () => {
   assert.strictEqual(engine.player.lives, 4);
   assert.ok(engine.player.stallTimer > 0, 'Engine must stall on incorrect answer');
   assert.strictEqual(engine.player.shiftFeedback.type, 'stall');
+
+  // 3. Quiz Close / Timeout penalty
+  engine.player.score = 1500;
+  engine.onQuizClosedOrTimeout();
+  assert.strictEqual(engine.player.score, 1200, 'Closing quiz window deducts 300 points');
+  assert.ok(engine.player.stallTimer > 0, 'Closing quiz causes engine stall');
+  assert.strictEqual(engine.player.shiftFeedback.type, 'stall');
+
+  // 4. Shift + A Super Fast Overdrive
+  engine.setSuperFast(true);
+  assert.strictEqual(engine.player.isSuperFast, true);
+  assert.strictEqual(engine.player.isNitroActive, true);
 });
 
 test('Physics simulation advances player and rival distances over time', () => {

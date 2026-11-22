@@ -96,3 +96,17 @@ test('QuizController generates Science Word Scramble puzzles with scrambled lett
   assert.strictEqual(q2.options.length, 4);
   assert.ok(q2.options.includes(q2.targetWord));
 });
+
+test('QuizController guarantees unique questions across session with zero duplicates', () => {
+  const quiz = new QuizController({ grade: 5, circuitId: 'physics', lang: 'en' });
+  const seenTexts = new Set();
+
+  for (let i = 0; i < 20; i++) {
+    const q = quiz.nextQuestion();
+    assert.ok(q, `Turn ${i} must provide a question`);
+    assert.ok(!seenTexts.has(q.text), `Question at turn ${i} must be unique. Duplicate: "${q.text}"`);
+    seenTexts.add(q.text);
+    quiz.dismiss();
+  }
+  assert.strictEqual(seenTexts.size, 20, 'All 20 questions generated must be distinct');
+});

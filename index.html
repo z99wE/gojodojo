@@ -39,8 +39,9 @@
         <div class="touch-steer-group">
           <button id="btn-steer-left" class="touch-btn" type="button">LANE UP [W]</button>
           <button id="btn-steer-right" class="touch-btn" type="button">LANE DOWN [S]</button>
-          <button id="btn-brake" class="touch-btn brake-btn" type="button">BRAKE [A]</button>
-          <button id="btn-gas" class="touch-btn gas-btn" type="button">GAS [D]</button>
+          <button id="btn-brake" class="touch-btn brake-btn" type="button">BRAKE [Z]</button>
+          <button id="btn-gas" class="touch-btn gas-btn" type="button">GAS [A]</button>
+          <button id="btn-shift-a" class="touch-btn nitro-btn" type="button">SUPER [SHIFT+A]</button>
         </div>
         <div class="touch-action-group">
           <button id="btn-shift-down" class="touch-btn" type="button">GEAR -</button>
@@ -181,19 +182,23 @@
           <!-- Controls Quick Reference Bar (Compact Monospace Legend) -->
           <div class="controls-guide">
             <div class="guide-item">
+              <span class="guide-key">A KEY</span>
+              <span class="guide-desc">Accelerate / Gas</span>
+            </div>
+            <div class="guide-item">
+              <span class="guide-key">SHIFT + A</span>
+              <span class="guide-desc">SUPER FAST OVERDRIVE</span>
+            </div>
+            <div class="guide-item">
               <span class="guide-key">W / UP</span>
               <span class="guide-desc">Lane Up (Dodge Traffic)</span>
             </div>
             <div class="guide-item">
               <span class="guide-key">S / DOWN</span>
-              <span class="guide-desc">Lane Down (Dodge Hazards)</span>
+              <span class="guide-desc">Lane Down (Dodge Traffic)</span>
             </div>
             <div class="guide-item">
-              <span class="guide-key">D / RIGHT</span>
-              <span class="guide-desc">Gas Accelerate</span>
-            </div>
-            <div class="guide-item">
-              <span class="guide-key">A / LEFT</span>
+              <span class="guide-key">Z / S</span>
               <span class="guide-desc">Active Brake</span>
             </div>
             <div class="guide-item">
@@ -201,20 +206,12 @@
               <span class="guide-desc">Shift Up (Green RPM)</span>
             </div>
             <div class="guide-item">
-              <span class="guide-key">N KEY</span>
-              <span class="guide-desc">Super Nitro (350+ KM/H)</span>
-            </div>
-            <div class="guide-item">
-              <span class="guide-key">B KEY</span>
-              <span class="guide-desc">Zen Breath (Calm Focus)</span>
-            </div>
-            <div class="guide-item">
-              <span class="guide-key">T KEY</span>
-              <span class="guide-desc">AI Pit Crew Tutor</span>
+              <span class="guide-key">10s QUIZ</span>
+              <span class="guide-desc">Answer in 10s for Bonus! Close = -300 PTS</span>
             </div>
             <div class="guide-item">
               <span class="guide-key">M KEY</span>
-              <span class="guide-desc">Mute / Unmute Audio</span>
+              <span class="guide-desc">Mute / Audio Toggle</span>
             </div>
           </div>
 
@@ -230,5 +227,14 @@
     <div id="ui"></div>
 
     <script type="module" src="/src/main.js"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(() => {
+            // Service worker registration skipped or blocked in certain sandbox envs
+          });
+        });
+      }
+    </script>
   </body>
 </html>
